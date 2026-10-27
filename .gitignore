@@ -4,6 +4,9 @@ node_modules/
 # Arquivos gerados pelo Build (.exe)
 dist/
 
+# Documentos internos de planejamento e refinamento (apenas local)
+planejamento/
+
 # Logs e temporários
 *.log
 npm-debug.log*
