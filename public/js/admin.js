@@ -2539,8 +2539,340 @@
     if (currentState.scoreboard) {
       renderScoreboardControls(currentState.scoreboard);
     }
+    if (!updaterAutoChecked && currentRuntime.appVersion) {
+      updaterAutoChecked = true;
+      if (settingsAppVersion) {
+        settingsAppVersion.textContent = 'v' + currentRuntime.appVersion;
+      }
+      setTimeout(() => {
+        socket.emit('updater:check', { force: false });
+      }, 3000);
+    }
     updateLiveMonitorTick();
   });
+
+  // ==========================================================================
+  // SISTEMA DE ATUALIZAÇÕES AUTOMÁTICAS E GERENCIADOR DE VERSÕES
+  // ==========================================================================
+  let latestUpdateInfo = null;
+  let downloadedInstallerPath = null;
+  let isDownloadingUpdate = false;
+  let updaterAutoChecked = false;
+
+  const updateBanner = document.getElementById('update-topbar-banner');
+  const updateBannerVersion = document.getElementById('update-banner-version');
+  const btnBannerUpdate = document.getElementById('btn-banner-update');
+  const btnBannerChangelog = document.getElementById('btn-banner-changelog');
+  const btnBannerDismiss = document.getElementById('btn-banner-dismiss');
+
+  const settingsAppVersion = document.getElementById('settings-app-version');
+  const settingsUpdateMsg = document.getElementById('settings-update-msg');
+  const settingsLastCheck = document.getElementById('settings-last-check');
+  const btnCheckUpdatesNow = document.getElementById('btn-check-updates-now');
+  const iconCheckUpdates = document.getElementById('icon-check-updates');
+  const btnSettingsOpenUpdate = document.getElementById('btn-settings-open-update');
+
+  const updateModal = document.getElementById('update-modal');
+  const btnCloseUpdateModal = document.getElementById('btn-close-update-modal');
+  const modalUpdateBadge = document.getElementById('modal-update-badge');
+  const updateStateInfo = document.getElementById('update-state-info');
+  const updateStateDownloading = document.getElementById('update-state-downloading');
+  const updateStateReady = document.getElementById('update-state-ready');
+
+  const updateCurrVer = document.getElementById('update-curr-ver');
+  const updateNewVer = document.getElementById('update-new-ver');
+  const updateReleaseDate = document.getElementById('update-release-date');
+  const updateReleaseTitle = document.getElementById('update-release-title');
+  const updateChangelogBody = document.getElementById('update-changelog-body');
+  const linkDownloadPortable = document.getElementById('link-download-portable');
+  const linkViewGithub = document.getElementById('link-view-github');
+  const btnCancelUpdateInfo = document.getElementById('btn-cancel-update-info');
+  const btnStartAutoUpdate = document.getElementById('btn-start-auto-update');
+
+  const updateProgressFill = document.getElementById('update-progress-fill');
+  const updateStatPercent = document.getElementById('update-stat-percent');
+  const updateStatBytes = document.getElementById('update-stat-bytes');
+  const updateStatSpeed = document.getElementById('update-stat-speed');
+  const btnCancelDownloadActive = document.getElementById('btn-cancel-download-active');
+
+  const updateReadyVer = document.getElementById('update-ready-ver');
+  const btnPostponeInstall = document.getElementById('btn-postpone-install');
+  const btnInstallAndRestart = document.getElementById('btn-install-and-restart');
+
+  function formatBytes(bytes) {
+    if (!bytes || bytes <= 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+
+  function renderMarkdownNotes(text) {
+    if (!text) return '<p class="text-gray-400 italic">Nenhum detalhe adicional informado.</p>';
+    const escapeHtml = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const lines = text.split(/\r?\n/);
+    let html = '';
+    let inList = false;
+
+    for (let rawLine of lines) {
+      const line = rawLine.trim();
+      if (!line) {
+        if (inList) { html += '</ul>'; inList = false; }
+        continue;
+      }
+      if (line.startsWith('### ')) {
+        if (inList) { html += '</ul>'; inList = false; }
+        html += `<h5 class="text-xs font-bold text-gray-200 mt-2 mb-1">${escapeHtml(line.slice(4))}</h5>`;
+      } else if (line.startsWith('## ') || line.startsWith('# ')) {
+        if (inList) { html += '</ul>'; inList = false; }
+        const title = line.replace(/^#+\s*/, '');
+        html += `<h4 class="text-sm font-bold text-emerald-400 mt-3 mb-1">${escapeHtml(title)}</h4>`;
+      } else if (line.startsWith('- ') || line.startsWith('* ')) {
+        if (!inList) { html += '<ul class="list-disc list-inside space-y-1 text-gray-300 text-xs">'; inList = true; }
+        html += `<li>${escapeHtml(line.slice(2))}</li>`;
+      } else {
+        if (inList) { html += '</ul>'; inList = false; }
+        html += `<p class="text-xs text-gray-300 mb-1">${escapeHtml(line)}</p>`;
+      }
+    }
+    if (inList) html += '</ul>';
+    return html;
+  }
+
+  function setUpdateModalStep(step) {
+    if (!updateStateInfo || !updateStateDownloading || !updateStateReady) return;
+    updateStateInfo.classList.add('is-hidden');
+    updateStateDownloading.classList.add('is-hidden');
+    updateStateReady.classList.add('is-hidden');
+
+    if (step === 'info') {
+      updateStateInfo.classList.remove('is-hidden');
+      if (modalUpdateBadge) modalUpdateBadge.textContent = 'Nova Versão';
+    } else if (step === 'downloading') {
+      updateStateDownloading.classList.remove('is-hidden');
+      if (modalUpdateBadge) modalUpdateBadge.textContent = 'Baixando...';
+    } else if (step === 'ready') {
+      updateStateReady.classList.remove('is-hidden');
+      if (modalUpdateBadge) modalUpdateBadge.textContent = 'Pronto para Instalar';
+    }
+  }
+
+  function showUpdateModal(step = 'info') {
+    if (!updateModal) return;
+    setUpdateModalStep(step);
+    updateModal.classList.remove('is-hidden');
+  }
+
+  function hideUpdateModal() {
+    if (!updateModal) return;
+    if (isDownloadingUpdate) {
+      const confirmCancel = window.confirm('O download da atualização está em andamento. Deseja cancelar o download?');
+      if (!confirmCancel) return;
+      socket.emit('updater:cancelDownload');
+      isDownloadingUpdate = false;
+    }
+    updateModal.classList.add('is-hidden');
+  }
+
+  function handleUpdateStatus(info) {
+    if (!info) return;
+    latestUpdateInfo = info;
+
+    if (settingsAppVersion && info.currentVersion) {
+      settingsAppVersion.textContent = 'v' + info.currentVersion;
+    }
+
+    if (settingsLastCheck) {
+      settingsLastCheck.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    if (iconCheckUpdates) iconCheckUpdates.classList.remove('fa-spin');
+    if (btnCheckUpdatesNow) btnCheckUpdatesNow.disabled = false;
+
+    if (info.error) {
+      if (settingsUpdateMsg) {
+        settingsUpdateMsg.innerHTML = `<span class="status-indicator-dot bg-amber-500"></span> <span class="text-amber-400">Não foi possível checar: ${info.error}</span>`;
+      }
+      return;
+    }
+
+    if (info.updateAvailable || info.available) {
+      // Exibe banner superior
+      if (updateBanner) {
+        updateBanner.classList.remove('is-hidden');
+        if (updateBannerVersion) {
+          updateBannerVersion.textContent = 'v' + info.latestVersion;
+        }
+      }
+
+      // Exibe botão de atalho em configurações
+      if (btnSettingsOpenUpdate) {
+        btnSettingsOpenUpdate.classList.remove('is-hidden');
+      }
+
+      if (settingsUpdateMsg) {
+        settingsUpdateMsg.innerHTML = `<span class="status-indicator-dot bg-blue-500"></span> <strong class="text-blue-400">Nova versão v${info.latestVersion} disponível!</strong>`;
+      }
+
+      // Atualiza campos do modal
+      if (updateCurrVer) updateCurrVer.textContent = 'v' + info.currentVersion;
+      if (updateNewVer) updateNewVer.textContent = 'v' + info.latestVersion;
+      if (updateReadyVer) updateReadyVer.textContent = 'v' + info.latestVersion;
+      if (updateReleaseTitle) updateReleaseTitle.textContent = info.releaseName || ('Novidades da Versão ' + info.latestVersion);
+      if (updateReleaseDate) {
+        updateReleaseDate.textContent = info.publishedAt
+          ? new Date(info.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+          : 'Recente';
+      }
+      if (updateChangelogBody) {
+        updateChangelogBody.innerHTML = renderMarkdownNotes(info.releaseNotes);
+      }
+      if (linkDownloadPortable) {
+        linkDownloadPortable.href = info.portableAsset ? info.portableAsset.downloadUrl : (info.releaseUrl || '#');
+      }
+      if (linkViewGithub) {
+        linkViewGithub.href = info.releaseUrl || 'https://github.com/TTreter/tImago/releases';
+      }
+
+      if (btnStartAutoUpdate) {
+        if (info.setupAsset && info.setupAsset.downloadUrl) {
+          btnStartAutoUpdate.disabled = false;
+          btnStartAutoUpdate.innerHTML = '<i class="fas fa-download"></i> Baixar e Atualizar';
+        } else {
+          btnStartAutoUpdate.disabled = false;
+          btnStartAutoUpdate.innerHTML = '<i class="fab fa-github"></i> Baixar no GitHub';
+        }
+      }
+    } else {
+      // Já está atualizado
+      if (updateBanner) updateBanner.classList.add('is-hidden');
+      if (btnSettingsOpenUpdate) btnSettingsOpenUpdate.classList.add('is-hidden');
+      if (settingsUpdateMsg) {
+        settingsUpdateMsg.innerHTML = `<span class="status-indicator-dot bg-emerald-500"></span> <span class="text-emerald-400">Você já está usando a versão mais recente (v${info.currentVersion})!</span>`;
+      }
+    }
+  }
+
+  // Socket events do Updater
+  socket.on('updater:status', (info) => {
+    handleUpdateStatus(info);
+  });
+
+  socket.on('updater:progress', (progress) => {
+    if (!progress) return;
+    const { percent = 0, transferredBytes = 0, totalBytes = 0, speedBytesPerSec = 0 } = progress;
+    if (updateProgressFill) {
+      updateProgressFill.style.width = Math.min(100, Math.max(0, percent)) + '%';
+    }
+    if (updateStatPercent) {
+      updateStatPercent.textContent = Math.round(percent) + '%';
+    }
+    if (updateStatBytes) {
+      updateStatBytes.textContent = `${formatBytes(transferredBytes)} / ${formatBytes(totalBytes)}`;
+    }
+    if (updateStatSpeed) {
+      updateStatSpeed.textContent = `${formatBytes(speedBytesPerSec)}/s`;
+    }
+  });
+
+  socket.on('updater:downloadComplete', (result) => {
+    isDownloadingUpdate = false;
+    downloadedInstallerPath = result.installerPath;
+    if (updateReadyVer) {
+      updateReadyVer.textContent = 'v' + (result.version || (latestUpdateInfo ? latestUpdateInfo.latestVersion : '1.4.0'));
+    }
+    setUpdateModalStep('ready');
+  });
+
+  socket.on('updater:error', ({ message }) => {
+    isDownloadingUpdate = false;
+    setUpdateModalStep('info');
+    if (iconCheckUpdates) iconCheckUpdates.classList.remove('fa-spin');
+    if (btnCheckUpdatesNow) btnCheckUpdatesNow.disabled = false;
+    window.alert('Erro durante a atualização: ' + (message || 'Falha desconhecida'));
+  });
+
+  socket.on('updater:cancelled', () => {
+    isDownloadingUpdate = false;
+    setUpdateModalStep('info');
+  });
+
+  // Interações de UI
+  btnBannerUpdate?.addEventListener('click', () => {
+    showUpdateModal('info');
+  });
+
+  btnBannerChangelog?.addEventListener('click', () => {
+    showUpdateModal('info');
+  });
+
+  btnBannerDismiss?.addEventListener('click', () => {
+    if (updateBanner) updateBanner.classList.add('is-hidden');
+  });
+
+  btnSettingsOpenUpdate?.addEventListener('click', () => {
+    showUpdateModal('info');
+  });
+
+  btnCheckUpdatesNow?.addEventListener('click', () => {
+    if (iconCheckUpdates) iconCheckUpdates.classList.add('fa-spin');
+    if (btnCheckUpdatesNow) btnCheckUpdatesNow.disabled = true;
+    if (settingsUpdateMsg) {
+      settingsUpdateMsg.innerHTML = '<span class="status-indicator-dot bg-blue-500"></span> Buscando atualizações no GitHub...';
+    }
+    socket.emit('updater:check', { force: true });
+  });
+
+  btnCloseUpdateModal?.addEventListener('click', hideUpdateModal);
+  btnCancelUpdateInfo?.addEventListener('click', hideUpdateModal);
+  btnPostponeInstall?.addEventListener('click', hideUpdateModal);
+
+  updateModal?.addEventListener('click', (e) => {
+    if (e.target === updateModal) {
+      hideUpdateModal();
+    }
+  });
+
+  btnStartAutoUpdate?.addEventListener('click', () => {
+    if (!latestUpdateInfo) return;
+    if (latestUpdateInfo.setupAsset && latestUpdateInfo.setupAsset.downloadUrl) {
+      isDownloadingUpdate = true;
+      if (updateProgressFill) updateProgressFill.style.width = '0%';
+      if (updateStatPercent) updateStatPercent.textContent = '0%';
+      if (updateStatBytes) updateStatBytes.textContent = 'Iniciando download...';
+      if (updateStatSpeed) updateStatSpeed.textContent = '0 KB/s';
+      setUpdateModalStep('downloading');
+      socket.emit('updater:startDownload', { url: latestUpdateInfo.setupAsset.downloadUrl });
+    } else if (latestUpdateInfo.releaseUrl) {
+      window.open(latestUpdateInfo.releaseUrl, '_blank');
+    }
+  });
+
+  btnCancelDownloadActive?.addEventListener('click', () => {
+    socket.emit('updater:cancelDownload');
+    isDownloadingUpdate = false;
+    setUpdateModalStep('info');
+  });
+
+  btnInstallAndRestart?.addEventListener('click', () => {
+    if (!downloadedInstallerPath) {
+      window.alert('Arquivo do instalador não localizado. Tente baixar novamente.');
+      setUpdateModalStep('info');
+      return;
+    }
+    btnInstallAndRestart.disabled = true;
+    btnInstallAndRestart.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando instalador e fechando app...';
+    socket.emit('updater:launchInstaller', { installerPath: downloadedInstallerPath });
+  });
+
+  // Pontes globais chamadas pelo processo principal Electron via webContents.executeJavaScript
+  window.tImagoOnUpdateFound = (info) => {
+    handleUpdateStatus(info);
+  };
+
+  window.tImagoOpenUpdateModal = () => {
+    showUpdateModal('info');
+  };
 
   if (!countdownInterval) {
     countdownInterval = setInterval(updateLiveMonitorTick, 200);

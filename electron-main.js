@@ -13,7 +13,7 @@
  * ============================================================================
  */
 
-const { app, BrowserWindow, shell, dialog, Tray, Menu, nativeImage } = require('electron');
+const { app, BrowserWindow, shell, dialog, Tray, Menu, nativeImage, Notification } = require('electron');
 const path = require('path');
 
 // Garante que apenas uma instância do aplicativo tImago rode por vez
@@ -32,7 +32,10 @@ const {
   isOverlayVisible,
   getSettings,
   onSettingsChange,
-  toggleOverlayVisibility
+  toggleOverlayVisibility,
+  setAppVersion,
+  setOnAppQuit,
+  checkForUpdates
 } = require('./server');
 
 let mainWindow = null;
@@ -221,6 +224,12 @@ async function startApplication() {
   // 1. Inicializa o servidor Express e WebSockets
   updateSplash(45, 'Iniciando servidor local e WebSockets...');
   try {
+    setAppVersion(app.getVersion());
+    setOnAppQuit(() => {
+      isQuitting = true;
+      stopServer();
+      app.quit();
+    });
     const serverInfo = await startServer(PORT);
     activePort = serverInfo?.port || PORT;
   } catch (err) {
@@ -302,6 +311,42 @@ async function startApplication() {
     shell.openExternal(url);
     return { action: 'deny' };
   });
+
+  // Checagem silenciosa e amigável de novas versões no GitHub (8s após inicialização)
+  setTimeout(async () => {
+    try {
+      const ver = app.getVersion();
+      const updateInfo = await checkForUpdates(ver, false);
+      if (updateInfo && updateInfo.available) {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.executeJavaScript(
+            `if (window.tImagoOnUpdateFound) window.tImagoOnUpdateFound(${JSON.stringify(updateInfo)});`
+          ).catch(() => {});
+        }
+
+        if (Notification && Notification.isSupported()) {
+          const toast = new Notification({
+            title: 'tImago — Nova Atualização Disponível',
+            body: `A versão v${updateInfo.latestVersion} está pronta para download e instalação.`,
+            icon: path.join(__dirname, 'public', 'img', 'icon.png')
+          });
+          toast.on('click', () => {
+            if (mainWindow) {
+              if (!mainWindow.isVisible()) mainWindow.show();
+              if (mainWindow.isMinimized()) mainWindow.restore();
+              mainWindow.focus();
+              mainWindow.webContents.executeJavaScript(
+                `if (window.tImagoOpenUpdateModal) window.tImagoOpenUpdateModal();`
+              ).catch(() => {});
+            }
+          });
+          toast.show();
+        }
+      }
+    } catch (err) {
+      console.warn('[Electron] Falha ao verificar atualizações silenciosas:', err.message);
+    }
+  }, 8000);
 
   // Reage a alterações de configurações salvas pelo painel
   onSettingsChange((newSettings) => {

@@ -18,6 +18,33 @@ const { Server } = require('socket.io');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const {
+  checkForUpdates,
+  registerUpdaterSocketEvents
+} = require('./updater-service');
+
+let appVersion = '1.4.0';
+try {
+  const pkg = require('./package.json');
+  if (pkg && pkg.version) appVersion = pkg.version;
+} catch (e) {}
+
+let onQuitAppCallback = () => {
+  stopServer();
+  process.exit(0);
+};
+
+function setAppVersion(v) {
+  if (v) appVersion = v;
+}
+
+function setOnAppQuit(fn) {
+  if (typeof fn === 'function') onQuitAppCallback = fn;
+}
+
+function getAppVersion() {
+  return appVersion;
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -521,6 +548,7 @@ function broadcastState() {
     state,
     runtime: {
       ...runtime,
+      appVersion: getAppVersion(),
       serverNow: Date.now(),
       pendingAudienceCount: getPendingAudiencePhrases().length,
       localIp: getLocalIpAddress(),
@@ -761,12 +789,16 @@ io.on('connection', (socket) => {
     state,
     runtime: {
       ...runtime,
+      appVersion: getAppVersion(),
       serverNow: Date.now(),
       pendingAudienceCount: getPendingAudiencePhrases().length,
       localIp: getLocalIpAddress(),
       port: activePort
     }
   });
+
+  // Registra eventos do motor de atualização em tempo real
+  registerUpdaterSocketEvents(io, socket, getAppVersion, onQuitAppCallback);
 
   // Envia estado inicial do placar esportivo
   socket.emit('scoreboard:sync', state.scoreboard);
@@ -1572,5 +1604,9 @@ module.exports = {
   getSettings,
   getState,
   onSettingsChange,
-  toggleOverlayVisibility
+  toggleOverlayVisibility,
+  setAppVersion,
+  setOnAppQuit,
+  getAppVersion,
+  checkForUpdates
 };

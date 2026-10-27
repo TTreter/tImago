@@ -61,6 +61,19 @@
       </div>
     </header>
 
+    <!-- BANNER DE ATUALIZAÇÃO DISPONÍVEL (TOPBAR) -->
+    <aside id="update-topbar-banner" class="update-banner is-hidden" aria-label="Aviso de Atualização">
+      <div class="update-banner-info">
+        <span class="update-pulse-dot"></span>
+        <span>Nova versão <strong id="update-banner-version">v1.4.0</strong> do tImago disponível!</span>
+      </div>
+      <div class="update-banner-actions">
+        <button type="button" id="btn-banner-update" class="btn btn-sm btn-primary">Atualizar Agora</button>
+        <button type="button" id="btn-banner-changelog" class="btn btn-sm btn-secondary">Ver Novidades</button>
+        <button type="button" id="btn-banner-dismiss" class="btn btn-sm btn-ghost" title="Lembrar mais tarde">Dispensar</button>
+      </div>
+    </aside>
+
     <!-- ====================================================================
          VISÃO 1: OPERAÇÃO AO VIVO (DESPOLUÍDA & FOCADA NA TRANSMISSÃO)
          ==================================================================== -->
@@ -1530,6 +1543,46 @@
           </div>
         </section>
 
+        <!-- SEÇÃO: ATUALIZAÇÕES DO APLICATIVO & CICLO DE VIDA -->
+        <section class="settings-section-card">
+          <div class="section-card-header">
+            <div class="section-card-icon" style="background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </div>
+            <div>
+              <h2>Atualizações & Ciclo de Vida do Aplicativo</h2>
+              <p>Verificação de lançamentos oficiais no GitHub, histórico de melhorias e download automático.</p>
+            </div>
+          </div>
+
+          <div class="section-card-body">
+            <div class="update-settings-card">
+              <div class="update-info-left">
+                <div class="app-version-pill-group">
+                  <span class="app-version-label">Versão Instalada:</span>
+                  <span id="settings-app-version" class="app-version-badge">v1.4.0</span>
+                </div>
+                <div id="settings-update-status" class="update-status-line">
+                  <span class="status-indicator-dot ok"></span>
+                  <span id="settings-update-msg">Verificação automática ativa.</span>
+                </div>
+                <small id="settings-last-check" class="field-help">Última checagem: verificando...</small>
+              </div>
+
+              <div class="update-info-right">
+                <button type="button" id="btn-check-updates-now" class="btn btn-secondary">
+                  <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                  <span>Verificar Atualizações Agora</span>
+                </button>
+                <button type="button" id="btn-settings-open-update" class="btn btn-primary is-hidden">
+                  <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>Nova Versão Disponível</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- SEÇÃO 5: REDE LOCAL, BACKUP JSON & DIAGNÓSTICO -->
         <section class="settings-section-card">
           <div class="section-card-header">
@@ -1718,6 +1771,103 @@
       <div class="modal-footer">
         <button type="button" id="btn-close-qr-footer" class="btn btn-primary">Fechar</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE ATUALIZAÇÃO DO APLICATIVO (IN-APP DOWNLOADER & CHANGELOG) -->
+  <div id="update-modal" class="modal-backdrop is-hidden">
+    <div class="modal-box modal-update-box">
+      <div class="modal-header">
+        <div class="title-with-badge">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <h3>Atualização do tImago</h3>
+        </div>
+        <button type="button" id="btn-close-update-modal" class="btn-icon" title="Fechar">
+          <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <!-- ESTADO 1: APRESENTAÇÃO DA NOVA VERSÃO & NOTAS -->
+      <div id="update-state-info" class="update-modal-step">
+        <div class="update-hero-banner">
+          <div class="update-version-capsule">
+            <span class="badge-curr">Instalada: <b id="update-curr-ver">v1.4.0</b></span>
+            <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <span class="badge-new">Nova: <b id="update-new-ver">v1.4.0</b></span>
+          </div>
+          <p id="update-release-title" class="update-release-title">Título da Release</p>
+          <span id="update-release-date" class="update-release-date">Publicado em 27/10/2026</span>
+        </div>
+
+        <div class="update-changelog-card">
+          <h4>Novidades e Melhorias desta Versão:</h4>
+          <div id="update-changelog-body" class="update-changelog-content"></div>
+        </div>
+
+        <div class="modal-footer update-footer">
+          <div class="update-alt-links">
+            <a href="#" id="link-download-portable" target="_blank" class="link-subtle">Baixar Versão Portátil (.exe)</a>
+            <span class="sep">•</span>
+            <a href="#" id="link-view-github" target="_blank" class="link-subtle">Ver no GitHub</a>
+          </div>
+          <div class="update-primary-actions">
+            <button type="button" id="btn-cancel-update-info" class="btn btn-ghost">Lembrar Mais Tarde</button>
+            <button type="button" id="btn-start-auto-update" class="btn btn-primary">
+              <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Baixar e Atualizar Agora</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESTADO 2: BAIXANDO EM TEMPO REAL -->
+      <div id="update-state-downloading" class="update-modal-step is-hidden">
+        <div class="update-download-center">
+          <div class="download-spinner-ring">
+            <svg class="spinner-svg" viewBox="0 0 50 50">
+              <circle class="spinner-path" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle>
+            </svg>
+          </div>
+          <h4>Baixando Atualização Oficial...</h4>
+          <p class="field-help">O arquivo do instalador está sendo transferido diretamente da CDN do GitHub.</p>
+
+          <div class="update-progress-track">
+            <div id="update-progress-fill" class="update-progress-fill" style="width: 0%;"></div>
+          </div>
+
+          <div class="update-stats-row">
+            <span id="update-stat-percent" class="stat-pct">0%</span>
+            <span id="update-stat-bytes" class="stat-bytes">0 MB / 0 MB</span>
+            <span id="update-stat-speed" class="stat-speed">-- MB/s</span>
+          </div>
+
+          <button type="button" id="btn-cancel-download-active" class="btn btn-ghost btn-sm" style="margin-top: 20px;">
+            Cancelar Download
+          </button>
+        </div>
+      </div>
+
+      <!-- ESTADO 3: PRONTO PARA INSTALAR -->
+      <div id="update-state-ready" class="update-modal-step is-hidden">
+        <div class="update-ready-box">
+          <div class="ready-icon-badge">
+            <svg class="icon-svg" viewBox="0 0 24 24" stroke="#22c55e" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <h4>Download Concluído com Sucesso!</h4>
+          <p class="ready-desc">
+            O instalador da nova versão está pronto.  
+            Ao clicar abaixo, o tImago será fechado com segurança e o assistente de atualização abrirá para atualizar o programa.  
+            <strong>Todas as suas playlists, frases e placares serão mantidos intactos!</strong>
+          </p>
+          <div class="ready-actions">
+            <button type="button" id="btn-install-and-restart" class="btn btn-success btn-lg">
+              <svg class="icon-svg icon-sm" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <span>Instalar e Reiniciar o tImago Agora</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
