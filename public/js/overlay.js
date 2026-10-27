@@ -130,41 +130,62 @@
     'civil-defense': `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#FB923C" stroke-width="2.2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`
   };
 
+  let _lastAppliedTheme = null;
+  let _lastAppliedPos = null;
+  let _lastAppliedAnim = null;
+  const _lastAppliedProps = {};
+
+  function setDocProperty(name, val) {
+    if (_lastAppliedProps[name] !== val) {
+      _lastAppliedProps[name] = val;
+      document.documentElement.style.setProperty(name, val);
+    }
+  }
+
   function applySettings(settings) {
     if (!settings) return;
 
     const theme = ALL_THEMES.includes(settings.theme) ? settings.theme : 'christmas';
-    ALL_THEMES.forEach((t) => stageEl.classList.remove(`theme-${t}`));
-    stageEl.classList.add(`theme-${theme}`);
+    if (theme !== _lastAppliedTheme) {
+      ALL_THEMES.forEach((t) => stageEl.classList.remove(`theme-${t}`));
+      stageEl.classList.add(`theme-${theme}`);
+      _lastAppliedTheme = theme;
 
-    if (themeBadgeIconEl) {
-      if (THEME_BADGE_SVGS[theme]) {
-        themeBadgeIconEl.innerHTML = THEME_BADGE_SVGS[theme];
-        themeBadgeIconEl.classList.add('has-badge');
-      } else {
-        themeBadgeIconEl.innerHTML = '';
-        themeBadgeIconEl.classList.remove('has-badge');
+      if (themeBadgeIconEl) {
+        if (THEME_BADGE_SVGS[theme]) {
+          themeBadgeIconEl.innerHTML = THEME_BADGE_SVGS[theme];
+          themeBadgeIconEl.classList.add('has-badge');
+        } else {
+          themeBadgeIconEl.innerHTML = '';
+          themeBadgeIconEl.classList.remove('has-badge');
+        }
       }
     }
 
     // Posição
     const pos = VALID_POSITIONS.includes(settings.position) ? settings.position : 'bottom-left';
-    VALID_POSITIONS.forEach((p) => stageEl.classList.remove(`pos-${p}`));
-    stageEl.classList.add(`pos-${pos}`);
+    if (pos !== _lastAppliedPos) {
+      VALID_POSITIONS.forEach((p) => stageEl.classList.remove(`pos-${p}`));
+      stageEl.classList.add(`pos-${pos}`);
+      _lastAppliedPos = pos;
+    }
 
     // Estilo de Animação (Fase 4)
     const anim = VALID_ANIMATIONS.includes(settings.animationStyle) ? settings.animationStyle : 'slide-up';
-    VALID_ANIMATIONS.forEach((a) => stageEl.classList.remove(`anim-${a}`));
-    stageEl.classList.add(`anim-${anim}`);
+    if (anim !== _lastAppliedAnim) {
+      VALID_ANIMATIONS.forEach((a) => stageEl.classList.remove(`anim-${a}`));
+      stageEl.classList.add(`anim-${anim}`);
+      _lastAppliedAnim = anim;
+    }
 
-    // Cores Personalizadas do 19º Tema (Custom Theme)
+    // Cores Personalizadas do Tema Custom
     if (settings.customThemeColors && typeof settings.customThemeColors === 'object') {
       const c = settings.customThemeColors;
-      if (c.bg1) document.documentElement.style.setProperty('--custom-bg1', c.bg1);
-      if (c.bg2) document.documentElement.style.setProperty('--custom-bg2', c.bg2);
-      if (c.border) document.documentElement.style.setProperty('--custom-border', c.border);
-      if (c.text) document.documentElement.style.setProperty('--custom-text', c.text);
-      if (c.author) document.documentElement.style.setProperty('--custom-author', c.author);
+      if (c.bg1) setDocProperty('--custom-bg1', c.bg1);
+      if (c.bg2) setDocProperty('--custom-bg2', c.bg2);
+      if (c.border) setDocProperty('--custom-border', c.border);
+      if (c.text) setDocProperty('--custom-text', c.text);
+      if (c.author) setDocProperty('--custom-author', c.author);
     }
 
     // Logo / Ícone Personalizado no Card
@@ -210,16 +231,16 @@
     const padX = Math.round(Math.max(24, resW * 0.04));
     const padY = Math.round(Math.max(24, resH * 0.052));
 
-    document.documentElement.style.setProperty('--font-scale', (fontPercent / 100).toFixed(2));
-    document.documentElement.style.setProperty('--overlay-scale', (scalePercent / 100).toFixed(2));
-    document.documentElement.style.setProperty('--card-max-width', `${maxWidthPx}px`);
-    document.documentElement.style.setProperty('--res-width', `${resW}px`);
-    document.documentElement.style.setProperty('--res-height', `${resH}px`);
-    document.documentElement.style.setProperty('--stage-pad-x', `${padX}px`);
-    document.documentElement.style.setProperty('--stage-pad-y', `${padY}px`);
+    setDocProperty('--font-scale', (fontPercent / 100).toFixed(2));
+    setDocProperty('--overlay-scale', (scalePercent / 100).toFixed(2));
+    setDocProperty('--card-max-width', `${maxWidthPx}px`);
+    setDocProperty('--res-width', `${resW}px`);
+    setDocProperty('--res-height', `${resH}px`);
+    setDocProperty('--stage-pad-x', `${padX}px`);
+    setDocProperty('--stage-pad-y', `${padY}px`);
 
     const tickerSpeed = Math.min(180, Math.max(8, Number(settings.tickerSpeedSeconds) || 32));
-    document.documentElement.style.setProperty('--ticker-duration', `${tickerSpeed}s`);
+    setDocProperty('--ticker-duration', `${tickerSpeed}s`);
   }
 
   function escapeHtml(str) {

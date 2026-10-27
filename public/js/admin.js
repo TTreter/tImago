@@ -367,6 +367,15 @@
   });
 
   // Escala proporcional do Preview (Resolução Dinâmica) dentro do card lateral
+  let previewResizeRaf = null;
+  function scheduleUpdatePreviewScale() {
+    if (previewResizeRaf) return;
+    previewResizeRaf = requestAnimationFrame(() => {
+      previewResizeRaf = null;
+      updatePreviewScale();
+    });
+  }
+
   function updatePreviewScale() {
     if (!previewWrapper || !previewIframe) return;
     const resW = Math.max(360, Number(currentState?.settings?.resolutionWidth) || 1920);
@@ -380,7 +389,13 @@
     const scale = width / resW;
     previewIframe.style.transform = `scale(${scale})`;
   }
-  window.addEventListener('resize', updatePreviewScale);
+
+  if (typeof ResizeObserver !== 'undefined' && previewWrapper) {
+    const previewRo = new ResizeObserver(() => scheduleUpdatePreviewScale());
+    previewRo.observe(previewWrapper);
+  } else {
+    window.addEventListener('resize', scheduleUpdatePreviewScale);
+  }
   updatePreviewScale();
 
   // ==========================================================================
@@ -543,6 +558,17 @@
     updatePreviewScale();
   }
 
+  let _lastMonitorText = '';
+  let _lastMonitorAuthor = '';
+  let _lastMonitorCountdown = '';
+  let _lastMonitorProgressPct = -1;
+
+  function setElTextIfChanged(el, text) {
+    if (el && el.textContent !== text) {
+      el.textContent = text;
+    }
+  }
+
   function updateLiveMonitorTick() {
     if (!currentState || !currentRuntime) return;
 
@@ -550,19 +576,27 @@
     const phase = currentRuntime.phase;
     const phrase = currentRuntime.currentPhrase;
 
-    livePhaseBadge.className = 'phase-badge';
     if (liveFloatingPopup) {
       liveFloatingPopup.classList.toggle('is-showing-now', visible && phase === 'showing');
     }
 
     if (!visible) {
-      livePhaseBadge.classList.add('phase-off');
-      livePhaseBadge.textContent = 'OVERLAY OCULTO';
-      liveCurrentText.textContent = 'Overlay desligado (Off Air). Clique em "NO AR" ou em "Exibir Agora".';
-      liveCurrentText.title = liveCurrentText.textContent;
-      liveCurrentAuthor.textContent = '';
-      liveCountdown.textContent = 'OFF';
-      liveMiniProgressBar.style.width = '0%';
+      if (livePhaseBadge.className !== 'phase-badge phase-off') {
+        livePhaseBadge.className = 'phase-badge phase-off';
+      }
+      setElTextIfChanged(livePhaseBadge, 'OVERLAY OCULTO');
+      if (_lastMonitorText !== 'off') {
+        _lastMonitorText = 'off';
+        const offMsg = 'Overlay desligado (Off Air). Clique em "NO AR" ou em "Exibir Agora".';
+        setElTextIfChanged(liveCurrentText, offMsg);
+        if (liveCurrentText) liveCurrentText.title = offMsg;
+      }
+      setElTextIfChanged(liveCurrentAuthor, '');
+      setElTextIfChanged(liveCountdown, 'OFF');
+      if (_lastMonitorProgressPct !== 0) {
+        _lastMonitorProgressPct = 0;
+        liveMiniProgressBar.style.width = '0%';
+      }
       return;
     }
 
@@ -573,38 +607,54 @@
     const progressPct = totalDuration > 0
       ? Math.min(100, Math.max(0, ((totalDuration - remainingMs) / totalDuration) * 100))
       : 0;
+    const roundedPct = Math.round(progressPct * 10) / 10;
 
     if (phase === 'showing' && phrase) {
-      livePhaseBadge.classList.add('phase-showing');
-      livePhaseBadge.textContent = phrase.source === 'audience'
-        ? '● PÚBLICO NO AR'
-        : '● CARROSSEL NO AR';
-      liveCurrentText.textContent = phrase.text;
-      liveCurrentText.title = phrase.text;
-      liveCurrentAuthor.textContent = phrase.author ? `— ${phrase.author}` : '';
-      liveCountdown.textContent = `${remainingSec}s`;
-      liveMiniProgressBar.style.width = `${progressPct}%`;
+      const targetBadgeCls = 'phase-badge phase-showing';
+      if (livePhaseBadge.className !== targetBadgeCls) livePhaseBadge.className = targetBadgeCls;
+      setElTextIfChanged(livePhaseBadge, phrase.source === 'audience' ? '● PÚBLICO NO AR' : '● CARROSSEL NO AR');
+      if (_lastMonitorText !== phrase.text) {
+        _lastMonitorText = phrase.text;
+        setElTextIfChanged(liveCurrentText, phrase.text);
+        if (liveCurrentText) liveCurrentText.title = phrase.text;
+      }
+      const authStr = phrase.author ? `— ${phrase.author}` : '';
+      setElTextIfChanged(liveCurrentAuthor, authStr);
+      setElTextIfChanged(liveCountdown, `${remainingSec}s`);
     } else if (phase === 'interval') {
       const pendingAud = currentRuntime.pendingAudienceCount || 0;
-      livePhaseBadge.classList.add('phase-interval');
-      livePhaseBadge.textContent = 'INTERVALO';
-      liveCurrentText.textContent = pendingAud > 0
+      const targetBadgeCls = 'phase-badge phase-interval';
+      if (livePhaseBadge.className !== targetBadgeCls) livePhaseBadge.className = targetBadgeCls;
+      setElTextIfChanged(livePhaseBadge, 'INTERVALO');
+      const intervalMsg = pendingAud > 0
         ? `Preparando próxima mensagem do público (${pendingAud} na fila)...`
         : 'Aguardando intervalo para exibir a próxima frase do carrossel...';
-      liveCurrentText.title = liveCurrentText.textContent;
-      liveCurrentAuthor.textContent = '';
-      liveCountdown.textContent = `Próx. ${remainingSec}s`;
-      liveMiniProgressBar.style.width = `${progressPct}%`;
+      if (_lastMonitorText !== intervalMsg) {
+        _lastMonitorText = intervalMsg;
+        setElTextIfChanged(liveCurrentText, intervalMsg);
+        if (liveCurrentText) liveCurrentText.title = intervalMsg;
+      }
+      setElTextIfChanged(liveCurrentAuthor, '');
+      setElTextIfChanged(liveCountdown, `Próx. ${remainingSec}s`);
     } else {
-      livePhaseBadge.classList.add('phase-idle');
-      livePhaseBadge.textContent = 'EM ESPERA';
-      liveCurrentText.textContent = currentState.settings?.autoRotate
+      const targetBadgeCls = 'phase-badge phase-idle';
+      if (livePhaseBadge.className !== targetBadgeCls) livePhaseBadge.className = targetBadgeCls;
+      setElTextIfChanged(livePhaseBadge, 'EM ESPERA');
+      const idleMsg = currentState.settings?.autoRotate
         ? 'Nenhuma frase ativa no carrossel ou na fila do público.'
         : 'Carrossel desligado — adicione uma frase na fila do público ou clique em "Exibir".';
-      liveCurrentText.title = liveCurrentText.textContent;
-      liveCurrentAuthor.textContent = '';
-      liveCountdown.textContent = '--';
-      liveMiniProgressBar.style.width = '0%';
+      if (_lastMonitorText !== idleMsg) {
+        _lastMonitorText = idleMsg;
+        setElTextIfChanged(liveCurrentText, idleMsg);
+        if (liveCurrentText) liveCurrentText.title = idleMsg;
+      }
+      setElTextIfChanged(liveCurrentAuthor, '');
+      setElTextIfChanged(liveCountdown, '--');
+    }
+
+    if (_lastMonitorProgressPct !== roundedPct) {
+      _lastMonitorProgressPct = roundedPct;
+      liveMiniProgressBar.style.width = `${roundedPct}%`;
     }
   }
 
@@ -2481,7 +2531,9 @@
     renderMasterControls(currentState.settings);
     renderLowerThirdControls(currentState.lowerThird);
     renderPlaylistsSelector(currentState.playlists || [], currentState.activePlaylistId);
-    renderMobileQrCodes(currentRuntime);
+    if (mobileQrModal && !mobileQrModal.classList.contains('is-hidden')) {
+      renderMobileQrCodes(currentRuntime);
+    }
     renderAudienceQueue(currentState.audienceQueue || [], currentRuntime, currentState.settings);
     renderPhrasesList(currentState.phrases || [], currentRuntime, currentState.settings);
     if (currentState.scoreboard) {
