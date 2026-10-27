@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tImago — OBS Overlay</title>
+  <link rel="icon" type="image/svg+xml" href="/img/logo-icon.svg">
+  <!-- Google Fonts para os Temas Natalino e Clean Moderno -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/overlay.css">
+</head>
+<body>
+  <!-- Palco transparente 1920x1080 -->
+  <div id="overlay-stage" class="stage pos-bottom-left theme-christmas">
+    
+    <!-- Card Principal do Anúncio / Frase -->
+    <div id="overlay-card" class="overlay-card is-hidden" aria-live="polite">
+      
+      <!-- Ornamentos exclusivos dos Temas de Natal -->
+      <div class="christmas-ornaments" aria-hidden="true">
+        <div class="christmas-glow"></div>
+        <div class="christmas-garland-top"></div>
+        <div class="christmas-corner corner-tl">✦</div>
+        <div class="christmas-corner corner-tr">✦</div>
+        <div class="christmas-corner corner-bl">✦</div>
+        <div class="christmas-corner corner-br">✦</div>
+        <div class="christmas-star-badge">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1L14.8 8.5L23 9.2L16.5 14.2L18.5 22L12 17.5L5.5 22L7.5 14.2L1 9.2L9.2 8.5L12 1Z" fill="url(#goldGrad)" stroke="#FFF3C4" stroke-width="1"/>
+            <defs>
+              <linearGradient id="goldGrad" x1="1" y1="1" x2="23" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#FFE58F"/>
+                <stop offset="0.5" stop-color="#D4AF37"/>
+                <stop offset="1" stop-color="#9A7418"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Medalhão / Ícone Dinâmico dos demais Temas (Páscoa, Mães, Pais, Futebol, Especial...) -->
+      <div id="theme-badge-icon" class="theme-badge-icon" aria-hidden="true"></div>
+
+      <!-- Detalhe lateral / superior de Temas Modernos & Esportivos -->
+      <div class="clean-accent-bar" aria-hidden="true"></div>
+
+      <!-- Conteúdo do Card -->
+      <div class="card-inner">
+        <!-- Selo de Participação do Público (Exibido apenas em frases de ouvintes/público) -->
+        <div id="audience-kicker" class="audience-kicker is-hidden">
+          <span class="audience-kicker-dot"></span>
+          <span class="audience-kicker-text">MENSAGEM DO PÚBLICO</span>
+        </div>
+
+        <div class="card-text-wrapper">
+          <p id="phrase-text" class="phrase-text"></p>
+        </div>
+
+        <div id="author-container" class="author-container is-empty">
+          <span class="author-divider" aria-hidden="true"></span>
+          <span id="phrase-author" class="phrase-author"></span>
+        </div>
+      </div>
+
+      <!-- Barra de Progresso do Tempo de Exibição -->
+      <div id="progress-wrapper" class="progress-wrapper">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/overlay.js"></script>
+</body>
+</html>

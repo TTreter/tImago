@@ -1,0 +1,11 @@
+# Dependências
+node_modules/
+
+# Arquivos gerados pelo Build (.exe)
+dist/
+
+# Logs e temporários
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db

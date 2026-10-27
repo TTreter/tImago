@@ -1,0 +1,827 @@
+/* ==========================================================================
+   tImago — OBS OVERLAY STYLESHEET (18 TEMAS PROFISSIONAIS DE BROADCAST)
+   100% Transparent Background for OBS Browser Source
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+}
+
+:root {
+  --font-scale: 1;
+  --overlay-scale: 1;
+  --card-max-width: 1020px;
+  --res-width: 1920px;
+  --res-height: 1080px;
+  --stage-pad-y: 58px;
+  --stage-pad-x: 76px;
+}
+
+/* ==========================================================================
+   PALCO & POSICIONAMENTO NA TELA
+   ========================================================================== */
+.stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  padding: var(--stage-pad-y, 58px) var(--stage-pad-x, 76px);
+  pointer-events: none;
+}
+
+.stage.pos-bottom-left {
+  align-items: flex-end;
+  justify-content: flex-start;
+  --origin-x: left;
+  --origin-y: bottom;
+}
+
+.stage.pos-bottom-center {
+  align-items: flex-end;
+  justify-content: center;
+  --origin-x: center;
+  --origin-y: bottom;
+}
+
+.stage.pos-bottom-right {
+  align-items: flex-end;
+  justify-content: flex-end;
+  --origin-x: right;
+  --origin-y: bottom;
+}
+
+.stage.pos-top-left {
+  align-items: flex-start;
+  justify-content: flex-start;
+  --origin-x: left;
+  --origin-y: top;
+}
+
+.stage.pos-top-center {
+  align-items: flex-start;
+  justify-content: center;
+  --origin-x: center;
+  --origin-y: top;
+}
+
+.stage.pos-top-right {
+  align-items: flex-start;
+  justify-content: flex-end;
+  --origin-x: right;
+  --origin-y: top;
+}
+
+/* ==========================================================================
+   ESTRUTURA BASE DO CARD & ANIMAÇÕES
+   ========================================================================== */
+.overlay-card {
+  position: relative;
+  max-width: min(var(--card-max-width, 1020px), 92vw);
+  min-width: min(440px, 80vw);
+  transform-origin: var(--origin-x, left) var(--origin-y, bottom);
+  transition:
+    opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    max-width 0.25s ease;
+  will-change: opacity, transform, filter;
+}
+
+.overlay-card.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(var(--overlay-scale, 1));
+  filter: blur(0px);
+}
+
+.overlay-card.is-hidden {
+  opacity: 0;
+  transform: translateY(28px) scale(calc(var(--overlay-scale, 1) * 0.975));
+  filter: blur(4px);
+}
+
+.stage.pos-top-left .overlay-card.is-hidden,
+.stage.pos-top-center .overlay-card.is-hidden,
+.stage.pos-top-right .overlay-card.is-hidden {
+  transform: translateY(-28px) scale(calc(var(--overlay-scale, 1) * 0.975));
+}
+
+.overlay-card.is-switching {
+  opacity: 0;
+  transform: translateY(14px) scale(calc(var(--overlay-scale, 1) * 0.985));
+  transition-duration: 0.28s;
+}
+
+/* Elementos ornamentais desligados por padrão e ativados por tema */
+.christmas-ornaments,
+.clean-accent-bar,
+.theme-badge-icon {
+  display: none;
+}
+
+.theme-badge-icon.has-badge {
+  position: absolute;
+  top: -18px;
+  left: 38px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+.card-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.author-container {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 2px;
+}
+
+.author-container.is-empty {
+  display: none !important;
+}
+
+.author-divider {
+  display: inline-block;
+  width: 24px;
+  height: 2px;
+  border-radius: 2px;
+}
+
+/* Selo "Mensagem do Público" */
+.audience-kicker.is-hidden {
+  display: none !important;
+}
+
+.audience-kicker {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: calc(11.5px * var(--font-scale, 1));
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  color: #fff;
+}
+
+.audience-kicker-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+
+/* Barra de progresso do tempo de exibição */
+.progress-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  overflow: hidden;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  opacity: 0.92;
+  z-index: 4;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.progress-wrapper.is-disabled {
+  display: none;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+@keyframes starPulse {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.07) rotate(6deg); }
+}
+
+/* ==========================================================================
+   🎄 CATEGORIA 1: NATAL (3 TEMAS)
+   1. christmas       -> Cantata Real (Rubi & Ouro)
+   2. christmas-snow  -> Noite Feliz (Azul Gelo, Prata & Cristal)
+   3. christmas-pine  -> Bosque de Pinheiros (Verde Esmeralda & Champanhe)
+   ========================================================================== */
+
+/* 1.1 Cantata Real (Rubi & Ouro) */
+.theme-christmas .overlay-card {
+  background:
+    radial-gradient(circle at 18% 15%, rgba(255, 224, 130, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 88% 80%, rgba(16, 89, 49, 0.42) 0%, transparent 55%),
+    radial-gradient(125% 140% at 10% 0%, rgba(156, 22, 36, 0.97) 0%, rgba(76, 8, 17, 0.98) 58%, rgba(34, 4, 9, 0.99) 100%);
+  border: 2px solid rgba(226, 188, 72, 0.85);
+  border-radius: 20px;
+  padding: 36px 46px 30px 46px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.72), 0 0 32px rgba(212, 175, 55, 0.26);
+}
+.theme-christmas .overlay-card::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgba(246, 214, 114, 0.34);
+  border-radius: 14px;
+  pointer-events: none;
+}
+.theme-christmas .christmas-ornaments { display: block; }
+.theme-christmas .christmas-garland-top {
+  position: absolute;
+  top: -1px; left: 42px; right: 42px; height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #FFE58F 25%, #D4AF37 50%, #FFE58F 75%, transparent 100%);
+}
+.theme-christmas .christmas-corner {
+  position: absolute; color: #F6D876; font-size: 13px; opacity: 0.85;
+}
+.theme-christmas .corner-tl { top: 11px; left: 14px; }
+.theme-christmas .corner-tr { top: 11px; right: 14px; }
+.theme-christmas .corner-bl { bottom: 11px; left: 14px; }
+.theme-christmas .corner-br { bottom: 11px; right: 14px; }
+.theme-christmas .christmas-star-badge {
+  position: absolute; top: -19px; left: 38px; width: 38px; height: 38px;
+  border-radius: 50%; background: radial-gradient(circle, #154D30 0%, #092616 100%);
+  border: 2px solid #ECC962; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55), 0 0 18px rgba(236, 201, 98, 0.6);
+  animation: starPulse 3.5s ease-in-out infinite; z-index: 3;
+}
+.theme-christmas .audience-kicker {
+  background: rgba(212, 175, 55, 0.22); border-color: rgba(255, 229, 143, 0.6); color: #FFE89E;
+}
+.theme-christmas .phrase-text {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600;
+  font-size: calc(33px * var(--font-scale, 1)); line-height: 1.34; color: #FFFDF9;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.65);
+}
+.theme-christmas .author-divider { background: linear-gradient(90deg, #FFE58F, transparent); }
+.theme-christmas .phrase-author {
+  font-family: 'Cinzel', serif; font-weight: 700; font-size: calc(15.5px * var(--font-scale, 1));
+  letter-spacing: 0.11em; text-transform: uppercase; color: #FFE58F;
+  background: rgba(14, 61, 35, 0.78); border: 1px solid rgba(235, 198, 92, 0.55);
+  padding: 5px 15px; border-radius: 999px;
+}
+.theme-christmas .progress-bar { background: linear-gradient(90deg, #C89B27, #FFE89E, #D4AF37); }
+
+/* 1.2 Noite Feliz (Azul Gelo, Prata & Cristal) */
+.theme-christmas-snow .overlay-card {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(186, 230, 253, 0.22) 0%, transparent 45%),
+    linear-gradient(135deg, rgba(12, 30, 62, 0.96) 0%, rgba(7, 16, 38, 0.98) 100%);
+  border: 2px solid rgba(186, 230, 253, 0.65);
+  border-radius: 20px;
+  padding: 36px 46px 30px 46px;
+  box-shadow: 0 24px 55px rgba(2, 6, 23, 0.75), 0 0 30px rgba(56, 189, 248, 0.25);
+}
+.theme-christmas-snow .overlay-card::before {
+  content: ""; position: absolute; inset: 7px;
+  border: 1px solid rgba(224, 242, 254, 0.25); border-radius: 14px; pointer-events: none;
+}
+.theme-christmas-snow .theme-badge-icon.has-badge {
+  background: radial-gradient(circle, #0c4a6e 0%, #082f49 100%);
+  border: 2px solid #7dd3fc; box-shadow: 0 0 18px rgba(125, 211, 252, 0.55);
+}
+.theme-christmas-snow .audience-kicker {
+  background: rgba(56, 189, 248, 0.2); border-color: rgba(125, 211, 252, 0.6); color: #BAE6FD;
+}
+.theme-christmas-snow .phrase-text {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600;
+  font-size: calc(33px * var(--font-scale, 1)); line-height: 1.34; color: #F0F9FF;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+.theme-christmas-snow .author-divider { background: linear-gradient(90deg, #7DD3FC, transparent); }
+.theme-christmas-snow .phrase-author {
+  font-family: 'Cinzel', serif; font-weight: 700; font-size: calc(15px * var(--font-scale, 1));
+  letter-spacing: 0.11em; text-transform: uppercase; color: #E0F2FE;
+  background: rgba(14, 116, 144, 0.45); border: 1px solid rgba(125, 211, 252, 0.5);
+  padding: 5px 15px; border-radius: 999px;
+}
+.theme-christmas-snow .progress-bar { background: linear-gradient(90deg, #38BDF8, #E0F2FE, #0284C7); }
+
+/* 1.3 Bosque de Pinheiros (Verde Esmeralda & Champanhe) */
+.theme-christmas-pine .overlay-card {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(253, 230, 138, 0.14) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(6, 56, 36, 0.97) 0%, rgba(4, 31, 20, 0.99) 100%);
+  border: 2px solid rgba(245, 208, 97, 0.78);
+  border-radius: 20px;
+  padding: 36px 46px 30px 46px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.72), 0 0 28px rgba(16, 185, 129, 0.2);
+}
+.theme-christmas-pine .overlay-card::before {
+  content: ""; position: absolute; inset: 7px;
+  border: 1px solid rgba(253, 230, 138, 0.28); border-radius: 14px; pointer-events: none;
+}
+.theme-christmas-pine .theme-badge-icon.has-badge {
+  background: radial-gradient(circle, #7f1d1d 0%, #450a0a 100%);
+  border: 2px solid #fde047;
+}
+.theme-christmas-pine .audience-kicker {
+  background: rgba(253, 224, 71, 0.18); border-color: rgba(253, 224, 71, 0.55); color: #FEF08A;
+}
+.theme-christmas-pine .phrase-text {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600;
+  font-size: calc(33px * var(--font-scale, 1)); line-height: 1.34; color: #ECFDF5;
+}
+.theme-christmas-pine .author-divider { background: linear-gradient(90deg, #FDE68A, transparent); }
+.theme-christmas-pine .phrase-author {
+  font-family: 'Cinzel', serif; font-weight: 700; font-size: calc(15px * var(--font-scale, 1));
+  letter-spacing: 0.11em; text-transform: uppercase; color: #FDE68A;
+  background: rgba(127, 29, 29, 0.75); border: 1px solid rgba(253, 230, 138, 0.55);
+  padding: 5px 15px; border-radius: 999px;
+}
+.theme-christmas-pine .progress-bar { background: linear-gradient(90deg, #10B981, #FDE68A, #D97706); }
+
+/* ==========================================================================
+   🏢 CATEGORIA 2: INSTITUCIONAL & CLEAN (3 TEMAS)
+   4. clean      -> Clean Dark Glass (Padrão Moderno)
+   5. inst-light -> Clean Alabaster (Editorial Claro & Azul)
+   6. inst-gold  ->Solene Black & Gold (Gala / Culto Solene)
+   ========================================================================== */
+
+/* 2.1 Clean Dark Glass */
+.theme-clean .overlay-card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(9, 14, 28, 0.94) 100%);
+  backdrop-filter: blur(20px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  padding: 28px 42px 28px 44px;
+  box-shadow: 0 24px 50px rgba(2, 6, 23, 0.65);
+  overflow: hidden;
+}
+.theme-clean .clean-accent-bar {
+  display: block; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+  background: linear-gradient(180deg, #38BDF8 0%, #6366F1 50%, #A855F7 100%);
+}
+.theme-clean .audience-kicker {
+  background: rgba(56, 189, 248, 0.16); border-color: rgba(56, 189, 248, 0.42); color: #38BDF8;
+}
+.theme-clean .phrase-text {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-weight: 600;
+  font-size: calc(27px * var(--font-scale, 1)); line-height: 1.42; color: #F8FAFC;
+}
+.theme-clean .author-divider { background: linear-gradient(90deg, #38BDF8, #818CF8); }
+.theme-clean .phrase-author {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-weight: 700;
+  font-size: calc(14px * var(--font-scale, 1)); letter-spacing: 0.09em;
+  text-transform: uppercase; color: #38BDF8;
+}
+.theme-clean .progress-bar { background: linear-gradient(90deg, #38BDF8, #818CF8); }
+
+/* 2.2 Clean Alabaster (Editorial Claro & Azul Royal) */
+.theme-inst-light .overlay-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.98) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 18px;
+  padding: 28px 42px 28px 44px;
+  box-shadow: 0 22px 48px rgba(15, 23, 42, 0.32);
+  overflow: hidden;
+}
+.theme-inst-light .clean-accent-bar {
+  display: block; position: absolute; left: 0; top: 0; bottom: 0; width: 7px;
+  background: linear-gradient(180deg, #2563EB 0%, #0EA5E9 100%);
+}
+.theme-inst-light .audience-kicker {
+  background: rgba(37, 99, 235, 0.12); border-color: rgba(37, 99, 235, 0.35); color: #1D4ED8;
+}
+.theme-inst-light .phrase-text {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-weight: 700;
+  font-size: calc(27px * var(--font-scale, 1)); line-height: 1.4; color: #0F172A;
+}
+.theme-inst-light .author-divider { background: #2563EB; }
+.theme-inst-light .phrase-author {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-weight: 800;
+  font-size: calc(14px * var(--font-scale, 1)); letter-spacing: 0.08em;
+  text-transform: uppercase; color: #2563EB;
+}
+.theme-inst-light .progress-wrapper { background: rgba(15, 23, 42, 0.08); }
+.theme-inst-light .progress-bar { background: linear-gradient(90deg, #2563EB, #06B6D4); }
+
+/* 2.3 Solene Black & Gold (Executivo / Culto Solene) */
+.theme-inst-gold .overlay-card {
+  background: linear-gradient(135deg, rgba(17, 17, 19, 0.96) 0%, rgba(9, 9, 11, 0.98) 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.65);
+  border-radius: 16px;
+  padding: 30px 44px 28px 44px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.78);
+  overflow: hidden;
+}
+.theme-inst-gold .clean-accent-bar {
+  display: block; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+  background: linear-gradient(180deg, #FDE047 0%, #D4AF37 50%, #9A7418 100%);
+}
+.theme-inst-gold .audience-kicker {
+  background: rgba(212, 175, 55, 0.16); border-color: rgba(212, 175, 55, 0.45); color: #FDE047;
+}
+.theme-inst-gold .phrase-text {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-weight: 600;
+  font-size: calc(27px * var(--font-scale, 1)); line-height: 1.42; color: #FAFAFA;
+}
+.theme-inst-gold .author-divider { background: #D4AF37; }
+.theme-inst-gold .phrase-author {
+  font-family: 'Cinzel', serif; font-weight: 700;
+  font-size: calc(14.5px * var(--font-scale, 1)); letter-spacing: 0.12em;
+  text-transform: uppercase; color: #FDE047;
+}
+.theme-inst-gold .progress-bar { background: linear-gradient(90deg, #D4AF37, #FEF08A); }
+
+/* ==========================================================================
+   🕊️ CATEGORIA 3: PÁSCOA (3 TEMAS)
+   7. easter-resurrection -> Aurora da Ressurreição (Marfim, Luz & Ouro)
+   8. easter-royal        -> Cordeiro Real (Púrpura Litúrgico & Dourado)
+   9. easter-olive        -> Jardim das Oliveiras (Verde Sálvia & Creme)
+   ========================================================================== */
+
+/* 3.1 Aurora da Ressurreição */
+.theme-easter-resurrection .overlay-card {
+  background:
+    radial-gradient(circle at 15% 0%, rgba(254, 240, 138, 0.55) 0%, transparent 55%),
+    linear-gradient(135deg, rgba(255, 251, 235, 0.97) 0%, rgba(254, 243, 199, 0.96) 100%);
+  border: 2px solid #D97706;
+  border-radius: 20px;
+  padding: 36px 46px 30px 46px;
+  box-shadow: 0 24px 55px rgba(120, 53, 15, 0.35), 0 0 32px rgba(251, 191, 36, 0.35);
+}
+.theme-easter-resurrection .theme-badge-icon.has-badge {
+  background: linear-gradient(135deg, #B45309 0%, #78350F 100%);
+  border: 2px solid #FDE68A;
+}
+.theme-easter-resurrection .audience-kicker {
+  background: rgba(180, 83, 9, 0.14); border-color: rgba(180, 83, 9, 0.4); color: #92400E;
+}
+.theme-easter-resurrection .phrase-text {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 700;
+  font-size: calc(33px * var(--font-scale, 1)); line-height: 1.32; color: #451A03;
+}
+.theme-easter-resurrection .author-divider { background: #D97706; }
+.theme-easter-resurrection .phrase-author {
+  font-family: 'Cinzel', serif; font-weight: 700; font-size: calc(15px * var(--font-scale, 1));
+  letter-spacing: 0.1em; text-transform: uppercase; color: #FFFBEB;
+  background: #92400E; padding: 5px 15px; border-radius: 999px;
+}
+.theme-easter-resurrection .progress-wrapper { background: rgba(146, 64, 14, 0.15); }
+.theme-easter-resurrection .progress-bar { background: linear-gradient(90deg, #D97706, #F59E0B); }
+
+/* 3.2 Cordeiro Real (Púrpura Litúrgico & Ouro) */
+.theme-easter-royal .overlay-card {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(217, 119, 6, 0.22) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(59, 7, 100, 0.97) 0%, rgba(30, 4, 54, 0.99) 100%);
+  border: 2px solid rgba(234, 179, 8, 0.8);
+  border-radius: 20px;
+  padding: 36px 46px 30px 46px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.72), 0 0 28px rgba(147, 51, 234, 0.3);
+}
+.theme-easter-royal .theme-badge-icon.has-badge {
+  background: radial-gradient(circle, #581c87 0%, #3b0764 100%);
+  border: 2px solid #fde047;
+}
+.theme-easter-royal .audience-kicker {
+  background: rgba(234, 179, 8, 0.2); border-color: rgba(253, 224, 71, 0.5); color: #FDE047;
+}
+.theme-easter-royal .phrase-text {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600;
+  font-size: calc(33px * var(--font-scale, 1)); line-height: 1.34; color: #FAF5FF;
+}
+.theme-easter-royal .author-divider { background: #FDE047; }
+.theme-easter-royal .phrase-author {
+  font-family: 'Cinzel', serif; font-weight: 700; font-size: calc(15px * var(--font-scale, 1));
+  letter-spacing: 0.11em; text-transform: uppercase; color: #FDE047;
+  background: rgba(88, 28, 135, 0.75); border: 1px solid rgba(253, 224, 71, 0.5);
+  padding: 5px 15px; border-radius: 999px;
+}
+.theme-easter-royal .progress-bar { background: linear-gradient(90deg, #A855F7, #FDE047); }
+
+/* 3.3 Jardim das Oliveiras (Verde Sálvia & Creme) */
+.theme-easter-olive .overlay-card {
+  background: linear-gradient(135deg, rgba(20, 46, 36, 0.96) 0%, rgba(12, 29, 22, 0.98) 100%);
+  border: 2px solid rgba(134, 239, 172, 0.55);
+  border-radius: 20px;
+  padding: 36px 46px 30px 46px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.68);
+}
+.theme-easter-olive .theme-badge-icon.has-badge {
+  background: #14532D; border: 2px solid #86EFAC;
+}
+.theme-easter-olive .audience-kicker {
+  background: rgba(134, 239, 172, 0.16); border-color: rgba(134, 239, 172, 0.45); color: #BBF7D0;
+}
+.theme-easter-olive .phrase-text {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600;
+  font-size: calc(33px * var(--font-scale, 1)); line-height: 1.34; color: #F0FDF4;
+}
+.theme-easter-olive .author-divider { background: #86EFAC; }
+.theme-easter-olive .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;
+  font-size: calc(14px * var(--font-scale, 1)); letter-spacing: 0.09em;
+  text-transform: uppercase; color: #86EFAC;
+}
+.theme-easter-olive .progress-bar { background: linear-gradient(90deg, #4ADE80, #FEF08A); }
+
+/* ==========================================================================
+   🌸 CATEGORIA 4: DIA DAS MÃES (2 TEMAS)
+   10. mothers-rose  -> Jardim de Rosas (Rubi Rosé, Blush & Ouro Rosa)
+   11. mothers-pearl -> Pérola & Afeto (Creme Perolado & Coral)
+   ========================================================================== */
+
+/* 4.1 Jardim de Rosas */
+.theme-mothers-rose .overlay-card {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(251, 113, 133, 0.28) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(112, 16, 48, 0.96) 0%, rgba(67, 8, 29, 0.98) 100%);
+  border: 2px solid rgba(253, 164, 175, 0.78);
+  border-radius: 22px;
+  padding: 36px 46px 30px 46px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.65), 0 0 28px rgba(244, 63, 94, 0.28);
+}
+.theme-mothers-rose .theme-badge-icon.has-badge {
+  background: #881337; border: 2px solid #FDA4AF;
+}
+.theme-mothers-rose .audience-kicker {
+  background: rgba(253, 164, 175, 0.2); border-color: rgba(253, 164, 175, 0.55); color: #FFE4E6;
+}
+.theme-mothers-rose .phrase-text {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600;
+  font-size: calc(33px * var(--font-scale, 1)); line-height: 1.34; color: #FFF1F2;
+}
+.theme-mothers-rose .author-divider { background: #FDA4AF; }
+.theme-mothers-rose .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;
+  font-size: calc(14px * var(--font-scale, 1)); letter-spacing: 0.09em;
+  text-transform: uppercase; color: #FFE4E6;
+  background: rgba(159, 18, 57, 0.75); border: 1px solid rgba(253, 164, 175, 0.5);
+  padding: 5px 15px; border-radius: 999px;
+}
+.theme-mothers-rose .progress-bar { background: linear-gradient(90deg, #FB7185, #FFE4E6); }
+
+/* 4.2 Pérola & Afeto (Editorial Claro) */
+.theme-mothers-pearl .overlay-card {
+  background: linear-gradient(135deg, rgba(255, 245, 247, 0.97) 0%, rgba(255, 228, 234, 0.97) 100%);
+  border: 2px solid #FB7185;
+  border-radius: 22px;
+  padding: 36px 46px 30px 46px;
+  box-shadow: 0 22px 50px rgba(136, 19, 55, 0.28);
+}
+.theme-mothers-pearl .theme-badge-icon.has-badge {
+  background: #FFF1F2; border: 2px solid #F43F5E;
+}
+.theme-mothers-pearl .audience-kicker {
+  background: rgba(225, 29, 72, 0.12); border-color: rgba(225, 29, 72, 0.35); color: #BE123C;
+}
+.theme-mothers-pearl .phrase-text {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 700;
+  font-size: calc(33px * var(--font-scale, 1)); line-height: 1.32; color: #4C0519;
+}
+.theme-mothers-pearl .author-divider { background: #E11D48; }
+.theme-mothers-pearl .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
+  font-size: calc(14px * var(--font-scale, 1)); letter-spacing: 0.08em;
+  text-transform: uppercase; color: #E11D48;
+}
+.theme-mothers-pearl .progress-wrapper { background: rgba(225, 29, 72, 0.12); }
+.theme-mothers-pearl .progress-bar { background: linear-gradient(90deg, #E11D48, #FB7185); }
+
+/* ==========================================================================
+   👔 CATEGORIA 5: DIA DOS PAIS (2 TEMAS)
+   12. fathers-navy     -> Executivo Navy & Prata (Azul Marinho & Aço)
+   13. fathers-espresso -> Clássico Espresso & Âmbar (Couro/Madeira & Bronze)
+   ========================================================================== */
+
+/* 5.1 Executivo Navy & Prata */
+.theme-fathers-navy .overlay-card {
+  background: linear-gradient(135deg, rgba(15, 29, 58, 0.96) 0%, rgba(8, 16, 36, 0.98) 100%);
+  border: 2px solid rgba(148, 163, 184, 0.6);
+  border-radius: 16px;
+  padding: 36px 46px 30px 46px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.72);
+}
+.theme-fathers-navy .theme-badge-icon.has-badge {
+  background: #0F172A; border: 2px solid #38BDF8;
+}
+.theme-fathers-navy .audience-kicker {
+  background: rgba(56, 189, 248, 0.16); border-color: rgba(56, 189, 248, 0.45); color: #7DD3FC;
+}
+.theme-fathers-navy .phrase-text {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-weight: 600;
+  font-size: calc(27px * var(--font-scale, 1)); line-height: 1.4; color: #F8FAFC;
+}
+.theme-fathers-navy .author-divider { background: #38BDF8; }
+.theme-fathers-navy .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
+  font-size: calc(14px * var(--font-scale, 1)); letter-spacing: 0.1em;
+  text-transform: uppercase; color: #93C5FD;
+}
+.theme-fathers-navy .progress-bar { background: linear-gradient(90deg, #38BDF8, #94A3B8); }
+
+/* 5.2 Clássico Espresso & Âmbar */
+.theme-fathers-espresso .overlay-card {
+  background: linear-gradient(135deg, rgba(48, 27, 19, 0.97) 0%, rgba(26, 14, 10, 0.99) 100%);
+  border: 2px solid rgba(217, 119, 6, 0.72);
+  border-radius: 16px;
+  padding: 36px 46px 30px 46px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.75);
+}
+.theme-fathers-espresso .theme-badge-icon.has-badge {
+  background: #451A03; border: 2px solid #FBBF24;
+}
+.theme-fathers-espresso .audience-kicker {
+  background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.5); color: #FDE68A;
+}
+.theme-fathers-espresso .phrase-text {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600;
+  font-size: calc(32px * var(--font-scale, 1)); line-height: 1.35; color: #FEF3C7;
+}
+.theme-fathers-espresso .author-divider { background: #F59E0B; }
+.theme-fathers-espresso .phrase-author {
+  font-family: 'Cinzel', serif; font-weight: 700;
+  font-size: calc(15px * var(--font-scale, 1)); letter-spacing: 0.1em;
+  text-transform: uppercase; color: #FBBF24;
+}
+.theme-fathers-espresso .progress-bar { background: linear-gradient(90deg, #D97706, #FDE047); }
+
+/* ==========================================================================
+   ⚽ CATEGORIA 6: FUTEBOL & ESPORTES (2 TEMAS)
+   14. soccer-pitch    -> Arena Gramado (Verde Campo, Amarelo Ouro & Placar TV)
+   15. soccer-champion -> Noite de Copa (Azul Estádio, Ciano Neon & Prata)
+   ========================================================================== */
+
+/* 6.1 Arena Gramado (Verde Campo & Amarelo Canarinho) */
+.theme-soccer-pitch .overlay-card {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 36px, transparent 36px, transparent 72px),
+    linear-gradient(135deg, rgba(6, 78, 59, 0.97) 0%, rgba(2, 44, 34, 0.99) 100%);
+  border: 2px solid #FACC15;
+  border-radius: 14px;
+  padding: 34px 44px 28px 46px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.78);
+}
+.theme-soccer-pitch .clean-accent-bar {
+  display: block; position: absolute; left: 0; top: 0; bottom: 0; width: 8px;
+  background: linear-gradient(180deg, #FACC15 0%, #22C55E 100%);
+}
+.theme-soccer-pitch .theme-badge-icon.has-badge {
+  background: #064E3B; border: 2px solid #FACC15;
+}
+.theme-soccer-pitch .audience-kicker {
+  background: #FACC15; border-color: #FEF08A; color: #052E16;
+}
+.theme-soccer-pitch .phrase-text {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-weight: 800;
+  font-size: calc(27px * var(--font-scale, 1)); line-height: 1.36; color: #FFFFFF;
+}
+.theme-soccer-pitch .author-divider { background: #FACC15; }
+.theme-soccer-pitch .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
+  font-size: calc(14px * var(--font-scale, 1)); letter-spacing: 0.11em;
+  text-transform: uppercase; color: #FACC15;
+}
+.theme-soccer-pitch .progress-bar { background: linear-gradient(90deg, #22C55E, #FACC15); }
+
+/* 6.2 Noite de Copa (Champions / Estádio Noturno) */
+.theme-soccer-champion .overlay-card {
+  background:
+    radial-gradient(circle at 90% 10%, rgba(56, 189, 248, 0.28) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(10, 18, 46, 0.97) 0%, rgba(4, 9, 26, 0.99) 100%);
+  border: 2px solid #38BDF8;
+  border-radius: 14px;
+  padding: 34px 44px 28px 46px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.28);
+}
+.theme-soccer-champion .clean-accent-bar {
+  display: block; position: absolute; left: 0; top: 0; bottom: 0; width: 8px;
+  background: linear-gradient(180deg, #38BDF8 0%, #3B82F6 50%, #1D4ED8 100%);
+}
+.theme-soccer-champion .theme-badge-icon.has-badge {
+  background: #0C4A6E; border: 2px solid #38BDF8;
+}
+.theme-soccer-champion .audience-kicker {
+  background: rgba(56, 189, 248, 0.2); border-color: #38BDF8; color: #E0F2FE;
+}
+.theme-soccer-champion .phrase-text {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-weight: 700;
+  font-size: calc(27px * var(--font-scale, 1)); line-height: 1.38; color: #F8FAFC;
+}
+.theme-soccer-champion .author-divider { background: #38BDF8; }
+.theme-soccer-champion .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
+  font-size: calc(14px * var(--font-scale, 1)); letter-spacing: 0.11em;
+  text-transform: uppercase; color: #38BDF8;
+}
+.theme-soccer-champion .progress-bar { background: linear-gradient(90deg, #38BDF8, #A855F7); }
+
+/* ==========================================================================
+   ✨ CATEGORIA 7: EXTRAS ESPECIAIS (3 TEMAS SUGERIDOS)
+   16. new-year    -> Ano Novo / Réveillon (Champanhe, Fogos & Branco)
+   17. youth-neon  -> Culto Jovem / Podcast / Louvor (Cyberpunk Violeta & Ciano)
+   18. junina-fest -> Festa Junina / Arraial (Terracota, Fogueira & Amarelo)
+   ========================================================================== */
+
+/* 7.1 Ano Novo / Réveillon */
+.theme-new-year .overlay-card {
+  background:
+    radial-gradient(circle at 80% 20%, rgba(253, 224, 71, 0.25) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(24, 24, 27, 0.96) 0%, rgba(9, 9, 11, 0.98) 100%);
+  border: 2px solid #FDE047;
+  border-radius: 20px;
+  padding: 36px 46px 30px 46px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.78), 0 0 32px rgba(253, 224, 71, 0.28);
+}
+.theme-new-year .theme-badge-icon.has-badge {
+  background: #27272A; border: 2px solid #FDE047;
+}
+.theme-new-year .phrase-text {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600;
+  font-size: calc(33px * var(--font-scale, 1)); line-height: 1.34; color: #FEFCE8;
+}
+.theme-new-year .author-divider { background: #FDE047; }
+.theme-new-year .phrase-author {
+  font-family: 'Cinzel', serif; font-weight: 700;
+  font-size: calc(15px * var(--font-scale, 1)); letter-spacing: 0.12em;
+  text-transform: uppercase; color: #FDE047;
+}
+.theme-new-year .progress-bar { background: linear-gradient(90deg, #FDE047, #FFFFFF, #CA8A04); }
+
+/* 7.2 Culto Jovem / Podcast / Louvor (Cyber Neon) */
+.theme-youth-neon .overlay-card {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(217, 70, 239, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 85% 80%, rgba(6, 182, 212, 0.25) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(15, 7, 34, 0.96) 0%, rgba(8, 5, 20, 0.98) 100%);
+  border: 2px solid #D946EF;
+  border-radius: 18px;
+  padding: 34px 44px 28px 44px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.78), 0 0 30px rgba(217, 70, 239, 0.3);
+}
+.theme-youth-neon .theme-badge-icon.has-badge {
+  background: #2E1065; border: 2px solid #22D3EE;
+}
+.theme-youth-neon .audience-kicker {
+  background: rgba(34, 211, 238, 0.18); border-color: #22D3EE; color: #67E8F9;
+}
+.theme-youth-neon .phrase-text {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; font-weight: 700;
+  font-size: calc(27px * var(--font-scale, 1)); line-height: 1.4; color: #FDF4FF;
+}
+.theme-youth-neon .author-divider { background: #22D3EE; }
+.theme-youth-neon .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
+  font-size: calc(14px * var(--font-scale, 1)); letter-spacing: 0.1em;
+  text-transform: uppercase; color: #22D3EE;
+}
+.theme-youth-neon .progress-bar { background: linear-gradient(90deg, #D946EF, #22D3EE); }
+
+/* 7.3 Festa Junina / Arraial */
+.theme-junina-fest .overlay-card {
+  background: linear-gradient(135deg, rgba(124, 45, 18, 0.97) 0%, rgba(67, 20, 7, 0.99) 100%);
+  border: 2px solid #FACC15;
+  border-radius: 18px;
+  padding: 36px 46px 30px 46px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.75);
+}
+.theme-junina-fest .theme-badge-icon.has-badge {
+  background: #9A3412; border: 2px solid #FACC15;
+}
+.theme-junina-fest .phrase-text {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;
+  font-size: calc(27px * var(--font-scale, 1)); line-height: 1.4; color: #FFFBEB;
+}
+.theme-junina-fest .author-divider { background: #FACC15; }
+.theme-junina-fest .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
+  font-size: calc(14px * var(--font-scale, 1)); letter-spacing: 0.09em;
+  text-transform: uppercase; color: #FDE047;
+}
+.theme-junina-fest .progress-bar { background: linear-gradient(90deg, #F97316, #FACC15, #22C55E); }

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 56" fill="none">
+  <defs>
+    <!-- Gradiente Principal tImago (Violeta / Índigo / Ciano) -->
+    <linearGradient id="timagoPrimary" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="55%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+
+    <!-- Gradiente Dourado / Âmbar para o ponto de foco "On Air / Luz" -->
+    <linearGradient id="timagoGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+
+    <!-- Sombra de brilho sutil -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#6366F1" flood-opacity="0.45" />
+    </filter>
+  </defs>
+
+  <!-- SÍMBOLO / ÍCONE (0..56) -->
+  <g filter="url(#glow)">
+    <!-- Base Escura Arredondada com Borda Gradiente -->
+    <rect x="3" y="3" width="50" height="50" rx="14" fill="#0F172A" stroke="url(#timagoPrimary)" stroke-width="2.5" />
+
+    <!-- Cantoneiras de Enquadramento Broadcast (Viewfinder) -->
+    <path d="M12 20V14C12 12.8954 12.8954 12 14 12H20" stroke="#38BDF8" stroke-width="2.2" stroke-linecap="round" />
+    <path d="M44 20V14C44 12.8954 43.1046 12 42 12H36" stroke="#8B5CF6" stroke-width="2.2" stroke-linecap="round" />
+    <path d="M12 36V42C12 43.1046 12.8954 44 14 44H20" stroke="#8B5CF6" stroke-width="2.2" stroke-linecap="round" />
+    <path d="M44 36V42C44 43.1046 43.1046 44 42 44H36" stroke="#06B6D4" stroke-width="2.2" stroke-linecap="round" />
+
+    <!-- Camadas de Overlay e Monograma "tI" Central -->
+    <rect x="19" y="21" width="18" height="4.5" rx="2.25" fill="url(#timagoPrimary)" />
+    <rect x="25.5" y="21" width="5" height="17" rx="2.5" fill="url(#timagoPrimary)" />
+
+    <!-- Ponto Luminoso "I" / Sinal On-Air -->
+    <circle cx="28" cy="15.5" r="3" fill="url(#timagoGold)" />
+  </g>
+
+  <!-- TIPOGRAFIA "tImago" -->
+  <g transform="translate(68, 0)">
+    <text x="0" y="35" font-family="'Plus Jakarta Sans', 'Inter', system-ui, sans-serif" font-size="29" font-weight="800" letter-spacing="-0.03em">
+      <tspan fill="#94A3B8" font-weight="600">t</tspan><tspan fill="#F8FAFC">Imago</tspan>
+    </text>
+    <!-- Ponto de status Live ao lado do nome -->
+    <circle cx="105" cy="16" r="4" fill="url(#timagoGold)" />
+    <text x="1" y="48" font-family="'Inter', system-ui, sans-serif" font-size="9.5" font-weight="700" fill="#38BDF8" letter-spacing="0.18em">
+      BROADCAST OVERLAY
+    </text>
+  </g>
+</svg>

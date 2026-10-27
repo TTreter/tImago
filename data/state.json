@@ -1,0 +1,49 @@
+{
+  "settings": {
+    "visible": true,
+    "autoRotate": true,
+    "theme": "christmas",
+    "position": "bottom-center",
+    "intervalSeconds": 1,
+    "defaultDurationSeconds": 20,
+    "showProgress": true,
+    "fontSizePercent": 100,
+    "overlayScalePercent": 100,
+    "cardMaxWidthPx": 1200,
+    "resolutionWidth": 1920,
+    "resolutionHeight": 1080,
+    "audienceHoldMode": true,
+    "audienceBatchPlaying": false
+  },
+  "phrases": [
+    {
+      "id": "p-1",
+      "text": "Sejam todos muito bem-vindos à nossa Cantata de Natal! Que a paz e a esperança desta noite preencham o seu lar.",
+      "author": "Coral & Organização",
+      "duration": 10,
+      "enabled": true
+    },
+    {
+      "id": "p-2",
+      "text": "\"Porque um menino nos nasceu, um filho se nos deu; o governo está sobre os seus ombros; e o seu nome será: Maravilhoso Conselheiro, Deus Forte, Pai da Eternidade, Príncipe da Paz.\"",
+      "author": "Isaías 9:6",
+      "duration": 12,
+      "enabled": true
+    },
+    {
+      "id": "p-3",
+      "text": "Deixe sua mensagem de Natal no chat! Vamos exibir os recados e felicitações especiais aqui na tela durante a transmissão.",
+      "author": "Participe ao Vivo",
+      "duration": 9,
+      "enabled": true
+    },
+    {
+      "id": "p-4",
+      "text": "\"Glória a Deus nas maiores alturas, e paz na terra entre os homens, a quem ele quer bem!\"",
+      "author": "Lucas 2:14",
+      "duration": 9,
+      "enabled": true
+    }
+  ],
+  "audienceQueue": []
+}
