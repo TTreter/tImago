@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node server.js",
     "app": "electron .",
-    "build:exe": "electron-builder --win portable"
+    "build:exe": "electron-builder --win portable nsis"
   },
   "dependencies": {
     "express": "^4.19.2",
