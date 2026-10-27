@@ -1070,13 +1070,21 @@ function startServer(port = PORT) {
  */
 function stopServer() {
   clearRotationTimer();
+  if (global.lowerThirdTimer) {
+    clearTimeout(global.lowerThirdTimer);
+    global.lowerThirdTimer = null;
+  }
   io.emit('app:shutdown');
   io.close();
   server.close();
+}
+
+function isOverlayVisible() {
+  return Boolean(state?.settings?.visible);
 }
 
 if (require.main === module) {
   startServer(PORT);
 }
 
-module.exports = { startServer, stopServer };
+module.exports = { startServer, stopServer, isOverlayVisible };

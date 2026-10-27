@@ -1414,6 +1414,42 @@
   }
 
   // ==========================================================================
+  // ATALHOS DE TECLADO DE ESTÚDIO AO VIVO (FASE 6)
+  // ==========================================================================
+  window.addEventListener('keydown', (e) => {
+    // Fecha qualquer modal aberto com ESC
+    if (e.key === 'Escape') {
+      closeEditModal();
+      closePlaylistModal();
+      closeQrModal();
+      return;
+    }
+
+    // Atalhos Alt + Tecla (funcionam em qualquer lugar do painel)
+    if (e.altKey && !e.ctrlKey && !e.metaKey) {
+      const key = e.key.toLowerCase();
+      if (key === 'a') {
+        e.preventDefault();
+        if (currentState) {
+          socket.emit('settings:update', { visible: !currentState.settings.visible });
+        }
+      } else if (key === 'n') {
+        e.preventDefault();
+        socket.emit('rotation:next');
+      } else if (key === 'c') {
+        e.preventDefault();
+        socket.emit('rotation:clearCurrent');
+      } else if (key === 'i') {
+        e.preventDefault();
+        socket.emit('audience:startBatch');
+      } else if (key === 'l') {
+        e.preventDefault();
+        socket.emit('lowerThird:hide');
+      }
+    }
+  });
+
+  // ==========================================================================
   // SINCRONIZAÇÃO SOCKET.IO
   // ==========================================================================
   socket.on('state:sync', (payload) => {

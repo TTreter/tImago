@@ -12,7 +12,7 @@
  * ============================================================================
  */
 
-const { app, BrowserWindow, shell } = require('electron');
+const { app, BrowserWindow, shell, dialog } = require('electron');
 const path = require('path');
 
 // Garante que apenas uma instância do aplicativo tImago rode por vez
@@ -25,7 +25,7 @@ if (!gotTheLock) {
 // Configura a pasta de persistência em AppData/Roaming/tImago antes de importar o server.js
 process.env.TIMAGO_DATA_DIR = path.join(app.getPath('userData'), 'data');
 
-const { startServer, stopServer } = require('./server');
+const { startServer, stopServer, isOverlayVisible } = require('./server');
 
 let mainWindow = null;
 const PORT = process.env.PORT || 3000;
@@ -58,6 +58,24 @@ async function createMainWindow() {
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
+  });
+
+  // Trava de Segurança ao Vivo (Fase 6): pergunta antes de fechar se o Overlay estiver NO AR
+  mainWindow.on('close', (e) => {
+    if (isOverlayVisible()) {
+      const choice = dialog.showMessageBoxSync(mainWindow, {
+        type: 'warning',
+        buttons: ['Cancelar (Manter Aberto)', 'Sim, Encerrar Transmissão e Fechar'],
+        defaultId: 0,
+        cancelId: 0,
+        title: 'Transmissão NO AR — tImago',
+        message: 'O Overlay está marcado como NO AR (Visível).',
+        detail: 'Deseja realmente fechar o tImago e encerrar o overlay no OBS Studio agora?'
+      });
+      if (choice === 0) {
+        e.preventDefault();
+      }
+    }
   });
 
   mainWindow.on('closed', () => {
