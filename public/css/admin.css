@@ -1725,3 +1725,109 @@ input:checked + .slider:before {
   gap: 6px;
   flex-wrap: wrap;
 }
+
+/* ==========================================================================
+   MODAL QR CODE MOBILE & MODO RECEPÇÃO (FASE 3)
+   ========================================================================== */
+.modal-qr-box {
+  max-width: 680px;
+}
+
+.qr-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.qr-card-option {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.qr-card-option.highlight {
+  border-color: rgba(245, 158, 11, 0.45);
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, var(--bg-input) 100%);
+}
+
+.qr-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 99px;
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.qr-badge.subtle {
+  background: rgba(56, 189, 248, 0.14);
+  color: #7dd3fc;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.qr-card-option h4 {
+  font-size: 14px;
+  color: #f8fafc;
+}
+
+.qr-card-option p {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.qr-svg-container {
+  width: 175px;
+  height: 175px;
+  margin: 4px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-svg-code {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.qr-url-code {
+  font-size: 11px;
+  color: #38bdf8;
+  background: rgba(15, 23, 42, 0.8);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  word-break: break-all;
+}
+
+/* Modo Recepção Simplificado (focado na Fila do Público para celular/voluntários) */
+#btn-toggle-reception-mode.is-active {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
+}
+
+body.is-reception-mode .obs-url-box,
+body.is-reception-mode #btn-export-backup,
+body.is-reception-mode #btn-import-backup,
+body.is-reception-mode .col-main > section:not(.audience-card),
+body.is-reception-mode .settings-tabs-card {
+  display: none !important;
+}
+
+body.is-reception-mode .main-grid {
+  max-width: 1020px;
+}

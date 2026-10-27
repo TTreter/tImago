@@ -41,6 +41,13 @@
         </div>
 
         <div class="backup-actions-box">
+          <button type="button" id="btn-open-mobile-qr" class="btn btn-sm btn-secondary" title="Abrir controle remoto no celular ou tablet via QR Code na rede Wi-Fi">
+            <svg class="icon-svg" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+            <span id="label-mobile-qr">📱 Celular / QR</span>
+          </button>
+          <button type="button" id="btn-toggle-reception-mode" class="btn btn-sm btn-ghost" title="Alternar Modo Recepção Simplificado (focado apenas na Fila do Público para celular/voluntários)">
+            <span>🙋 Modo Recepção</span>
+          </button>
           <button type="button" id="btn-export-backup" class="btn btn-sm btn-ghost" title="Exportar backup completo (.json) de todas as playlists, configurações e fila">
             <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             <span>Exportar JSON</span>
@@ -822,7 +829,43 @@
     </div>
   </div>
 
+  <!-- MODAL DE CONEXÃO MOBILE (QR CODE NA REDE LOCAL) -->
+  <div id="mobile-qr-modal" class="modal-backdrop is-hidden">
+    <div class="modal-box modal-qr-box">
+      <div class="modal-header">
+        <h3>📱 Controle Remoto pelo Celular / Tablet</h3>
+        <button type="button" id="btn-close-qr-modal" class="btn-icon">✕</button>
+      </div>
+      <p class="field-help">
+        Conecte o celular na <strong>mesma rede Wi-Fi</strong> deste computador e aponte a câmera para um dos QR Codes abaixo:
+      </p>
+
+      <div class="qr-cards-grid">
+        <div class="qr-card-option highlight">
+          <span class="qr-badge">RECOMENDADO PARA EQUIPE</span>
+          <h4>🙋 Modo Recepção (Fila do Público)</h4>
+          <p>Tela limpa e otimizada para cadastrar mensagens da live pelo celular sem risco de esbarrar nas configurações.</p>
+          <div id="qr-svg-reception" class="qr-svg-container"></div>
+          <code id="qr-url-reception" class="qr-url-code">http://localhost:3000/?mode=recepcao</code>
+        </div>
+
+        <div class="qr-card-option">
+          <span class="qr-badge subtle">OPERADOR PRINCIPAL</span>
+          <h4>🎛️ Painel de Estúdio Completo</h4>
+          <p>Acesso integral à Fila do Público, Carrossel, Playlists, Temas e Configurações de Transmissão.</p>
+          <div id="qr-svg-full" class="qr-svg-container"></div>
+          <code id="qr-url-full" class="qr-url-code">http://localhost:3000</code>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="btn-close-qr-footer" class="btn btn-primary">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/qrcode-svg.js"></script>
   <script src="/js/admin.js"></script>
 </body>
 </html>

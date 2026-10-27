@@ -79,6 +79,18 @@
   const btnImportBackup = document.getElementById('btn-import-backup');
   const inputImportJson = document.getElementById('input-import-json');
 
+  // Controle Mobile (QR Code) & Modo Recepção (Fase 3)
+  const btnOpenMobileQr = document.getElementById('btn-open-mobile-qr');
+  const labelMobileQr = document.getElementById('label-mobile-qr');
+  const btnToggleReceptionMode = document.getElementById('btn-toggle-reception-mode');
+  const mobileQrModal = document.getElementById('mobile-qr-modal');
+  const btnCloseQrModal = document.getElementById('btn-close-qr-modal');
+  const btnCloseQrFooter = document.getElementById('btn-close-qr-footer');
+  const qrSvgReception = document.getElementById('qr-svg-reception');
+  const qrUrlReception = document.getElementById('qr-url-reception');
+  const qrSvgFull = document.getElementById('qr-svg-full');
+  const qrUrlFull = document.getElementById('qr-url-full');
+
   const phrasesListEl = document.getElementById('phrases-list');
   const phrasesCounterEl = document.getElementById('phrases-counter');
 
@@ -1159,6 +1171,64 @@
   }
 
   // ==========================================================================
+  // ACESSO REMOTO VIA CELULAR (QR CODE) & MODO RECEPÇÃO (FASE 3)
+  // ==========================================================================
+  function setReceptionMode(enabled) {
+    document.body.classList.toggle('is-reception-mode', Boolean(enabled));
+    if (btnToggleReceptionMode) {
+      btnToggleReceptionMode.classList.toggle('is-active', Boolean(enabled));
+      const span = btnToggleReceptionMode.querySelector('span');
+      if (span) {
+        span.textContent = enabled ? '🎛️ Voltar ao Painel Completo' : '🙋 Modo Recepção';
+      }
+    }
+    setTimeout(updatePreviewScale, 60);
+  }
+
+  // Ativa automaticamente o Modo Recepção se a URL tiver ?mode=recepcao
+  if (new URLSearchParams(window.location.search).get('mode') === 'recepcao') {
+    setReceptionMode(true);
+  }
+
+  if (btnToggleReceptionMode) {
+    btnToggleReceptionMode.addEventListener('click', () => {
+      const next = !document.body.classList.contains('is-reception-mode');
+      setReceptionMode(next);
+    });
+  }
+
+  function renderMobileQrCodes(runtime) {
+    const ip = runtime?.localIp || window.location.hostname || 'localhost';
+    const port = runtime?.port || window.location.port || 3000;
+    const baseUrl = `http://${ip}:${port}`;
+    const receptionUrl = `${baseUrl}/?mode=recepcao`;
+
+    if (labelMobileQr && ip !== 'localhost') {
+      labelMobileQr.textContent = `📱 Celular (${ip})`;
+    }
+    if (qrUrlReception) qrUrlReception.textContent = receptionUrl;
+    if (qrUrlFull) qrUrlFull.textContent = baseUrl;
+
+    if (window.tImagoQR && typeof window.tImagoQR.renderQrSvg === 'function') {
+      if (qrSvgReception) qrSvgReception.innerHTML = window.tImagoQR.renderQrSvg(receptionUrl);
+      if (qrSvgFull) qrSvgFull.innerHTML = window.tImagoQR.renderQrSvg(baseUrl);
+    }
+  }
+
+  function closeQrModal() {
+    if (mobileQrModal) mobileQrModal.classList.add('is-hidden');
+  }
+
+  if (btnOpenMobileQr) {
+    btnOpenMobileQr.addEventListener('click', () => {
+      renderMobileQrCodes(currentRuntime);
+      if (mobileQrModal) mobileQrModal.classList.remove('is-hidden');
+    });
+  }
+  if (btnCloseQrModal) btnCloseQrModal.addEventListener('click', closeQrModal);
+  if (btnCloseQrFooter) btnCloseQrFooter.addEventListener('click', closeQrModal);
+
+  // ==========================================================================
   // SINCRONIZAÇÃO SOCKET.IO
   // ==========================================================================
   socket.on('state:sync', (payload) => {
@@ -1176,6 +1246,7 @@
 
     renderMasterControls(currentState.settings);
     renderPlaylistsSelector(currentState.playlists || [], currentState.activePlaylistId);
+    renderMobileQrCodes(currentRuntime);
     renderAudienceQueue(currentState.audienceQueue || [], currentRuntime, currentState.settings);
     renderPhrasesList(currentState.phrases || [], currentRuntime, currentState.settings);
     updateLiveMonitorTick();

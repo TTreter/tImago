@@ -306,7 +306,9 @@ function broadcastState() {
     runtime: {
       ...runtime,
       serverNow: Date.now(),
-      pendingAudienceCount: getPendingAudiencePhrases().length
+      pendingAudienceCount: getPendingAudiencePhrases().length,
+      localIp: getLocalIpAddress(),
+      port: PORT
     }
   });
 }
@@ -544,7 +546,9 @@ io.on('connection', (socket) => {
     runtime: {
       ...runtime,
       serverNow: Date.now(),
-      pendingAudienceCount: getPendingAudiencePhrases().length
+      pendingAudienceCount: getPendingAudiencePhrases().length,
+      localIp: getLocalIpAddress(),
+      port: PORT
     }
   });
 
