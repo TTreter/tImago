@@ -2329,6 +2329,11 @@ body {
   display: block !important;
 }
 
+#view-sports.view-panel.active {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
 /* ==========================================================================
    PÁGINA DEDICADA DE CONFIGURAÇÕES
    ========================================================================== */
@@ -2632,17 +2637,22 @@ body.is-compact-lists .phrase-item-text {
 /* ==========================================================================
    MESA DE TRANSMISSÃO ESPORTIVA (PLACAR AO VIVO - VIEW-SPORTS)
    ========================================================================== */
+.file-hidden {
+  display: none !important;
+}
+
 .sports-page-wrapper {
   display: none;
   flex-direction: column;
   gap: 20px;
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
   padding-bottom: 40px;
 }
 
 .sports-page-wrapper.active {
-  display: flex;
+  display: flex !important;
 }
 
 .sports-page-header {
