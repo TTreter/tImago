@@ -147,13 +147,28 @@
     progressAnimationFrame = requestAnimationFrame(tick);
   }
 
-  function setCardContent(phrase) {
+  function setCardContent(phrase, settings) {
     phraseTextEl.textContent = phrase.text || '';
 
-    // Diferencia visualmente recados do público vs frases do carrossel do sistema
+    // Diferencia visualmente recados do público ou etiqueta personalizada da frase
     if (audienceKickerEl) {
-      if (phrase.source === 'audience') {
+      const kickerTextSpan = audienceKickerEl.querySelector('.audience-kicker-text');
+      const showKickerGlobal = settings?.showKicker !== false;
+      const customKicker = (phrase.kicker || '').trim();
+
+      if (!showKickerGlobal || customKicker === '__NONE__') {
+        audienceKickerEl.classList.add('is-hidden');
+      } else if (customKicker) {
+        if (kickerTextSpan) kickerTextSpan.textContent = customKicker;
         audienceKickerEl.classList.remove('is-hidden');
+      } else if (phrase.source === 'audience') {
+        const defaultLabel = (settings?.defaultKickerText || 'MENSAGEM DO PÚBLICO').trim();
+        if (defaultLabel) {
+          if (kickerTextSpan) kickerTextSpan.textContent = defaultLabel;
+          audienceKickerEl.classList.remove('is-hidden');
+        } else {
+          audienceKickerEl.classList.add('is-hidden');
+        }
       } else {
         audienceKickerEl.classList.add('is-hidden');
       }
@@ -206,7 +221,7 @@
       cardEl.classList.add('is-switching');
 
       switchTimeout = setTimeout(() => {
-        setCardContent(phrase);
+        setCardContent(phrase, state?.settings);
         renderedPhraseId = phrase.id;
         renderedPhaseStartedAt = runtime.phaseStartedAt;
         cardEl.classList.remove('is-switching', 'is-hidden');
@@ -217,7 +232,7 @@
     }
 
     // Atualiza texto/autor (inclusive se o operador editou o texto ao vivo)
-    setCardContent(phrase);
+    setCardContent(phrase, state?.settings);
 
     cardEl.classList.remove('is-hidden', 'is-switching');
     cardEl.classList.add('is-visible');

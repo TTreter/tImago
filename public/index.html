@@ -96,6 +96,19 @@
                 />
               </div>
 
+              <div class="form-group kicker-group">
+                <label for="aud-input-kicker">Etiqueta do Topo <span class="opt">(selo)</span></label>
+                <select id="aud-input-kicker">
+                  <option value="">Padrão (Mensagem do Público)</option>
+                  <option value="PEDIDO DE ORAÇÃO">🙏 Pedido de Oração</option>
+                  <option value="RECADO DE NATAL">🎄 Recado de Natal</option>
+                  <option value="PERGUNTA AO VIVO">❓ Pergunta ao Vivo</option>
+                  <option value="ANIVERSARIANTE">🎂 Aniversariante</option>
+                  <option value="TESTEMUNHO">✨ Testemunho</option>
+                  <option value="__NONE__">🚫 Ocultar Etiqueta</option>
+                </select>
+              </div>
+
               <div class="form-group duration-group">
                 <label for="aud-input-duration">Tempo na Tela (seg)</label>
                 <input
@@ -198,6 +211,15 @@
                 />
               </div>
 
+              <div class="form-group kicker-group">
+                <label for="input-kicker">Etiqueta do Topo <span class="opt">(opcional)</span></label>
+                <input
+                  type="text"
+                  id="input-kicker"
+                  placeholder="Ex: AVISO, VERSÍCULO, MÚSICA..."
+                />
+              </div>
+
               <div class="form-group duration-group">
                 <label for="input-duration">Tempo na Tela (seg)</label>
                 <input
@@ -221,6 +243,26 @@
               </button>
             </div>
           </form>
+
+          <!-- Barra de Pesquisa e Ações em Massa do Carrossel -->
+          <div class="carousel-toolbar">
+            <div class="search-input-wrapper">
+              <svg class="icon-svg icon-xs search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input
+                type="text"
+                id="input-search-phrases"
+                placeholder="Filtrar frases do carrossel por texto ou autor..."
+              />
+            </div>
+            <div class="bulk-actions-group">
+              <button type="button" id="btn-enable-all-phrases" class="btn-reset-link" title="Ativar todas as frases no carrossel">
+                ✓ Ativar Todas
+              </button>
+              <button type="button" id="btn-disable-all-phrases" class="btn-reset-link" title="Desativar todas as frases do carrossel">
+                ✕ Desativar Todas
+              </button>
+            </div>
+          </div>
 
           <div id="phrases-list" class="phrases-list">
             <!-- Renderizado via JS -->
@@ -635,6 +677,27 @@
                 </label>
               </div>
 
+              <div class="setting-item-toggle">
+                <div>
+                  <strong>Mostrar Etiqueta no Topo do Card</strong>
+                  <small>Exibe o selo identificador acima da frase (ex: Mensagem do Público)</small>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="toggle-show-kicker" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="form-group">
+                <label for="setting-default-kicker">Texto Padrão da Etiqueta da Fila do Público</label>
+                <input
+                  type="text"
+                  id="setting-default-kicker"
+                  placeholder="Ex: MENSAGEM DO PÚBLICO"
+                  value="MENSAGEM DO PÚBLICO"
+                />
+              </div>
+
               <hr class="divider" />
 
               <div class="form-row">
@@ -666,23 +729,28 @@
     </main>
   </div>
 
-  <!-- MODAL DE EDIÇÃO RÁPIDA DE FRASE -->
+  <!-- MODAL DE EDIÇÃO RÁPIDA DE FRASE (PÚBLICO OU CARROSSEL) -->
   <div id="edit-modal" class="modal-backdrop is-hidden">
     <div class="modal-box">
       <div class="modal-header">
-        <h3>Editar Frase do Carrossel</h3>
+        <h3 id="edit-modal-title">Editar Frase</h3>
         <button type="button" id="btn-close-modal" class="btn-icon">✕</button>
       </div>
       <form id="form-edit-phrase">
         <input type="hidden" id="edit-id">
+        <input type="hidden" id="edit-source" value="system">
         <div class="form-group">
-          <label for="edit-text">Frase / Anúncio</label>
+          <label for="edit-text">Frase / Mensagem</label>
           <textarea id="edit-text" rows="3" required></textarea>
         </div>
         <div class="form-row">
           <div class="form-group flex-grow">
             <label for="edit-author">Autor / Remetente (opcional)</label>
             <input type="text" id="edit-author">
+          </div>
+          <div class="form-group kicker-group">
+            <label for="edit-kicker">Etiqueta do Topo (opcional)</label>
+            <input type="text" id="edit-kicker" placeholder="Vazio = padrão | __NONE__ = ocultar">
           </div>
           <div class="form-group duration-group">
             <label for="edit-duration">Duração (seg)</label>

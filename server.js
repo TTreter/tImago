@@ -64,7 +64,9 @@ const defaultState = {
     resolutionWidth: 1920,
     resolutionHeight: 1080,
     audienceHoldMode: true,
-    audienceBatchPlaying: false
+    audienceBatchPlaying: false,
+    showKicker: true,
+    defaultKickerText: 'MENSAGEM DO PÚBLICO'
   },
   phrases: [
     {
@@ -474,6 +476,7 @@ io.on('connection', (socket) => {
     if (!text) return;
 
     const author = String(payload?.author || '').trim();
+    const kicker = payload?.kicker !== undefined ? String(payload.kicker).trim() : '';
     const duration = Math.max(2, Number(payload?.duration) || state.settings.defaultDurationSeconds || 10);
     const showImmediately = Boolean(payload?.showImmediately);
 
@@ -481,6 +484,7 @@ io.on('connection', (socket) => {
       id: 'aud-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
       text,
       author,
+      kicker,
       duration,
       status: 'pending',
       createdAt: new Date().toISOString()
@@ -497,6 +501,41 @@ io.on('connection', (socket) => {
     } else {
       interruptCarouselForAudienceIfNeeded();
     }
+  });
+
+  socket.on('audience:update', (payload) => {
+    const idx = state.audienceQueue.findIndex((a) => a.id === payload?.id);
+    if (idx === -1) return;
+
+    const current = state.audienceQueue[idx];
+    const updated = {
+      ...current,
+      text: payload.text !== undefined ? String(payload.text).trim() : current.text,
+      author: payload.author !== undefined ? String(payload.author).trim() : current.author,
+      kicker: payload.kicker !== undefined ? String(payload.kicker).trim() : (current.kicker || ''),
+      duration: payload.duration !== undefined ? Math.max(2, Number(payload.duration) || 10) : current.duration
+    };
+
+    state.audienceQueue[idx] = updated;
+    saveState();
+
+    if (runtime.currentPhraseId === updated.id) {
+      runtime.currentPhrase = { ...updated, source: 'audience' };
+    }
+    broadcastState();
+  });
+
+  socket.on('audience:move', ({ id, direction }) => {
+    const idx = state.audienceQueue.findIndex((a) => a.id === id);
+    if (idx === -1) return;
+    const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= state.audienceQueue.length) return;
+
+    const temp = state.audienceQueue[idx];
+    state.audienceQueue[idx] = state.audienceQueue[targetIdx];
+    state.audienceQueue[targetIdx] = temp;
+    saveState();
+    broadcastState();
   });
 
   socket.on('audience:trigger', (id) => {
@@ -570,6 +609,7 @@ io.on('connection', (socket) => {
     if (!text) return;
 
     const author = String(payload?.author || '').trim();
+    const kicker = payload?.kicker !== undefined ? String(payload.kicker).trim() : '';
     const duration = Math.max(2, Number(payload?.duration) || state.settings.defaultDurationSeconds || 10);
     const showImmediately = Boolean(payload?.showImmediately);
 
@@ -577,6 +617,7 @@ io.on('connection', (socket) => {
       id: 'p-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
       text,
       author,
+      kicker,
       duration,
       enabled: payload?.enabled !== undefined ? Boolean(payload.enabled) : true
     };
@@ -607,6 +648,7 @@ io.on('connection', (socket) => {
       ...current,
       text: payload.text !== undefined ? String(payload.text).trim() : current.text,
       author: payload.author !== undefined ? String(payload.author).trim() : current.author,
+      kicker: payload.kicker !== undefined ? String(payload.kicker).trim() : (current.kicker || ''),
       duration: payload.duration !== undefined ? Math.max(2, Number(payload.duration) || 10) : current.duration,
       enabled: payload.enabled !== undefined ? Boolean(payload.enabled) : current.enabled
     };
@@ -623,6 +665,23 @@ io.on('connection', (socket) => {
     }
 
     if (state.settings.visible && state.settings.autoRotate && runtime.phase === 'idle' && getEnabledSystemPhrases().length > 0) {
+      advanceNextInPriority();
+    } else {
+      broadcastState();
+    }
+  });
+
+  socket.on('phrase:bulkToggle', ({ enabled }) => {
+    const targetState = Boolean(enabled);
+    state.phrases = state.phrases.map((p) => ({ ...p, enabled: targetState }));
+    saveState();
+
+    if (!targetState && runtime.phase === 'showing' && runtime.currentPhrase?.source === 'system' && state.settings.autoRotate) {
+      onPhraseShowComplete();
+      return;
+    }
+
+    if (targetState && state.settings.visible && state.settings.autoRotate && runtime.phase === 'idle') {
       advanceNextInPriority();
     } else {
       broadcastState();

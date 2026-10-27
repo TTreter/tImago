@@ -37,6 +37,7 @@
   const formAddAudience = document.getElementById('form-add-audience');
   const audInputText = document.getElementById('aud-input-text');
   const audInputAuthor = document.getElementById('aud-input-author');
+  const audInputKicker = document.getElementById('aud-input-kicker');
   const audInputDuration = document.getElementById('aud-input-duration');
   const btnAudShowNow = document.getElementById('btn-aud-show-now');
   const btnStartAudienceBatch = document.getElementById('btn-start-audience-batch');
@@ -53,8 +54,14 @@
   const formAddPhrase = document.getElementById('form-add-phrase');
   const inputText = document.getElementById('input-text');
   const inputAuthor = document.getElementById('input-author');
+  const inputKicker = document.getElementById('input-kicker');
   const inputDuration = document.getElementById('input-duration');
   const btnAddAndShow = document.getElementById('btn-add-and-show');
+
+  // Busca e Ações em Massa do Carrossel
+  const inputSearchPhrases = document.getElementById('input-search-phrases');
+  const btnEnableAllPhrases = document.getElementById('btn-enable-all-phrases');
+  const btnDisableAllPhrases = document.getElementById('btn-disable-all-phrases');
 
   const phrasesListEl = document.getElementById('phrases-list');
   const phrasesCounterEl = document.getElementById('phrases-counter');
@@ -72,6 +79,8 @@
   const posBtns = document.querySelectorAll('.pos-btn');
   const toggleAutoRotate = document.getElementById('toggle-auto-rotate');
   const toggleShowProgress = document.getElementById('toggle-show-progress');
+  const toggleShowKicker = document.getElementById('toggle-show-kicker');
+  const settingDefaultKicker = document.getElementById('setting-default-kicker');
   const settingInterval = document.getElementById('setting-interval');
   const settingDefaultDuration = document.getElementById('setting-default-duration');
 
@@ -96,10 +105,13 @@
 
   // Modal de Edição
   const editModal = document.getElementById('edit-modal');
+  const editModalTitle = document.getElementById('edit-modal-title');
   const formEditPhrase = document.getElementById('form-edit-phrase');
   const editIdInput = document.getElementById('edit-id');
+  const editSourceInput = document.getElementById('edit-source');
   const editTextInput = document.getElementById('edit-text');
   const editAuthorInput = document.getElementById('edit-author');
+  const editKickerInput = document.getElementById('edit-kicker');
   const editDurationInput = document.getElementById('edit-duration');
   const btnCloseModal = document.getElementById('btn-close-modal');
   const btnCancelEdit = document.getElementById('btn-cancel-edit');
@@ -208,6 +220,12 @@
 
     toggleAutoRotate.checked = Boolean(settings.autoRotate);
     toggleShowProgress.checked = settings.showProgress !== false;
+    if (toggleShowKicker) {
+      toggleShowKicker.checked = settings.showKicker !== false;
+    }
+    if (settingDefaultKicker && document.activeElement !== settingDefaultKicker) {
+      settingDefaultKicker.value = settings.defaultKickerText ?? 'MENSAGEM DO PÚBLICO';
+    }
     if (toggleAudienceHoldMode) {
       toggleAudienceHoldMode.checked = settings.audienceHoldMode !== false;
     }
@@ -402,7 +420,7 @@
     const activeId = settings?.visible && runtime?.phase === 'showing' ? runtime.currentPhraseId : null;
 
     audienceListEl.innerHTML = sorted
-      .map((item) => {
+      .map((item, idx) => {
         const isLive = item.id === activeId || item.status === 'showing';
         const isPending = item.status === 'pending' && !isLive;
         const isPlayed = item.status === 'played' && !isLive;
@@ -425,6 +443,15 @@
           statusBadge = '<span class="meta-tag meta-played-badge">✓ JÁ EXIBIDA</span>';
         }
 
+        let kickerBadge = '';
+        if (item.kicker === '__NONE__') {
+          kickerBadge = '<span class="meta-tag meta-played-badge">🚫 Sem Etiqueta</span>';
+        } else if (item.kicker) {
+          kickerBadge = `<span class="meta-tag meta-kicker">🏷️ ${escapeHtml(item.kicker)}</span>`;
+        }
+
+        const origIdx = list.findIndex((a) => a.id === item.id);
+
         return `
           <div class="${itemClasses}" data-id="${escapeHtml(item.id)}">
             <div class="phrase-item-left">
@@ -432,6 +459,7 @@
                 <p class="phrase-item-text">${escapeHtml(item.text)}</p>
                 <div class="phrase-meta">
                   ${statusBadge}
+                  ${kickerBadge}
                   ${item.author ? `<span class="meta-tag meta-author">${ICONS.user} ${escapeHtml(item.author)}</span>` : ''}
                   <span class="meta-tag">${ICONS.clock} ${Number(item.duration) || 10}s</span>
                 </div>
@@ -450,6 +478,15 @@
                       <span>Exibir Agora</span>
                     </button>`
               }
+              <button type="button" class="btn-icon-sm js-move-audience" data-id="${escapeHtml(item.id)}" data-dir="up" ${origIdx <= 0 ? 'disabled' : ''} title="Mover para cima na fila">
+                ${ICONS.up}
+              </button>
+              <button type="button" class="btn-icon-sm js-move-audience" data-id="${escapeHtml(item.id)}" data-dir="down" ${origIdx === -1 || origIdx >= list.length - 1 ? 'disabled' : ''} title="Mover para baixo na fila">
+                ${ICONS.down}
+              </button>
+              <button type="button" class="btn-icon-sm js-edit-audience" data-id="${escapeHtml(item.id)}" title="Editar mensagem/autor/etiqueta/tempo">
+                ${ICONS.edit}
+              </button>
               <button type="button" class="btn-icon-sm danger js-delete-audience" data-id="${escapeHtml(item.id)}" title="Remover da lista">
                 ${ICONS.trash}
               </button>
@@ -473,10 +510,30 @@
       return;
     }
 
+    const searchQuery = (inputSearchPhrases?.value || '').trim().toLowerCase();
+    const filteredPhrases = searchQuery
+      ? phrases.filter(
+          (p) =>
+            (p.text || '').toLowerCase().includes(searchQuery) ||
+            (p.author || '').toLowerCase().includes(searchQuery) ||
+            (p.kicker || '').toLowerCase().includes(searchQuery)
+        )
+      : phrases;
+
+    if (filteredPhrases.length === 0) {
+      phrasesListEl.innerHTML = `
+        <div class="empty-state-box">
+          <span>Nenhuma frase encontrada para o filtro "${escapeHtml(searchQuery)}".</span>
+        </div>
+      `;
+      return;
+    }
+
     const activeId = settings?.visible && runtime?.phase === 'showing' ? runtime.currentPhraseId : null;
 
-    phrasesListEl.innerHTML = phrases
-      .map((phrase, idx) => {
+    phrasesListEl.innerHTML = filteredPhrases
+      .map((phrase) => {
+        const idx = phrases.findIndex((p) => p.id === phrase.id);
         const isLive = phrase.id === activeId;
         const itemClasses = [
           'phrase-item',
@@ -485,6 +542,11 @@
         ]
           .filter(Boolean)
           .join(' ');
+
+        const kickerBadge =
+          phrase.kicker && phrase.kicker !== '__NONE__'
+            ? `<span class="meta-tag meta-kicker">🏷️ ${escapeHtml(phrase.kicker)}</span>`
+            : '';
 
         return `
           <div class="${itemClasses}" data-id="${escapeHtml(phrase.id)}">
@@ -498,6 +560,7 @@
                 <p class="phrase-item-text">${escapeHtml(phrase.text)}</p>
                 <div class="phrase-meta">
                   ${isLive ? '<span class="meta-tag meta-live-badge">● NO AR AGORA</span>' : ''}
+                  ${kickerBadge}
                   ${phrase.author ? `<span class="meta-tag meta-author">${ICONS.user} ${escapeHtml(phrase.author)}</span>` : ''}
                   <span class="meta-tag">${ICONS.clock} ${Number(phrase.duration) || 10}s</span>
                 </div>
@@ -559,17 +622,20 @@
     }
 
     const author = audInputAuthor.value.trim();
+    const kicker = audInputKicker ? audInputKicker.value : '';
     const duration = Math.max(2, Number(audInputDuration.value) || 10);
 
     socket.emit('audience:add', {
       text,
       author,
+      kicker,
       duration,
       showImmediately
     });
 
     audInputText.value = '';
     audInputAuthor.value = '';
+    if (audInputKicker) audInputKicker.value = '';
     audInputText.focus();
   }
 
@@ -636,6 +702,32 @@
         return;
       }
 
+      const moveBtn = e.target.closest('.js-move-audience');
+      if (moveBtn) {
+        socket.emit('audience:move', {
+          id: moveBtn.dataset.id,
+          direction: moveBtn.dataset.dir
+        });
+        return;
+      }
+
+      const editBtn = e.target.closest('.js-edit-audience');
+      if (editBtn && currentState) {
+        const item = (currentState.audienceQueue || []).find((a) => a.id === editBtn.dataset.id);
+        if (item) {
+          if (editModalTitle) editModalTitle.textContent = 'Editar Mensagem da Fila do Público';
+          if (editSourceInput) editSourceInput.value = 'audience';
+          editIdInput.value = item.id;
+          editTextInput.value = item.text;
+          editAuthorInput.value = item.author || '';
+          if (editKickerInput) editKickerInput.value = item.kicker || '';
+          editDurationInput.value = item.duration || 10;
+          editModal.classList.remove('is-hidden');
+          editTextInput.focus();
+        }
+        return;
+      }
+
       const deleteBtn = e.target.closest('.js-delete-audience');
       if (deleteBtn) {
         socket.emit('audience:delete', deleteBtn.dataset.id);
@@ -662,11 +754,13 @@
     }
 
     const author = inputAuthor.value.trim();
+    const kicker = inputKicker ? inputKicker.value.trim() : '';
     const duration = Math.max(2, Number(inputDuration.value) || 10);
 
     socket.emit('phrase:add', {
       text,
       author,
+      kicker,
       duration,
       enabled: true,
       showImmediately
@@ -674,6 +768,7 @@
 
     inputText.value = '';
     inputAuthor.value = '';
+    if (inputKicker) inputKicker.value = '';
     formAddPhrase.classList.add('is-collapsed');
   }
 
@@ -692,6 +787,27 @@
       submitNewPhrase(true);
     }
   });
+
+  // Busca e ações em massa no Carrossel
+  if (inputSearchPhrases) {
+    inputSearchPhrases.addEventListener('input', () => {
+      if (currentState) {
+        renderPhrasesList(currentState.phrases || [], currentRuntime, currentState.settings);
+      }
+    });
+  }
+
+  if (btnEnableAllPhrases) {
+    btnEnableAllPhrases.addEventListener('click', () => {
+      socket.emit('phrase:bulkToggle', { enabled: true });
+    });
+  }
+
+  if (btnDisableAllPhrases) {
+    btnDisableAllPhrases.addEventListener('click', () => {
+      socket.emit('phrase:bulkToggle', { enabled: false });
+    });
+  }
 
   // Delegação de eventos na lista de frases do carrossel
   phrasesListEl.addEventListener('click', (e) => {
@@ -714,9 +830,12 @@
     if (editBtn && currentState) {
       const phrase = currentState.phrases.find((p) => p.id === editBtn.dataset.id);
       if (phrase) {
+        if (editModalTitle) editModalTitle.textContent = 'Editar Frase do Carrossel';
+        if (editSourceInput) editSourceInput.value = 'system';
         editIdInput.value = phrase.id;
         editTextInput.value = phrase.text;
         editAuthorInput.value = phrase.author || '';
+        if (editKickerInput) editKickerInput.value = phrase.kicker || '';
         editDurationInput.value = phrase.duration || 10;
         editModal.classList.remove('is-hidden');
         editTextInput.focus();
@@ -740,7 +859,7 @@
     }
   });
 
-  // Modal de edição
+  // Modal de edição (suporta tanto 'audience' quanto 'system')
   function closeEditModal() {
     editModal.classList.add('is-hidden');
   }
@@ -751,14 +870,22 @@
     e.preventDefault();
     const id = editIdInput.value;
     const text = editTextInput.value.trim();
+    const source = editSourceInput ? editSourceInput.value : 'system';
     if (!id || !text) return;
 
-    socket.emit('phrase:update', {
+    const payload = {
       id,
       text,
       author: editAuthorInput.value.trim(),
+      kicker: editKickerInput ? editKickerInput.value.trim() : '',
       duration: Math.max(2, Number(editDurationInput.value) || 10)
-    });
+    };
+
+    if (source === 'audience') {
+      socket.emit('audience:update', payload);
+    } else {
+      socket.emit('phrase:update', payload);
+    }
     closeEditModal();
   });
 
@@ -782,6 +909,20 @@
   toggleShowProgress.addEventListener('change', () => {
     socket.emit('settings:update', { showProgress: toggleShowProgress.checked });
   });
+
+  if (toggleShowKicker) {
+    toggleShowKicker.addEventListener('change', () => {
+      socket.emit('settings:update', { showKicker: toggleShowKicker.checked });
+    });
+  }
+
+  if (settingDefaultKicker) {
+    settingDefaultKicker.addEventListener('change', () => {
+      const val = settingDefaultKicker.value.trim() || 'MENSAGEM DO PÚBLICO';
+      settingDefaultKicker.value = val;
+      socket.emit('settings:update', { defaultKickerText: val });
+    });
+  }
 
   settingInterval.addEventListener('change', () => {
     const val = Math.max(0, Number(settingInterval.value) || 0);
