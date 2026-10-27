@@ -1,7 +1,7 @@
 {
   "name": "timago",
   "productName": "tImago",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "tImago — Sistema de Controle de Overlay em Tempo Real para OBS Studio",
   "main": "electron-main.js",
   "author": "Tiago Treter (TTreter)",

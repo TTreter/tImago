@@ -18,6 +18,29 @@
     inbox: '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>'
   };
 
+  // Navegação entre Visões (Operação Ao Vivo vs Página de Configurações)
+  const navBtnLive = document.getElementById('nav-btn-live');
+  const navBtnSettings = document.getElementById('nav-btn-settings');
+  const viewLive = document.getElementById('view-live');
+  const viewSettings = document.getElementById('view-settings');
+  const btnJumpToSettings = document.getElementById('btn-jump-to-settings');
+  const btnBackToLive = document.getElementById('btn-back-to-live');
+
+  // Elementos da Página de Configurações
+  const topbarOrgName = document.getElementById('topbar-org-name');
+  const settingOrgName = document.getElementById('setting-organization-name');
+  const settingStartWithWindows = document.getElementById('setting-start-with-windows');
+  const settingStartMinimized = document.getElementById('setting-start-minimized');
+  const settingCloseBehavior = document.getElementById('setting-close-behavior');
+  const settingLogoPosition = document.getElementById('setting-logo-position');
+  const settingLogoSize = document.getElementById('setting-logo-size');
+  const settingCompactLists = document.getElementById('setting-compact-lists');
+  const btnResetDefaults = document.getElementById('btn-reset-defaults');
+  const quickThemeSelect = document.getElementById('quick-theme-select');
+  const quickDisplayMode = document.getElementById('quick-display-mode');
+  const diagUrlReception = document.getElementById('diag-url-reception');
+  const diagUrlFull = document.getElementById('diag-url-full');
+
   // Elementos do Topo e Status Ao Vivo
   const obsUrlDisplay = document.getElementById('obs-url-display');
   const btnCopyUrl = document.getElementById('btn-copy-url');
@@ -192,6 +215,113 @@
     }
   });
 
+  // ==========================================================================
+  // NAVEGAÇÃO ENTRE TELAS: OPERAÇÃO AO VIVO vs PÁGINA DE CONFIGURAÇÕES
+  // ==========================================================================
+  function switchView(viewName) {
+    const isLive = viewName === 'live';
+    if (navBtnLive) navBtnLive.classList.toggle('active', isLive);
+    if (navBtnSettings) navBtnSettings.classList.toggle('active', !isLive);
+    if (viewLive) viewLive.classList.toggle('active', isLive);
+    if (viewSettings) viewSettings.classList.toggle('active', !isLive);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(updatePreviewScale, 60);
+  }
+
+  if (navBtnLive) navBtnLive.addEventListener('click', () => switchView('live'));
+  if (navBtnSettings) navBtnSettings.addEventListener('click', () => switchView('settings'));
+  if (btnJumpToSettings) btnJumpToSettings.addEventListener('click', () => switchView('settings'));
+  if (btnBackToLive) btnBackToLive.addEventListener('click', () => switchView('live'));
+
+  const THEME_NAMES = {
+    'clean': 'Clean Dark Pro (Prefeitura)',
+    'inst-light': 'Clean Alabaster (Institucional)',
+    'inst-gold': 'Solene Black & Gold (Cerimonial)',
+    'civil-defense': 'Defesa Civil & Alerta (Laranja)',
+    'october-pink': 'Outubro Rosa (Saúde da Mulher)',
+    'november-blue': 'Novembro Azul (Saúde do Homem)',
+    'september-yellow': 'Setembro Amarelo (Prevenção)',
+    'cycling-tour': 'Passeio Ciclístico (Verde)',
+    'city-marathon': 'Corrida & Movimento (Esporte)',
+    'soccer-pitch': 'Arena Gramado (Futebol)',
+    'soccer-champion': 'Noite de Copa (Azul Champions)',
+    'christmas': 'Natal Luz Municipal (Rubi & Ouro)',
+    'christmas-snow': 'Noite Feliz (Azul Gelo)',
+    'christmas-pine': 'Bosque Real (Pinheiro & Ouro)',
+    'easter-resurrection': 'Aurora de Páscoa (Luz & Ouro)',
+    'easter-royal': 'Páscoa Imperial (Púrpura & Ouro)',
+    'easter-olive': 'Outono & Paz (Verde Sálvia)',
+    'mothers-rose': 'Jardim de Rosas (Rubi Rosé)',
+    'mothers-pearl': 'Pérola & Afeto (Creme & Coral)',
+    'fathers-navy': 'Executivo Navy (Azul Marinho)',
+    'fathers-espresso': 'Clássico Espresso (Tabaco)',
+    'new-year': 'Réveillon na Praça (Champanhe)',
+    'youth-neon': 'Festival & Podcast (Cyber Neon)',
+    'junina-fest': 'Arraial Municipal (Terracota)',
+    'custom': 'Tema Personalizado'
+  };
+
+  if (quickThemeSelect) {
+    Object.entries(THEME_NAMES).forEach(([key, label]) => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = label;
+      quickThemeSelect.appendChild(opt);
+    });
+    quickThemeSelect.addEventListener('change', () => {
+      socket.emit('settings:update', { theme: quickThemeSelect.value });
+    });
+  }
+
+  if (quickDisplayMode) {
+    quickDisplayMode.addEventListener('change', () => {
+      socket.emit('settings:update', { displayMode: quickDisplayMode.value });
+    });
+  }
+
+  if (settingOrgName) {
+    settingOrgName.addEventListener('change', () => {
+      socket.emit('settings:update', { organizationName: settingOrgName.value.trim() });
+    });
+  }
+  if (settingStartWithWindows) {
+    settingStartWithWindows.addEventListener('change', () => {
+      socket.emit('settings:update', { startWithWindows: settingStartWithWindows.checked });
+    });
+  }
+  if (settingStartMinimized) {
+    settingStartMinimized.addEventListener('change', () => {
+      socket.emit('settings:update', { startMinimized: settingStartMinimized.checked });
+    });
+  }
+  if (settingCloseBehavior) {
+    settingCloseBehavior.addEventListener('change', () => {
+      socket.emit('settings:update', { closeBehavior: settingCloseBehavior.value });
+    });
+  }
+  if (settingLogoPosition) {
+    settingLogoPosition.addEventListener('change', () => {
+      socket.emit('settings:update', { logoPosition: settingLogoPosition.value });
+    });
+  }
+  if (settingLogoSize) {
+    settingLogoSize.addEventListener('input', () => {
+      socket.emit('settings:update', { logoSizePx: Number(settingLogoSize.value) || 56 });
+    });
+  }
+  if (settingCompactLists) {
+    settingCompactLists.addEventListener('change', () => {
+      socket.emit('settings:update', { compactLists: settingCompactLists.checked });
+    });
+  }
+  if (btnResetDefaults) {
+    btnResetDefaults.addEventListener('click', () => {
+      if (confirm('Deseja realmente restaurar as configurações visuais e técnicas de fábrica?')) {
+        socket.emit('settings:resetDefaults');
+      }
+    });
+  }
+
   // Navegação por Abas na Coluna Direita
   tabBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -292,6 +422,37 @@
     const dispMode = settings.displayMode === 'ticker' ? 'ticker' : 'card';
     if (settingDisplayMode && document.activeElement !== settingDisplayMode) {
       settingDisplayMode.value = dispMode;
+    }
+    if (quickDisplayMode && document.activeElement !== quickDisplayMode) {
+      quickDisplayMode.value = dispMode;
+    }
+    if (quickThemeSelect && document.activeElement !== quickThemeSelect) {
+      quickThemeSelect.value = settings.theme || 'christmas';
+    }
+    if (topbarOrgName) {
+      topbarOrgName.textContent = settings.organizationName || 'Prefeitura Municipal • ASCOM';
+    }
+    if (settingOrgName && document.activeElement !== settingOrgName) {
+      settingOrgName.value = settings.organizationName || 'Prefeitura Municipal';
+    }
+    if (settingStartWithWindows) {
+      settingStartWithWindows.checked = Boolean(settings.startWithWindows);
+    }
+    if (settingStartMinimized) {
+      settingStartMinimized.checked = Boolean(settings.startMinimized);
+    }
+    if (settingCloseBehavior && document.activeElement !== settingCloseBehavior) {
+      settingCloseBehavior.value = settings.closeBehavior || 'tray';
+    }
+    if (settingLogoPosition && document.activeElement !== settingLogoPosition) {
+      settingLogoPosition.value = settings.logoPosition || 'left';
+    }
+    if (settingLogoSize && document.activeElement !== settingLogoSize) {
+      settingLogoSize.value = settings.logoSizePx || 56;
+    }
+    if (settingCompactLists) {
+      settingCompactLists.checked = Boolean(settings.compactLists);
+      document.body.classList.toggle('is-compact-lists', Boolean(settings.compactLists));
     }
     if (tickerSpeedBox) {
       tickerSpeedBox.classList.toggle('is-hidden', dispMode !== 'ticker');
@@ -410,7 +571,7 @@
       liveCurrentText.textContent = phrase.text;
       liveCurrentText.title = phrase.text;
       liveCurrentAuthor.textContent = phrase.author ? `— ${phrase.author}` : '';
-      liveCountdown.textContent = `⏱ ${remainingSec}s`;
+      liveCountdown.textContent = `${remainingSec}s`;
       liveMiniProgressBar.style.width = `${progressPct}%`;
     } else if (phase === 'interval') {
       const pendingAud = currentRuntime.pendingAudienceCount || 0;
@@ -522,18 +683,18 @@
 
         let statusBadge = '';
         if (isLive) {
-          statusBadge = '<span class="meta-tag meta-live-badge">● NO AR AGORA</span>';
+          statusBadge = '<span class="meta-tag meta-live-badge"><svg class="icon-svg icon-xxs" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> NO AR AGORA</span>';
         } else if (isPending) {
-          statusBadge = '<span class="meta-tag meta-pending-badge">⏳ NA FILA</span>';
+          statusBadge = '<span class="meta-tag meta-pending-badge"><svg class="icon-svg icon-xxs" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> NA FILA</span>';
         } else {
-          statusBadge = '<span class="meta-tag meta-played-badge">✓ JÁ EXIBIDA</span>';
+          statusBadge = '<span class="meta-tag meta-played-badge"><svg class="icon-svg icon-xxs" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> JÁ EXIBIDA</span>';
         }
 
         let kickerBadge = '';
         if (item.kicker === '__NONE__') {
-          kickerBadge = '<span class="meta-tag meta-played-badge">🚫 Sem Etiqueta</span>';
+          kickerBadge = '<span class="meta-tag meta-played-badge">Sem Etiqueta</span>';
         } else if (item.kicker) {
-          kickerBadge = `<span class="meta-tag meta-kicker">🏷️ ${escapeHtml(item.kicker)}</span>`;
+          kickerBadge = `<span class="meta-tag meta-kicker"><svg class="icon-svg icon-xxs" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg> ${escapeHtml(item.kicker)}</span>`;
         }
 
         const origIdx = list.findIndex((a) => a.id === item.id);
@@ -631,7 +792,7 @@
 
         const kickerBadge =
           phrase.kicker && phrase.kicker !== '__NONE__'
-            ? `<span class="meta-tag meta-kicker">🏷️ ${escapeHtml(phrase.kicker)}</span>`
+            ? `<span class="meta-tag meta-kicker"><svg class="icon-svg icon-xxs" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg> ${escapeHtml(phrase.kicker)}</span>`
             : '';
 
         return `
@@ -645,7 +806,7 @@
               <div class="phrase-body">
                 <p class="phrase-item-text">${escapeHtml(phrase.text)}</p>
                 <div class="phrase-meta">
-                  ${isLive ? '<span class="meta-tag meta-live-badge">● NO AR AGORA</span>' : ''}
+                  ${isLive ? '<span class="meta-tag meta-live-badge"><svg class="icon-svg icon-xxs" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> NO AR AGORA</span>' : ''}
                   ${kickerBadge}
                   ${phrase.author ? `<span class="meta-tag meta-author">${ICONS.user} ${escapeHtml(phrase.author)}</span>` : ''}
                   <span class="meta-tag">${ICONS.clock} ${Number(phrase.duration) || 10}s</span>
@@ -1235,9 +1396,9 @@
     document.body.classList.toggle('is-reception-mode', Boolean(enabled));
     if (btnToggleReceptionMode) {
       btnToggleReceptionMode.classList.toggle('is-active', Boolean(enabled));
-      const span = btnToggleReceptionMode.querySelector('span');
+      const span = btnToggleReceptionMode.querySelector('#label-reception-mode') || btnToggleReceptionMode.querySelector('span');
       if (span) {
-        span.textContent = enabled ? '🎛️ Painel Completo' : '🙋 Modo Recepção';
+        span.textContent = enabled ? 'Painel Completo' : 'Modo Recepção';
       }
     }
     setTimeout(updatePreviewScale, 60);
@@ -1266,6 +1427,8 @@
     }
     if (qrUrlReception) qrUrlReception.textContent = receptionUrl;
     if (qrUrlFull) qrUrlFull.textContent = baseUrl;
+    if (diagUrlReception) diagUrlReception.textContent = receptionUrl;
+    if (diagUrlFull) diagUrlFull.textContent = baseUrl;
 
     if (window.tImagoQR && typeof window.tImagoQR.renderQrSvg === 'function') {
       if (qrSvgReception) qrSvgReception.innerHTML = window.tImagoQR.renderQrSvg(receptionUrl);
@@ -1433,6 +1596,12 @@
         if (currentState) {
           socket.emit('settings:update', { visible: !currentState.settings.visible });
         }
+      } else if (key === 'o') {
+        e.preventDefault();
+        switchView('live');
+      } else if (key === 's') {
+        e.preventDefault();
+        switchView('settings');
       } else if (key === 'n') {
         e.preventDefault();
         socket.emit('rotation:next');
