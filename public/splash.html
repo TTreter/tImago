@@ -207,7 +207,7 @@
 
       <div class="brand-title">
         <span>t<span class="highlight">Imago</span></span>
-        <span class="brand-version">v1.2.0</span>
+        <span id="splash-version" class="brand-version">v1.3.0</span>
       </div>
 
       <p class="brand-desc">Broadcast Overlay Controller • OBS Studio</p>
@@ -237,6 +237,13 @@
     const percentEl = document.getElementById('splash-percent');
     const progressEl = document.getElementById('splash-progress');
     const splashEl = document.getElementById('splash');
+    const versionEl = document.getElementById('splash-version');
+
+    const params = new URLSearchParams(window.location.search);
+    const vParam = params.get('v');
+    if (vParam && versionEl) {
+      versionEl.textContent = vParam.startsWith('v') ? vParam : `v${vParam}`;
+    }
 
     function updateView(percent, message) {
       if (typeof percent === 'number') {

@@ -66,7 +66,9 @@ function createSplashWindow() {
       }
     });
 
-    splashWindow.loadFile(path.join(__dirname, 'public', 'splash.html'));
+    splashWindow.loadFile(path.join(__dirname, 'public', 'splash.html'), {
+      query: { v: app.getVersion() }
+    });
 
     splashWindow.webContents.once('did-finish-load', () => {
       updateSplash(lastSplashPercent, lastSplashMessage);

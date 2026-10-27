@@ -1831,8 +1831,12 @@ input:checked + .slider:before {
 body.is-reception-mode .obs-url-box,
 body.is-reception-mode #btn-export-backup,
 body.is-reception-mode #btn-import-backup,
+body.is-reception-mode #nav-btn-sports,
+body.is-reception-mode #nav-btn-settings,
 body.is-reception-mode .col-main > section:not(.audience-card),
-body.is-reception-mode .settings-tabs-card {
+body.is-reception-mode .settings-tabs-card,
+body.is-reception-mode #view-sports,
+body.is-reception-mode #view-settings {
   display: none !important;
 }
 
