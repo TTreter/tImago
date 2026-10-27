@@ -24,6 +24,7 @@ const server = http.createServer(app);
 const io = new Server(server, { maxHttpBufferSize: 5e6 });
 
 const PORT = process.env.PORT || 3000;
+let activePort = PORT;
 
 /**
  * Define o caminho do arquivo de estado persistente (state.json).
@@ -354,10 +355,16 @@ function toggleOverlayVisibility() {
  * Garante que a estrutura de playlists exista e esteja sincronizada com state.phrases
  */
 function ensurePlaylistsStructure(st) {
-  const hasLegacyReligiousPlaylist = Array.isArray(st.playlists) && st.playlists.some((p) => p.id === 'pl-worship');
-  if (!Array.isArray(st.playlists) || st.playlists.length === 0 || hasLegacyReligiousPlaylist) {
+  if (!Array.isArray(st.playlists) || st.playlists.length === 0) {
     st.playlists = JSON.parse(JSON.stringify(defaultState.playlists));
     st.activePlaylistId = 'pl-inst';
+  } else {
+    // Filtra silenciosamente qualquer resquício legado sem resetar as playlists do usuário
+    st.playlists = st.playlists.filter((p) => p.id !== 'pl-worship');
+    if (st.playlists.length === 0) {
+      st.playlists = JSON.parse(JSON.stringify(defaultState.playlists));
+      st.activePlaylistId = 'pl-inst';
+    }
   }
   let activePl = st.playlists.find((p) => p.id === st.activePlaylistId);
   if (!activePl) {
@@ -471,7 +478,7 @@ function broadcastState() {
       serverNow: Date.now(),
       pendingAudienceCount: getPendingAudiencePhrases().length,
       localIp: getLocalIpAddress(),
-      port: PORT
+      port: activePort
     }
   });
 }
@@ -711,7 +718,7 @@ io.on('connection', (socket) => {
       serverNow: Date.now(),
       pendingAudienceCount: getPendingAudiencePhrases().length,
       localIp: getLocalIpAddress(),
-      port: PORT
+      port: activePort
     }
   });
 
@@ -749,11 +756,11 @@ io.on('connection', (socket) => {
 
   // --- Eventos da Fila do Público / Ouvintes ---
   socket.on('audience:add', (payload) => {
-    const text = String(payload?.text || '').trim();
+    const text = String(payload?.text || '').trim().slice(0, 350);
     if (!text) return;
 
-    const author = String(payload?.author || '').trim();
-    const kicker = payload?.kicker !== undefined ? String(payload.kicker).trim() : '';
+    const author = String(payload?.author || '').trim().slice(0, 60);
+    const kicker = payload?.kicker !== undefined ? String(payload.kicker).trim().slice(0, 40) : '';
     const duration = Math.max(2, Number(payload?.duration) || state.settings.defaultDurationSeconds || 10);
     const showImmediately = Boolean(payload?.showImmediately);
 
@@ -787,9 +794,9 @@ io.on('connection', (socket) => {
     const current = state.audienceQueue[idx];
     const updated = {
       ...current,
-      text: payload.text !== undefined ? String(payload.text).trim() : current.text,
-      author: payload.author !== undefined ? String(payload.author).trim() : current.author,
-      kicker: payload.kicker !== undefined ? String(payload.kicker).trim() : (current.kicker || ''),
+      text: payload.text !== undefined ? String(payload.text).trim().slice(0, 350) : current.text,
+      author: payload.author !== undefined ? String(payload.author).trim().slice(0, 60) : current.author,
+      kicker: payload.kicker !== undefined ? String(payload.kicker).trim().slice(0, 40) : (current.kicker || ''),
       duration: payload.duration !== undefined ? Math.max(2, Number(payload.duration) || 10) : current.duration
     };
 
@@ -882,11 +889,11 @@ io.on('connection', (socket) => {
 
   // --- Eventos do Carrossel do Sistema ---
   socket.on('phrase:add', (payload) => {
-    const text = String(payload?.text || '').trim();
+    const text = String(payload?.text || '').trim().slice(0, 350);
     if (!text) return;
 
-    const author = String(payload?.author || '').trim();
-    const kicker = payload?.kicker !== undefined ? String(payload.kicker).trim() : '';
+    const author = String(payload?.author || '').trim().slice(0, 60);
+    const kicker = payload?.kicker !== undefined ? String(payload.kicker).trim().slice(0, 40) : '';
     const duration = Math.max(2, Number(payload?.duration) || state.settings.defaultDurationSeconds || 10);
     const showImmediately = Boolean(payload?.showImmediately);
 
@@ -923,9 +930,9 @@ io.on('connection', (socket) => {
     const current = state.phrases[idx];
     const updated = {
       ...current,
-      text: payload.text !== undefined ? String(payload.text).trim() : current.text,
-      author: payload.author !== undefined ? String(payload.author).trim() : current.author,
-      kicker: payload.kicker !== undefined ? String(payload.kicker).trim() : (current.kicker || ''),
+      text: payload.text !== undefined ? String(payload.text).trim().slice(0, 350) : current.text,
+      author: payload.author !== undefined ? String(payload.author).trim().slice(0, 60) : current.author,
+      kicker: payload.kicker !== undefined ? String(payload.kicker).trim().slice(0, 40) : (current.kicker || ''),
       duration: payload.duration !== undefined ? Math.max(2, Number(payload.duration) || 10) : current.duration,
       enabled: payload.enabled !== undefined ? Boolean(payload.enabled) : current.enabled
     };
@@ -1116,6 +1123,18 @@ io.on('connection', (socket) => {
       state.audienceQueue = importedData.audienceQueue;
     }
 
+    if (importedData.scoreboard && typeof importedData.scoreboard === 'object') {
+      state.scoreboard = {
+        ...defaultState.scoreboard,
+        ...importedData.scoreboard,
+        teamA: { ...defaultState.scoreboard.teamA, ...(importedData.scoreboard.teamA || {}) },
+        teamB: { ...defaultState.scoreboard.teamB, ...(importedData.scoreboard.teamB || {}) },
+        timer: { ...defaultState.scoreboard.timer, ...(importedData.scoreboard.timer || {}), running: false },
+        celebration: null
+      };
+      io.emit('scoreboard:sync', state.scoreboard);
+    }
+
     state = ensurePlaylistsStructure(sanitizeStateStrings(state));
     runtime.queueIndex = -1;
     saveState();
@@ -1125,11 +1144,11 @@ io.on('connection', (socket) => {
 
   // --- Eventos de Tarja de Identificação Rápida (Lower Third - Fase 5) ---
   socket.on('lowerThird:show', (payload) => {
-    const title = String(payload?.title || '').trim();
+    const title = String(payload?.title || '').trim().slice(0, 80);
     if (!title) return;
 
-    const badge = String(payload?.badge || '').trim();
-    const subtitle = String(payload?.subtitle || '').trim();
+    const badge = String(payload?.badge || '').trim().slice(0, 50);
+    const subtitle = String(payload?.subtitle || '').trim().slice(0, 100);
     const autoHideSeconds = Math.max(0, Number(payload?.autoHideSeconds) ?? 10);
 
     if (global.lowerThirdTimer) {
@@ -1225,14 +1244,26 @@ io.on('connection', (socket) => {
 
     if (action === 'start') {
       state.scoreboard.timer.running = true;
+      state.scoreboard.timer.startedAtMs = Date.now();
+      state.scoreboard.timer.baseSeconds = state.scoreboard.timer.seconds || 0;
     } else if (action === 'pause') {
       state.scoreboard.timer.running = false;
+      state.scoreboard.timer.startedAtMs = null;
+      state.scoreboard.timer.baseSeconds = state.scoreboard.timer.seconds || 0;
     } else if (action === 'reset') {
       state.scoreboard.timer.running = false;
       state.scoreboard.timer.seconds = 0;
       state.scoreboard.timer.extraMinutes = 0;
+      state.scoreboard.timer.startedAtMs = null;
+      state.scoreboard.timer.baseSeconds = 0;
     } else if (action === 'set') {
-      if (typeof seconds === 'number') state.scoreboard.timer.seconds = Math.max(0, seconds);
+      if (typeof seconds === 'number') {
+        state.scoreboard.timer.seconds = Math.max(0, seconds);
+        state.scoreboard.timer.baseSeconds = state.scoreboard.timer.seconds;
+        if (state.scoreboard.timer.running) {
+          state.scoreboard.timer.startedAtMs = Date.now();
+        }
+      }
       if (typeof extraMinutes === 'number') state.scoreboard.timer.extraMinutes = Math.max(0, extraMinutes);
       if (direction) state.scoreboard.timer.direction = direction;
     }
@@ -1373,18 +1404,25 @@ function startScoreboardTicker() {
   if (scoreboardTicker) return;
   scoreboardTicker = setInterval(() => {
     if (state.scoreboard && state.scoreboard.timer && state.scoreboard.timer.running) {
-      if (state.scoreboard.timer.direction === 'down') {
-        if (state.scoreboard.timer.seconds > 0) {
-          state.scoreboard.timer.seconds--;
-        } else {
-          state.scoreboard.timer.running = false;
+      const timer = state.scoreboard.timer;
+      if (!timer.startedAtMs) {
+        timer.startedAtMs = Date.now();
+        timer.baseSeconds = timer.seconds || 0;
+      }
+      const elapsedSec = Math.floor((Date.now() - timer.startedAtMs) / 1000);
+      if (timer.direction === 'down') {
+        const nextSec = Math.max(0, (timer.baseSeconds || 0) - elapsedSec);
+        timer.seconds = nextSec;
+        if (nextSec === 0) {
+          timer.running = false;
+          timer.startedAtMs = null;
         }
       } else {
-        state.scoreboard.timer.seconds++;
+        timer.seconds = (timer.baseSeconds || 0) + elapsedSec;
       }
       io.emit('scoreboard:tick', {
-        seconds: state.scoreboard.timer.seconds,
-        running: state.scoreboard.timer.running
+        seconds: timer.seconds,
+        running: timer.running
       });
     }
   }, 1000);
@@ -1424,6 +1462,7 @@ function startServer(preferredPort = PORT) {
 
       const onListening = () => {
         server.removeListener('error', onError);
+        activePort = currentPort;
         const localIp = getLocalIpAddress();
         console.log('====================================================');
         console.log('[tImago] SISTEMA DE OVERLAY OBS INICIADO');

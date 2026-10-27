@@ -218,8 +218,18 @@ async function startApplication() {
 
   // 1. Inicializa o servidor Express e WebSockets
   updateSplash(45, 'Iniciando servidor local e WebSockets...');
-  const serverInfo = await startServer(PORT);
-  activePort = serverInfo?.port || PORT;
+  try {
+    const serverInfo = await startServer(PORT);
+    activePort = serverInfo?.port || PORT;
+  } catch (err) {
+    closeSplash();
+    dialog.showErrorBox(
+      'Falha de Inicialização — tImago',
+      `Não foi possível iniciar o servidor local do tImago.\n\nDetalhes:\n${err.message || err}`
+    );
+    app.quit();
+    return;
+  }
 
   // 2. Carrega configurações do usuário
   updateSplash(70, 'Carregando preferências e temas...');

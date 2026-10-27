@@ -2333,8 +2333,8 @@
       return;
     }
 
-    // Atalhos Alt + Tecla (funcionam em qualquer lugar do painel)
-    if (e.altKey && !e.ctrlKey && !e.metaKey) {
+    // Atalhos Alt + Tecla (funcionam em qualquer lugar do painel, ignorando AltGr do teclado ABNT2)
+    if (e.altKey && !e.ctrlKey && !e.metaKey && !e.getModifierState?.('AltGraph')) {
       const key = e.key.toLowerCase();
       if (key === 'a') {
         e.preventDefault();
@@ -2387,6 +2387,9 @@
       } else if (e.code === 'Numpad5') {
         e.preventDefault();
         btnTriggerGoalA?.click();
+      } else if (e.code === 'Numpad2') {
+        e.preventDefault();
+        btnTriggerGoalB?.click();
       } else if (e.code === 'Numpad0') {
         e.preventDefault();
         btnSbSwitchSides?.click();
