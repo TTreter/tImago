@@ -307,6 +307,80 @@
           </div>
         </section>
 
+        <!-- CARD EXTRA (FASE 5): TARJA DE IDENTIFICAÇÃO RÁPIDA (LOWER THIRD - MÚSICA / PRELETOR) -->
+        <section class="panel-card lower-third-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="title-with-badge">
+                <span class="section-icon system-icon">🎙️</span>
+                <h2>Tarja de Identificação (Lower Third — Música / Preletor)</h2>
+                <span id="lt-status-pill" class="badge-carousel-state is-off">Oculta</span>
+              </div>
+              <p class="card-subtitle">
+                Dispare rapidamente uma tarja elegante para identificar a música atual, cantor, preletor ou convidado sem alterar o carrossel.
+              </p>
+            </div>
+          </div>
+
+          <form id="form-lower-third" class="quick-form">
+            <div class="form-row">
+              <div class="form-group kicker-group">
+                <label for="lt-input-badge">Categoria / Selo</label>
+                <select id="lt-input-badge">
+                  <option value="🎵 LOUVOR AO VIVO">🎵 Louvor ao Vivo</option>
+                  <option value="🎙️ PRELETOR / MENSAGEM">🎙️ Preletor / Mensagem</option>
+                  <option value="🙌 CONVIDADO ESPECIAL">🙌 Convidado Especial</option>
+                  <option value="📖 LEITURA BÍBLICA">📖 Leitura Bíblica</option>
+                  <option value="📌 DESTAQUE DA LIVE">📌 Destaque da Live</option>
+                  <option value="">Sem Etiqueta</option>
+                </select>
+              </div>
+
+              <div class="form-group flex-grow">
+                <label for="lt-input-title">Título Principal (Nome da Música ou Preletor) <span class="req">*</span></label>
+                <input
+                  type="text"
+                  id="lt-input-title"
+                  placeholder="Ex: Noite Feliz — Cantata de Natal (ou Pr. João Silva)"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-grow">
+                <label for="lt-input-subtitle">Subtítulo / Intérprete / Cargo <span class="opt">(opcional)</span></label>
+                <input
+                  type="text"
+                  id="lt-input-subtitle"
+                  placeholder="Ex: Coral Principal & Orquestra • Regência: Maestro Carlos"
+                />
+              </div>
+
+              <div class="form-group duration-group">
+                <label for="lt-input-autohide" title="0 = permanece na tela até você clicar em Ocultar">Auto-Ocultar (seg)</label>
+                <input
+                  type="number"
+                  id="lt-input-autohide"
+                  min="0"
+                  max="180"
+                  value="10"
+                />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" id="btn-show-lower-third" class="btn btn-primary">
+                <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Exibir Tarja no OBS</span>
+              </button>
+              <button type="button" id="btn-hide-lower-third" class="btn btn-ghost" disabled>
+                <span>⏹ Ocultar Tarja</span>
+              </button>
+            </div>
+          </form>
+        </section>
+
       </div>
 
       <!-- COLUNA DIREITA FIXA (STICKY): PREVIEW + MONITOR INTEGRADO + ABAS DE CONFIGURAÇÃO -->
@@ -766,6 +840,26 @@
           <!-- ABA 3: AUTOMAÇÃO & TEMPOS -->
           <div id="tab-timing" class="tab-pane">
             <div class="settings-stack">
+              <div class="form-group">
+                <label for="setting-display-mode">Modo de Exibição Principal no OBS (Fase 5)</label>
+                <select id="setting-display-mode">
+                  <option value="card">🗂️ Card Flutuante Individual (Padrão)</option>
+                  <option value="ticker">📰 Faixa Ticker Deslizante de Rodapé (Letreiro Contínuo)</option>
+                </select>
+              </div>
+
+              <div id="ticker-speed-box" class="form-row is-hidden">
+                <div class="form-group flex-grow">
+                  <label for="setting-ticker-speed">Velocidade do Letreiro Ticker (seg por volta)</label>
+                  <small class="field-help">Menor valor = mais rápido | Maior valor = mais lento</small>
+                </div>
+                <div class="form-group" style="width: 90px;">
+                  <input type="number" id="setting-ticker-speed" min="8" max="180" value="32">
+                </div>
+              </div>
+
+              <hr class="divider" />
+
               <div class="setting-item-toggle">
                 <div>
                   <strong>Rotação Automática (Carrossel)</strong>

@@ -77,6 +77,27 @@
 
     </div>
 
+    <!-- Tarja de Identificação Rápida (Lower Third - Música / Preletor / Convidado - Fase 5) -->
+    <div id="overlay-lower-third" class="overlay-lower-third is-hidden" aria-live="polite">
+      <div class="lt-accent-bar"></div>
+      <div class="lt-body">
+        <span id="lt-badge" class="lt-badge">🎵 LOUVOR AO VIVO</span>
+        <strong id="lt-title" class="lt-title"></strong>
+        <span id="lt-subtitle" class="lt-subtitle"></span>
+      </div>
+    </div>
+
+    <!-- Faixa Deslizante de Rodapé (Modo Ticker - Fase 5) -->
+    <div id="overlay-ticker" class="overlay-ticker is-hidden" aria-live="off">
+      <div class="ticker-label-box">
+        <span class="ticker-live-dot"></span>
+        <span id="ticker-label-text">AO VIVO</span>
+      </div>
+      <div class="ticker-track-viewport">
+        <div id="ticker-track" class="ticker-track"></div>
+      </div>
+    </div>
+
   </div>
 
   <script src="/socket.io/socket.io.js"></script>

@@ -76,7 +76,16 @@ const defaultState = {
       border: '#38bdf8',
       text: '#f8fafc',
       author: '#fde047'
-    }
+    },
+    displayMode: 'card',
+    tickerSpeedSeconds: 32
+  },
+  lowerThird: {
+    active: false,
+    badge: '🎵 LOUVOR AO VIVO',
+    title: '',
+    subtitle: '',
+    autoHideSeconds: 10
   },
   activePlaylistId: 'pl-christmas',
   playlists: [
@@ -241,6 +250,7 @@ function loadState() {
       const parsed = JSON.parse(raw);
       const loaded = {
         settings: { ...defaultState.settings, ...(parsed.settings || {}) },
+        lowerThird: { ...defaultState.lowerThird, ...(parsed.lowerThird || {}), active: false },
         activePlaylistId: parsed.activePlaylistId || 'pl-christmas',
         playlists: Array.isArray(parsed.playlists) ? parsed.playlists : [],
         phrases: Array.isArray(parsed.phrases) ? parsed.phrases : defaultState.phrases,
@@ -963,6 +973,53 @@ io.on('connection', (socket) => {
     runtime.queueIndex = -1;
     saveState();
     syncEngineWithSettings(true);
+  });
+
+  // --- Eventos de Tarja de Identificação Rápida (Lower Third - Fase 5) ---
+  socket.on('lowerThird:show', (payload) => {
+    const title = String(payload?.title || '').trim();
+    if (!title) return;
+
+    const badge = String(payload?.badge || '').trim();
+    const subtitle = String(payload?.subtitle || '').trim();
+    const autoHideSeconds = Math.max(0, Number(payload?.autoHideSeconds) ?? 10);
+
+    if (global.lowerThirdTimer) {
+      clearTimeout(global.lowerThirdTimer);
+      global.lowerThirdTimer = null;
+    }
+
+    state.lowerThird = {
+      active: true,
+      badge,
+      title,
+      subtitle,
+      autoHideSeconds
+    };
+    saveState();
+    broadcastState();
+
+    if (autoHideSeconds > 0) {
+      global.lowerThirdTimer = setTimeout(() => {
+        if (state.lowerThird) {
+          state.lowerThird.active = false;
+          saveState();
+          broadcastState();
+        }
+      }, autoHideSeconds * 1000);
+    }
+  });
+
+  socket.on('lowerThird:hide', () => {
+    if (global.lowerThirdTimer) {
+      clearTimeout(global.lowerThirdTimer);
+      global.lowerThirdTimer = null;
+    }
+    if (state.lowerThird) {
+      state.lowerThird.active = false;
+      saveState();
+      broadcastState();
+    }
   });
 });
 

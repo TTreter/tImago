@@ -932,3 +932,207 @@ html, body {
 .theme-custom .progress-wrapper { background: rgba(255, 255, 255, 0.12); }
 .theme-custom .progress-bar { background: linear-gradient(90deg, var(--custom-border, #38bdf8), var(--custom-author, #fde047)); }
 
+/* ==========================================================================
+   TARJA DE IDENTIFICAÇÃO RÁPIDA (LOWER THIRD - MÚSICA / PRELETOR - FASE 5)
+   ========================================================================== */
+.overlay-lower-third {
+  position: absolute;
+  left: var(--stage-pad-x, 86px);
+  bottom: calc(var(--stage-pad-y, 64px) + 12px);
+  z-index: 30;
+  display: flex;
+  align-items: stretch;
+  min-width: 380px;
+  max-width: 780px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(30, 41, 59, 0.92) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.68), 0 0 24px rgba(56, 189, 248, 0.22);
+  overflow: hidden;
+  transform-origin: left bottom;
+  transition:
+    opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Se o card principal estiver embaixo à esquerda, posiciona a tarja no topo esquerdo para nunca colidir */
+.stage.pos-bottom-left .overlay-lower-third {
+  bottom: auto;
+  top: var(--stage-pad-y, 64px);
+  transform-origin: left top;
+}
+
+.overlay-lower-third.is-visible {
+  opacity: 1;
+  transform: translateX(0) scale(var(--overlay-scale, 1));
+}
+
+.overlay-lower-third.is-hidden {
+  opacity: 0;
+  transform: translateX(-44px) scale(calc(var(--overlay-scale, 1) * 0.96));
+  pointer-events: none;
+}
+
+.lt-accent-bar {
+  width: 7px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #38bdf8 0%, #f59e0b 100%);
+}
+
+.lt-body {
+  padding: 14px 24px 15px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.lt-badge {
+  align-self: flex-start;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: #fde047;
+  margin-bottom: 2px;
+}
+
+.lt-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(23px * var(--font-scale, 1));
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.lt-subtitle {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(14.5px * var(--font-scale, 1));
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.lt-subtitle:empty {
+  display: none;
+}
+
+/* ==========================================================================
+   FAIXA DESLIZANTE DE RODAPÉ (MODO TICKER / LETREIRO CONTÍNUO - FASE 5)
+   ========================================================================== */
+.overlay-ticker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(58px * var(--overlay-scale, 1));
+  background: linear-gradient(90deg, rgba(10, 15, 29, 0.95) 0%, rgba(17, 24, 39, 0.95) 100%);
+  border-top: 2px solid rgba(250, 204, 21, 0.55);
+  box-shadow: 0 -10px 32px rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  z-index: 25;
+  overflow: hidden;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.overlay-ticker.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.overlay-ticker.is-hidden {
+  opacity: 0;
+  transform: translateY(100%);
+  pointer-events: none;
+}
+
+.ticker-label-box {
+  height: 100%;
+  padding: 0 24px;
+  background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+  border-right: 2px solid rgba(253, 224, 71, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #ffffff;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  z-index: 2;
+  box-shadow: 8px 0 20px rgba(0, 0, 0, 0.45);
+}
+
+.ticker-live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #fde047;
+  box-shadow: 0 0 10px #fde047;
+  animation: pulseKickerDot 1.6s infinite ease-in-out;
+}
+
+.ticker-track-viewport {
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.ticker-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+  animation: tickerMarquee var(--ticker-duration, 32s) linear infinite;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 32px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(19px * var(--font-scale, 1));
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.ticker-item-kicker {
+  font-size: calc(11.5px * var(--font-scale, 1));
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 99px;
+  background: rgba(250, 204, 21, 0.2);
+  color: #fde047;
+  border: 1px solid rgba(250, 204, 21, 0.45);
+}
+
+.ticker-item-author {
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 700;
+  color: #fde047;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ticker-sep {
+  color: rgba(253, 224, 71, 0.65);
+  font-size: calc(16px * var(--font-scale, 1));
+}
+
+@keyframes tickerMarquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+

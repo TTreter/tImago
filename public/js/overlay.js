@@ -17,6 +17,15 @@
   const progressWrapperEl = document.getElementById('progress-wrapper');
   const progressBarEl = document.getElementById('progress-bar');
 
+  // Elementos Lower Third & Ticker (Fase 5)
+  const lowerThirdEl = document.getElementById('overlay-lower-third');
+  const ltBadgeEl = document.getElementById('lt-badge');
+  const ltTitleEl = document.getElementById('lt-title');
+  const ltSubtitleEl = document.getElementById('lt-subtitle');
+  const tickerEl = document.getElementById('overlay-ticker');
+  const tickerTrackEl = document.getElementById('ticker-track');
+  let lastTickerSignature = '';
+
   let renderedPhraseId = null;
   let renderedPhaseStartedAt = null;
   let switchTimeout = null;
@@ -153,6 +162,95 @@
     document.documentElement.style.setProperty('--res-height', `${resH}px`);
     document.documentElement.style.setProperty('--stage-pad-x', `${padX}px`);
     document.documentElement.style.setProperty('--stage-pad-y', `${padY}px`);
+
+    const tickerSpeed = Math.min(180, Math.max(8, Number(settings.tickerSpeedSeconds) || 32));
+    document.documentElement.style.setProperty('--ticker-duration', `${tickerSpeed}s`);
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function renderLowerThird(state) {
+    if (!lowerThirdEl) return;
+    const isVisibleGlobal = Boolean(state?.settings?.visible);
+    const lt = state?.lowerThird;
+
+    if (!isVisibleGlobal || !lt || !lt.active || !lt.title) {
+      lowerThirdEl.classList.remove('is-visible');
+      lowerThirdEl.classList.add('is-hidden');
+      return;
+    }
+
+    if (ltBadgeEl) {
+      ltBadgeEl.textContent = lt.badge || '';
+      ltBadgeEl.style.display = lt.badge ? 'inline-block' : 'none';
+    }
+    if (ltTitleEl) ltTitleEl.textContent = lt.title || '';
+    if (ltSubtitleEl) ltSubtitleEl.textContent = lt.subtitle || '';
+
+    lowerThirdEl.classList.remove('is-hidden');
+    lowerThirdEl.classList.add('is-visible');
+  }
+
+  function renderTicker(state) {
+    if (!tickerEl || !tickerTrackEl) return;
+    const isVisibleGlobal = Boolean(state?.settings?.visible);
+    const isTickerMode = state?.settings?.displayMode === 'ticker';
+
+    if (!isVisibleGlobal || !isTickerMode) {
+      tickerEl.classList.remove('is-visible');
+      tickerEl.classList.add('is-hidden');
+      return;
+    }
+
+    const audItems = (state?.audienceQueue || []).filter(
+      (a) => a.status === 'pending' || a.status === 'showing'
+    );
+    const sysItems = (state?.phrases || []).filter((p) => p.enabled);
+
+    const combined = [
+      ...audItems.map((a) => ({
+        text: a.text,
+        author: a.author,
+        kicker: a.kicker && a.kicker !== '__NONE__' ? a.kicker : (state?.settings?.defaultKickerText || 'PÚBLICO')
+      })),
+      ...sysItems.map((p) => ({
+        text: p.text,
+        author: p.author,
+        kicker: p.kicker && p.kicker !== '__NONE__' ? p.kicker : ''
+      }))
+    ];
+
+    if (combined.length === 0) {
+      tickerEl.classList.remove('is-visible');
+      tickerEl.classList.add('is-hidden');
+      return;
+    }
+
+    const signature = JSON.stringify(combined);
+    if (signature !== lastTickerSignature) {
+      lastTickerSignature = signature;
+      const singlePassHtml = combined
+        .map(
+          (item) => `
+          <span class="ticker-item">
+            ${item.kicker ? `<span class="ticker-item-kicker">${escapeHtml(item.kicker)}</span>` : ''}
+            <span>${escapeHtml(item.text)}</span>
+            ${item.author ? `<span class="ticker-item-author">— ${escapeHtml(item.author)}</span>` : ''}
+            <span class="ticker-sep">✦</span>
+          </span>
+        `
+        )
+        .join('');
+      // Duplica o bloco para criar loop contínuo (-50%) sem salto visual
+      tickerTrackEl.innerHTML = singlePassHtml + singlePassHtml;
+    }
+
+    tickerEl.classList.remove('is-hidden');
+    tickerEl.classList.add('is-visible');
   }
 
   function stopProgressAnimation() {
@@ -235,10 +333,14 @@
   }
 
   function renderRuntime(state, runtime) {
+    renderLowerThird(state);
+    renderTicker(state);
+
     const isVisibleSetting = Boolean(state?.settings?.visible);
+    const isTickerMode = state?.settings?.displayMode === 'ticker';
     const isShowingPhase = runtime?.phase === 'showing' && Boolean(runtime?.currentPhrase);
 
-    if (!isVisibleSetting || !isShowingPhase) {
+    if (!isVisibleSetting || isTickerMode || !isShowingPhase) {
       hideCard();
       return;
     }
@@ -291,9 +393,13 @@
   // Quando o aplicativo desktop (tImago.exe) ou o servidor é fechado, recolhe imediatamente o card no OBS
   socket.on('app:shutdown', () => {
     hideCard();
+    if (lowerThirdEl) lowerThirdEl.classList.replace('is-visible', 'is-hidden');
+    if (tickerEl) tickerEl.classList.replace('is-visible', 'is-hidden');
   });
 
   socket.on('disconnect', () => {
     hideCard();
+    if (lowerThirdEl) lowerThirdEl.classList.replace('is-visible', 'is-hidden');
+    if (tickerEl) tickerEl.classList.replace('is-visible', 'is-hidden');
   });
 })();

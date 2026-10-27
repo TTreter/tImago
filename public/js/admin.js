@@ -134,6 +134,18 @@
   const btnRemoveLogo = document.getElementById('btn-remove-logo');
   const inputLogoFile = document.getElementById('input-logo-file');
 
+  // Ticker de Rodapé e Tarja Lower Third (Fase 5)
+  const settingDisplayMode = document.getElementById('setting-display-mode');
+  const tickerSpeedBox = document.getElementById('ticker-speed-box');
+  const settingTickerSpeed = document.getElementById('setting-ticker-speed');
+  const formLowerThird = document.getElementById('form-lower-third');
+  const ltInputBadge = document.getElementById('lt-input-badge');
+  const ltInputTitle = document.getElementById('lt-input-title');
+  const ltInputSubtitle = document.getElementById('lt-input-subtitle');
+  const ltInputAutohide = document.getElementById('lt-input-autohide');
+  const btnHideLowerThird = document.getElementById('btn-hide-lower-third');
+  const ltStatusPill = document.getElementById('lt-status-pill');
+
   // Controles de Resolução
   const resPresetBtns = document.querySelectorAll('.res-preset-btn');
   const settingResWidth = document.getElementById('setting-res-width');
@@ -275,6 +287,17 @@
     }
     if (btnRemoveLogo) {
       btnRemoveLogo.classList.toggle('is-hidden', !settings.logoDataUrl);
+    }
+
+    const dispMode = settings.displayMode === 'ticker' ? 'ticker' : 'card';
+    if (settingDisplayMode && document.activeElement !== settingDisplayMode) {
+      settingDisplayMode.value = dispMode;
+    }
+    if (tickerSpeedBox) {
+      tickerSpeedBox.classList.toggle('is-hidden', dispMode !== 'ticker');
+    }
+    if (settingTickerSpeed && document.activeElement !== settingTickerSpeed) {
+      settingTickerSpeed.value = settings.tickerSpeedSeconds ?? 32;
     }
 
     posBtns.forEach((btn) => {
@@ -1333,6 +1356,64 @@
   }
 
   // ==========================================================================
+  // MODO TICKER DE RODAPÉ & TARJA LOWER THIRD (FASE 5)
+  // ==========================================================================
+  if (settingDisplayMode) {
+    settingDisplayMode.addEventListener('change', () => {
+      socket.emit('settings:update', { displayMode: settingDisplayMode.value });
+    });
+  }
+
+  if (settingTickerSpeed) {
+    settingTickerSpeed.addEventListener('change', () => {
+      const val = Math.min(180, Math.max(8, Number(settingTickerSpeed.value) || 32));
+      settingTickerSpeed.value = val;
+      socket.emit('settings:update', { tickerSpeedSeconds: val });
+    });
+  }
+
+  function renderLowerThirdControls(lowerThird) {
+    if (!ltStatusPill) return;
+    const isActive = Boolean(lowerThird?.active);
+    ltStatusPill.className = 'badge-carousel-state ' + (isActive ? 'is-running' : 'is-off');
+    ltStatusPill.textContent = isActive ? '● TARJA NO AR' : 'Oculta';
+    if (btnHideLowerThird) {
+      btnHideLowerThird.disabled = !isActive;
+    }
+    if (lowerThird && document.activeElement !== ltInputTitle && document.activeElement !== ltInputSubtitle) {
+      if (ltInputTitle && !ltInputTitle.value && lowerThird.title) {
+        ltInputTitle.value = lowerThird.title;
+      }
+      if (ltInputSubtitle && !ltInputSubtitle.value && lowerThird.subtitle) {
+        ltInputSubtitle.value = lowerThird.subtitle;
+      }
+    }
+  }
+
+  if (formLowerThird) {
+    formLowerThird.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = ltInputTitle ? ltInputTitle.value.trim() : '';
+      if (!title) {
+        if (ltInputTitle) ltInputTitle.focus();
+        return;
+      }
+      socket.emit('lowerThird:show', {
+        badge: ltInputBadge ? ltInputBadge.value : '',
+        title,
+        subtitle: ltInputSubtitle ? ltInputSubtitle.value.trim() : '',
+        autoHideSeconds: Math.max(0, Number(ltInputAutohide?.value) ?? 10)
+      });
+    });
+  }
+
+  if (btnHideLowerThird) {
+    btnHideLowerThird.addEventListener('click', () => {
+      socket.emit('lowerThird:hide');
+    });
+  }
+
+  // ==========================================================================
   // SINCRONIZAÇÃO SOCKET.IO
   // ==========================================================================
   socket.on('state:sync', (payload) => {
@@ -1349,6 +1430,7 @@
     };
 
     renderMasterControls(currentState.settings);
+    renderLowerThirdControls(currentState.lowerThird);
     renderPlaylistsSelector(currentState.playlists || [], currentState.activePlaylistId);
     renderMobileQrCodes(currentRuntime);
     renderAudienceQueue(currentState.audienceQueue || [], currentRuntime, currentState.settings);
