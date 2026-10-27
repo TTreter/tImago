@@ -90,30 +90,30 @@ body {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
   background: rgba(17, 24, 39, 0.92);
   backdrop-filter: blur(12px);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 12px 20px;
+  padding: 10px 16px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.28);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .brand-logo {
-  height: 44px;
+  height: 38px;
   width: auto;
   display: block;
 }
 
 .brand-divider {
   width: 1px;
-  height: 32px;
+  height: 28px;
   background: rgba(255, 255, 255, 0.1);
 }
 
@@ -126,51 +126,52 @@ body {
 
 .brand-tag {
   display: inline-block;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.11em;
   color: #a5b4fc;
   background: rgba(99, 102, 241, 0.16);
   border: 1px solid rgba(99, 102, 241, 0.35);
-  padding: 2px 8px;
+  padding: 2px 7px;
   border-radius: 99px;
   white-space: nowrap;
 }
 
 .brand-subtitle {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .topbar-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .obs-url-box {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: var(--bg-input);
   border: 1px solid var(--border-subtle);
-  padding: 5px 8px 5px 13px;
+  padding: 4px 6px 4px 10px;
   border-radius: var(--radius-md);
 }
 
 .obs-url-label {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--text-muted);
   font-weight: 600;
   white-space: nowrap;
 }
 
 .obs-url-box code {
-  font-size: 12.5px;
+  font-size: 12px;
   color: #38bdf8;
   font-weight: 600;
-  padding: 0 4px;
+  padding: 0 3px;
   white-space: nowrap;
 }
 
@@ -178,11 +179,11 @@ body {
 .btn-master-air {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  height: 42px;
-  padding: 0 20px;
+  gap: 8px;
+  height: 38px;
+  padding: 0 15px;
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 800;
   letter-spacing: 0.05em;
   white-space: nowrap;
@@ -237,7 +238,10 @@ body {
 
 @media (max-width: 1120px) {
   .main-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .col-sidebar {
+    position: static;
   }
 }
 
@@ -245,6 +249,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  min-width: 0;
 }
 
 .col-sidebar {
@@ -253,6 +258,7 @@ body {
   gap: 16px;
   position: sticky;
   top: 16px;
+  min-width: 0;
 }
 
 .panel-card {
@@ -315,7 +321,7 @@ body {
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  white-space: nowrap;
+  line-height: 1.3;
 }
 
 .card-subtitle {
@@ -413,22 +419,24 @@ body {
 
 .form-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: flex-end;
 }
 
 .flex-grow {
-  flex: 1;
+  flex: 1 1 200px;
+  min-width: 0;
 }
 
 .duration-group {
-  width: 145px;
-  flex-shrink: 0;
+  flex: 0 0 130px;
+  min-width: 115px;
 }
 
 .kicker-group {
-  width: 225px;
-  flex-shrink: 0;
+  flex: 0 1 250px;
+  min-width: 190px;
 }
 
 .form-group {
@@ -1958,4 +1966,289 @@ body.is-reception-mode .main-grid {
   font-weight: 700;
   color: #38bdf8;
   white-space: nowrap;
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE MOBILE E TABLET (iPhone / Android - ZERO OVERFLOW LATERAL)
+   ========================================================================== */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    padding: 10px 10px 36px;
+    gap: 12px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .panel-card {
+    padding: 14px;
+    border-radius: 12px;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  /* Topbar Mobile */
+  .topbar {
+    padding: 12px;
+    gap: 10px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .brand {
+    justify-content: space-between;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .brand-logo {
+    height: 32px;
+  }
+
+  .brand-divider,
+  .brand-subtitle {
+    display: none;
+  }
+
+  .topbar-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .obs-url-box {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 6px 8px;
+  }
+
+  .obs-url-box code {
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .backup-actions-box {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+    padding: 6px;
+  }
+
+  .backup-actions-box .btn {
+    width: 100%;
+    min-width: 0;
+    padding: 0 8px;
+    font-size: 11.5px;
+    justify-content: center;
+  }
+
+  .backup-actions-box .btn span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .btn-master-air {
+    width: 100%;
+    justify-content: center;
+    height: 42px;
+    font-size: 13px;
+  }
+
+  /* Cabeçalhos dos Cards Mobile */
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .card-header h2 {
+    font-size: 15px;
+    white-space: normal;
+  }
+
+  .header-right-actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  /* Formulários Mobile (100% largura e 16px para evitar zoom automático no iOS Safari) */
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .flex-grow,
+  .kicker-group,
+  .duration-group {
+    width: 100% !important;
+    flex: none !important;
+    min-width: 0 !important;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+    height: 42px;
+    justify-content: center;
+  }
+
+  /* Barra de Bateria da Fila do Público Mobile */
+  .audience-batch-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .batch-bar-left {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #btn-start-audience-batch,
+  #btn-pause-audience-batch {
+    width: 100%;
+    height: 42px;
+    justify-content: center;
+  }
+
+  .hold-mode-toggle {
+    font-size: 12px;
+    line-height: 1.35;
+    white-space: normal;
+  }
+
+  /* Barra de Playlists Mobile */
+  .playlist-selector-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .playlist-select-group {
+    flex: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .playlist-actions-group {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+  }
+
+  .playlist-actions-group .btn {
+    width: 100%;
+    padding: 0 4px;
+    font-size: 11px;
+    justify-content: center;
+  }
+
+  /* Busca e Ações em Massa Mobile */
+  .carousel-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input-wrapper {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .bulk-actions-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Itens de Frase Mobile */
+  .phrase-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .phrase-actions {
+    width: 100%;
+    justify-content: flex-end;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    flex-wrap: wrap;
+  }
+
+  .btn-trigger-now {
+    flex: 1;
+    justify-content: center;
+    height: 34px;
+  }
+
+  /* Abas, Cores, Logo e Atalhos Mobile */
+  .tab-btn {
+    font-size: 11px;
+    padding: 0 4px;
+  }
+
+  .color-pickers-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .logo-upload-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .logo-upload-actions {
+    width: 100%;
+  }
+
+  .logo-upload-actions .btn {
+    flex: 1;
+  }
+
+  .shortcuts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Modais Mobile */
+  .modal-box {
+    padding: 16px;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  .qr-cards-grid {
+    grid-template-columns: 1fr;
+  }
 }

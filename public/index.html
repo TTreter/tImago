@@ -22,17 +22,17 @@
         <div class="brand-divider"></div>
         <div class="brand-meta">
           <span class="brand-tag">ESTÚDIO AO VIVO</span>
-          <p class="brand-subtitle">Controle de Frases, Temas & Anúncios para OBS Studio</p>
+          <p class="brand-subtitle">Controle de Overlays para OBS Studio</p>
         </div>
       </div>
 
       <div class="topbar-actions">
         <div class="obs-url-box">
-          <span class="obs-url-label">URL do OBS:</span>
+          <span class="obs-url-label">OBS:</span>
           <code id="obs-url-display">http://localhost:3000/overlay</code>
           <button id="btn-copy-url" class="btn btn-sm btn-secondary" title="Copiar link para colar no Browser Source do OBS">
             <svg class="icon-svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            <span>Copiar Link</span>
+            <span>Copiar</span>
           </button>
           <a href="/overlay" target="_blank" class="btn btn-sm btn-ghost" title="Abrir Overlay em nova aba">
             <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
@@ -43,23 +43,23 @@
         <div class="backup-actions-box">
           <button type="button" id="btn-open-mobile-qr" class="btn btn-sm btn-secondary" title="Abrir controle remoto no celular ou tablet via QR Code na rede Wi-Fi">
             <svg class="icon-svg" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-            <span id="label-mobile-qr">📱 Celular / QR</span>
+            <span id="label-mobile-qr">Celular / QR</span>
           </button>
           <button type="button" id="btn-toggle-reception-mode" class="btn btn-sm btn-ghost" title="Alternar Modo Recepção Simplificado (focado apenas na Fila do Público para celular/voluntários)">
             <span>🙋 Modo Recepção</span>
           </button>
           <button type="button" id="btn-export-backup" class="btn btn-sm btn-ghost" title="Exportar backup completo (.json) de todas as playlists, configurações e fila">
             <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            <span>Exportar JSON</span>
+            <span>Exportar</span>
           </button>
           <button type="button" id="btn-import-backup" class="btn btn-sm btn-ghost" title="Restaurar/Importar backup (.json)">
             <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-            <span>Importar JSON</span>
+            <span>Importar</span>
           </button>
           <input type="file" id="input-import-json" accept=".json,application/json" class="is-hidden" />
         </div>
 
-        <button id="btn-toggle-visible" class="btn-master-air is-on">
+        <button id="btn-toggle-visible" class="btn-master-air is-on" title="Alternar visibilidade do Overlay no OBS (Atalho: Alt+A)">
           <span class="air-dot"></span>
           <span id="master-air-label">NO AR (VISÍVEL)</span>
         </button>
@@ -459,7 +459,7 @@
           <div id="tab-style" class="tab-pane active">
             <div class="form-group">
               <div class="theme-header-row">
-                <label>Galeria de Temas (18 estilos)</label>
+                <label>Galeria de Temas (19 estilos)</label>
                 <span id="active-theme-name-pill" class="slider-value-pill">Cantata Real</span>
               </div>
 
@@ -472,7 +472,7 @@
                 <button type="button" class="theme-cat-btn" data-cat="mothers">🌸 Mães (2)</button>
                 <button type="button" class="theme-cat-btn" data-cat="fathers">👔 Pais (2)</button>
                 <button type="button" class="theme-cat-btn" data-cat="soccer">⚽ Futebol (2)</button>
-                <button type="button" class="theme-cat-btn" data-cat="extra">✨ Extras (3)</button>
+                <button type="button" class="theme-cat-btn" data-cat="extra">✨ Extras (4)</button>
               </div>
 
               <div class="theme-selector-grid theme-gallery-scroll">

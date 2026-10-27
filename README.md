@@ -43,7 +43,7 @@ Ideal para transmissões ao vivo, cantatas de Natal, cultos, eventos institucion
 ## 🚀 Como Usar
 
 ### Opção 1: Aplicativo Executável Windows (`.exe`)
-1. Abra o executável portátil gerado em `dist/tImago-Portable-1.0.6.exe` (ou rode `npm run app`).
+1. Abra o executável portátil gerado em `dist/tImago-Portable-1.0.7.exe` (ou rode `npm run app`).
 2. O **tImago** abrirá em sua própria janela dedicada, sem precisar manter nenhum terminal aberto.
 3. Quando você fechar a janela do **tImago**, o servidor e o overlay no OBS são encerrados automaticamente.
 

@@ -13,8 +13,99 @@
     "resolutionWidth": 1920,
     "resolutionHeight": 1080,
     "audienceHoldMode": true,
-    "audienceBatchPlaying": false
+    "audienceBatchPlaying": false,
+    "showKicker": true,
+    "defaultKickerText": "MENSAGEM DO PÚBLICO",
+    "animationStyle": "slide-up",
+    "showLogo": false,
+    "logoDataUrl": "",
+    "customThemeColors": {
+      "bg1": "#1e1b4b",
+      "bg2": "#0f172a",
+      "border": "#38bdf8",
+      "text": "#f8fafc",
+      "author": "#fde047"
+    },
+    "displayMode": "card",
+    "tickerSpeedSeconds": 32
   },
+  "lowerThird": {
+    "active": false,
+    "badge": "🎵 LOUVOR AO VIVO",
+    "title": "",
+    "subtitle": "",
+    "autoHideSeconds": 10
+  },
+  "activePlaylistId": "pl-christmas",
+  "playlists": [
+    {
+      "id": "pl-christmas",
+      "name": "🎄 Cantata de Natal",
+      "phrases": [
+        {
+          "id": "p-1",
+          "text": "Sejam todos muito bem-vindos à nossa Cantata de Natal! Que a paz e a esperança desta noite preencham o seu lar.",
+          "author": "Coral & Organização",
+          "duration": 10,
+          "enabled": true
+        },
+        {
+          "id": "p-2",
+          "text": "\"Porque um menino nos nasceu, um filho se nos deu; o governo está sobre os seus ombros; e o seu nome será: Maravilhoso Conselheiro, Deus Forte, Pai da Eternidade, Príncipe da Paz.\"",
+          "author": "Isaías 9:6",
+          "duration": 12,
+          "enabled": true
+        },
+        {
+          "id": "p-3",
+          "text": "Deixe sua mensagem de Natal no chat! Vamos exibir os recados e felicitações especiais aqui na tela durante a transmissão.",
+          "author": "Participe ao Vivo",
+          "duration": 9,
+          "enabled": true
+        },
+        {
+          "id": "p-4",
+          "text": "\"Glória a Deus nas maiores alturas, e paz na terra entre os homens, a quem ele quer bem!\"",
+          "author": "Lucas 2:14",
+          "duration": 9,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "pl-worship",
+      "name": "⛪ Culto & Avisos Gerais",
+      "phrases": [
+        {
+          "id": "p-w1",
+          "text": "Sejam bem-vindos ao nosso culto ao vivo! Compartilhe esta transmissão com sua família e amigos.",
+          "author": "Recepção & Mídia",
+          "duration": 10,
+          "enabled": true
+        },
+        {
+          "id": "p-w2",
+          "text": "\"O Senhor te abençoe e te guarde; o Senhor faça resplandecer o seu rosto sobre ti e tenha misericórdia de ti.\"",
+          "author": "Números 6:24-25",
+          "duration": 11,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "pl-easter",
+      "name": "🕊️ Especial de Páscoa",
+      "phrases": [
+        {
+          "id": "p-e1",
+          "text": "\"Ele não está aqui, porque já ressuscitou, como havia dito! Cristo vive para sempre!\"",
+          "author": "Mateus 28:6",
+          "duration": 11,
+          "enabled": true
+        }
+      ]
+    }
+  ],
   "phrases": [
     {
       "id": "p-1",

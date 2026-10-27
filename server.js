@@ -1025,14 +1025,39 @@ io.on('connection', (socket) => {
 
 function getLocalIpAddress() {
   const interfaces = os.networkInterfaces();
+  const candidates = [];
+
   for (const name of Object.keys(interfaces)) {
+    const lowerName = name.toLowerCase();
+    const isVirtualName =
+      lowerName.includes('vethernet') ||
+      lowerName.includes('wsl') ||
+      lowerName.includes('virtual') ||
+      lowerName.includes('vmware') ||
+      lowerName.includes('vbox') ||
+      lowerName.includes('vpn') ||
+      lowerName.includes('loopback');
+
     for (const iface of interfaces[name]) {
-      if (iface.family === 'IPv4' && !iface.internal) {
-        return iface.address;
+      if (iface.family !== 'IPv4' || iface.internal) continue;
+      // Ignora túneis/VPNs sem MAC físico ou com máscara /32
+      const hasPhysicalMac = iface.mac && iface.mac !== '00:00:00:00:00:00';
+      const isPointToPoint = iface.netmask === '255.255.255.255';
+
+      let score = 0;
+      if (hasPhysicalMac && !isPointToPoint && !isVirtualName) score += 100;
+      if (iface.address.startsWith('192.168.')) score += 50;
+      else if (iface.address.startsWith('10.')) score += 30;
+      if (lowerName.includes('wi-fi') || lowerName.includes('wifi') || lowerName.includes('ethernet')) {
+        score += 20;
       }
+
+      candidates.push({ address: iface.address, score });
     }
   }
-  return 'localhost';
+
+  candidates.sort((a, b) => b.score - a.score);
+  return candidates.length > 0 ? candidates[0].address : 'localhost';
 }
 
 /**

@@ -1237,7 +1237,7 @@
       btnToggleReceptionMode.classList.toggle('is-active', Boolean(enabled));
       const span = btnToggleReceptionMode.querySelector('span');
       if (span) {
-        span.textContent = enabled ? '🎛️ Voltar ao Painel Completo' : '🙋 Modo Recepção';
+        span.textContent = enabled ? '🎛️ Painel Completo' : '🙋 Modo Recepção';
       }
     }
     setTimeout(updatePreviewScale, 60);
@@ -1262,7 +1262,7 @@
     const receptionUrl = `${baseUrl}/?mode=recepcao`;
 
     if (labelMobileQr && ip !== 'localhost') {
-      labelMobileQr.textContent = `📱 Celular (${ip})`;
+      labelMobileQr.textContent = `Celular (${ip})`;
     }
     if (qrUrlReception) qrUrlReception.textContent = receptionUrl;
     if (qrUrlFull) qrUrlFull.textContent = baseUrl;
