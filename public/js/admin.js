@@ -216,19 +216,30 @@
   });
 
   // ==========================================================================
-  // NAVEGAÇÃO ENTRE TELAS: OPERAÇÃO AO VIVO vs PÁGINA DE CONFIGURAÇÕES
+  // NAVEGAÇÃO ENTRE TELAS: OPERAÇÃO AO VIVO vs PLACAR ESPORTIVO vs CONFIGURAÇÕES
   // ==========================================================================
+  const navBtnSports = document.getElementById('nav-btn-sports');
+  const viewSports = document.getElementById('view-sports');
+
   function switchView(viewName) {
     const isLive = viewName === 'live';
+    const isSports = viewName === 'sports';
+    const isSettings = viewName === 'settings';
+
     if (navBtnLive) navBtnLive.classList.toggle('active', isLive);
-    if (navBtnSettings) navBtnSettings.classList.toggle('active', !isLive);
+    if (navBtnSports) navBtnSports.classList.toggle('active', isSports);
+    if (navBtnSettings) navBtnSettings.classList.toggle('active', isSettings);
+
     if (viewLive) viewLive.classList.toggle('active', isLive);
-    if (viewSettings) viewSettings.classList.toggle('active', !isLive);
+    if (viewSports) viewSports.classList.toggle('active', isSports);
+    if (viewSettings) viewSettings.classList.toggle('active', isSettings);
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(updatePreviewScale, 60);
   }
 
   if (navBtnLive) navBtnLive.addEventListener('click', () => switchView('live'));
+  if (navBtnSports) navBtnSports.addEventListener('click', () => switchView('sports'));
   if (navBtnSettings) navBtnSettings.addEventListener('click', () => switchView('settings'));
   if (btnJumpToSettings) btnJumpToSettings.addEventListener('click', () => switchView('settings'));
   if (btnBackToLive) btnBackToLive.addEventListener('click', () => switchView('live'));
@@ -1577,6 +1588,442 @@
   }
 
   // ==========================================================================
+  // MÓDULO DE TRANSMISSÃO ESPORTIVA (PLACAR AO VIVO - VIEW-SPORTS)
+  // ==========================================================================
+  let currentScoreboard = null;
+
+  const btnToggleSbAir = document.getElementById('btn-toggle-sb-air');
+  const sbAirLabel = document.getElementById('sb-air-label');
+  const btnSbResetMatch = document.getElementById('btn-sb-reset-match');
+  const sbSportSelect = document.getElementById('sb-sport-select');
+  const sbPosSelect = document.getElementById('sb-pos-select');
+  const btnSbSwitchSides = document.getElementById('btn-sb-switch-sides');
+
+  // Mandante (Time A)
+  const sbInputNameA = document.getElementById('sb-input-name-a');
+  const sbInputShortA = document.getElementById('sb-input-short-a');
+  const sbInputColorA = document.getElementById('sb-input-color-a');
+  const sbTextColorA = document.getElementById('sb-text-color-a');
+  const badgePillA = document.getElementById('badge-pill-a');
+  const sbFileLogoA = document.getElementById('sb-file-logo-a');
+  const btnUploadLogoA = document.getElementById('btn-upload-logo-a');
+  const btnRemoveLogoA = document.getElementById('btn-remove-logo-a');
+  const sbLogoPreviewNameA = document.getElementById('sb-logo-preview-name-a');
+  const btnIncScoreA = document.getElementById('btn-inc-score-a');
+  const btnDecScoreA = document.getElementById('btn-dec-score-a');
+  const sbDisplayScoreA = document.getElementById('sb-display-score-a');
+  const btnTriggerGoalA = document.getElementById('btn-trigger-goal-a');
+  const btnIncYellowA = document.getElementById('btn-inc-yellow-a');
+  const btnDecYellowA = document.getElementById('btn-dec-yellow-a');
+  const sbCountYellowA = document.getElementById('sb-count-yellow-a');
+  const btnIncRedA = document.getElementById('btn-inc-red-a');
+  const btnDecRedA = document.getElementById('btn-dec-red-a');
+  const sbCountRedA = document.getElementById('sb-count-red-a');
+  const btnIncSetsA = document.getElementById('btn-inc-sets-a');
+  const btnDecSetsA = document.getElementById('btn-dec-sets-a');
+  const sbCountSetsA = document.getElementById('sb-count-sets-a');
+  const radioServingA = document.getElementById('radio-serving-a');
+  const sbSoccerActionsA = document.getElementById('sb-soccer-actions-a');
+  const sbVoleyActionsA = document.getElementById('sb-voley-actions-a');
+
+  // Visitante (Time B)
+  const sbInputNameB = document.getElementById('sb-input-name-b');
+  const sbInputShortB = document.getElementById('sb-input-short-b');
+  const sbInputColorB = document.getElementById('sb-input-color-b');
+  const sbTextColorB = document.getElementById('sb-text-color-b');
+  const badgePillB = document.getElementById('badge-pill-b');
+  const sbFileLogoB = document.getElementById('sb-file-logo-b');
+  const btnUploadLogoB = document.getElementById('btn-upload-logo-b');
+  const btnRemoveLogoB = document.getElementById('btn-remove-logo-b');
+  const sbLogoPreviewNameB = document.getElementById('sb-logo-preview-name-b');
+  const btnIncScoreB = document.getElementById('btn-inc-score-b');
+  const btnDecScoreB = document.getElementById('btn-dec-score-b');
+  const sbDisplayScoreB = document.getElementById('sb-display-score-b');
+  const btnTriggerGoalB = document.getElementById('btn-trigger-goal-b');
+  const btnIncYellowB = document.getElementById('btn-inc-yellow-b');
+  const btnDecYellowB = document.getElementById('btn-dec-yellow-b');
+  const sbCountYellowB = document.getElementById('sb-count-yellow-b');
+  const btnIncRedB = document.getElementById('btn-inc-red-b');
+  const btnDecRedB = document.getElementById('btn-dec-red-b');
+  const sbCountRedB = document.getElementById('sb-count-red-b');
+  const btnIncSetsB = document.getElementById('btn-inc-sets-b');
+  const btnDecSetsB = document.getElementById('btn-dec-sets-b');
+  const sbCountSetsB = document.getElementById('sb-count-sets-b');
+  const radioServingB = document.getElementById('radio-serving-b');
+  const sbSoccerActionsB = document.getElementById('sb-soccer-actions-b');
+  const sbVoleyActionsB = document.getElementById('sb-voley-actions-b');
+
+  // Relógio e Período
+  const sbTimerDigits = document.getElementById('sb-timer-digits');
+  const sbTimerStateLabel = document.getElementById('sb-timer-state-label');
+  const btnSbToggleTimer = document.getElementById('btn-sb-toggle-timer');
+  const labelBtnTimer = document.getElementById('label-btn-timer');
+  const btnSbPlus1m = document.getElementById('btn-sb-plus-1m');
+  const btnSbMinus1m = document.getElementById('btn-sb-minus-1m');
+  const btnSbResetTimer = document.getElementById('btn-sb-reset-timer');
+  const sbPeriodSelect = document.getElementById('sb-period-select');
+  const extraPills = document.querySelectorAll('.btn-extra-pill');
+
+  function formatTime(totalSeconds) {
+    const sec = Math.max(0, Number(totalSeconds) || 0);
+    const m = String(Math.floor(sec / 60)).padStart(2, '0');
+    const s = String(sec % 60).padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  function renderScoreboardControls(sb) {
+    if (!sb) return;
+    currentScoreboard = sb;
+
+    // Botão NO AR
+    if (btnToggleSbAir && sbAirLabel) {
+      btnToggleSbAir.classList.toggle('is-on', Boolean(sb.visible));
+      sbAirLabel.textContent = sb.visible ? 'PLACAR NO AR (VISÍVEL)' : 'PLACAR OCULTO';
+    }
+
+    // Modalidade e Posição
+    if (sbSportSelect) sbSportSelect.value = sb.sport || 'soccer';
+    if (sbPosSelect) sbPosSelect.value = sb.position || 'top-left';
+
+    const isVoley = sb.sport === 'volleyball';
+    if (sbSoccerActionsA) sbSoccerActionsA.classList.toggle('is-hidden', isVoley);
+    if (sbSoccerActionsB) sbSoccerActionsB.classList.toggle('is-hidden', isVoley);
+    if (sbVoleyActionsA) sbVoleyActionsA.classList.toggle('is-hidden', !isVoley);
+    if (sbVoleyActionsB) sbVoleyActionsB.classList.toggle('is-hidden', !isVoley);
+
+    // Time Mandante (A)
+    const tA = sb.teamA || {};
+    if (sbInputNameA && document.activeElement !== sbInputNameA) sbInputNameA.value = tA.name || '';
+    if (sbInputShortA && document.activeElement !== sbInputShortA) sbInputShortA.value = tA.shortName || '';
+    if (sbInputColorA) sbInputColorA.value = tA.color || '#16a34a';
+    if (sbTextColorA && document.activeElement !== sbTextColorA) sbTextColorA.value = tA.color || '#16a34a';
+    if (badgePillA) badgePillA.style.background = tA.color || '#16a34a';
+    if (sbDisplayScoreA) sbDisplayScoreA.textContent = tA.score ?? 0;
+    if (sbCountYellowA) sbCountYellowA.textContent = tA.yellowCards ?? 0;
+    if (sbCountRedA) sbCountRedA.textContent = tA.redCards ?? 0;
+    if (sbCountSetsA) sbCountSetsA.textContent = tA.setsWon ?? 0;
+    if (btnRemoveLogoA) btnRemoveLogoA.classList.toggle('is-hidden', !tA.logo);
+    if (sbLogoPreviewNameA) sbLogoPreviewNameA.textContent = tA.logo ? 'Escudo ativo' : 'Sem escudo';
+
+    // Time Visitante (B)
+    const tB = sb.teamB || {};
+    if (sbInputNameB && document.activeElement !== sbInputNameB) sbInputNameB.value = tB.name || '';
+    if (sbInputShortB && document.activeElement !== sbInputShortB) sbInputShortB.value = tB.shortName || '';
+    if (sbInputColorB) sbInputColorB.value = tB.color || '#2563eb';
+    if (sbTextColorB && document.activeElement !== sbTextColorB) sbTextColorB.value = tB.color || '#2563eb';
+    if (badgePillB) badgePillB.style.background = tB.color || '#2563eb';
+    if (sbDisplayScoreB) sbDisplayScoreB.textContent = tB.score ?? 0;
+    if (sbCountYellowB) sbCountYellowB.textContent = tB.yellowCards ?? 0;
+    if (sbCountRedB) sbCountRedB.textContent = tB.redCards ?? 0;
+    if (sbCountSetsB) sbCountSetsB.textContent = tB.setsWon ?? 0;
+    if (btnRemoveLogoB) btnRemoveLogoB.classList.toggle('is-hidden', !tB.logo);
+    if (sbLogoPreviewNameB) sbLogoPreviewNameB.textContent = tB.logo ? 'Escudo ativo' : 'Sem escudo';
+
+    // Saque Vôlei
+    if (radioServingA && radioServingB) {
+      if (sb.servingTeam === 'teamB') {
+        radioServingB.checked = true;
+      } else {
+        radioServingA.checked = true;
+      }
+    }
+
+    // Relógio e Período
+    const timer = sb.timer || {};
+    if (sbTimerDigits) sbTimerDigits.textContent = formatTime(timer.seconds || 0);
+    if (sbTimerStateLabel) {
+      sbTimerStateLabel.textContent = timer.running ? 'EM ANDAMENTO' : 'PAUSADO';
+      sbTimerStateLabel.classList.toggle('is-running', Boolean(timer.running));
+    }
+    if (btnSbToggleTimer && labelBtnTimer) {
+      btnSbToggleTimer.classList.toggle('is-running', Boolean(timer.running));
+      labelBtnTimer.textContent = timer.running ? 'Pausar Relógio' : 'Iniciar Tempo';
+    }
+    if (sbPeriodSelect && document.activeElement !== sbPeriodSelect) {
+      sbPeriodSelect.value = sb.period || '1T';
+    }
+
+    // Acréscimos
+    const currentExtra = Number(timer.extraMinutes) || 0;
+    extraPills.forEach((p) => {
+      p.classList.toggle('active', Number(p.dataset.extra) === currentExtra);
+    });
+  }
+
+  // Interações de controle
+  if (btnToggleSbAir) {
+    btnToggleSbAir.addEventListener('click', () => {
+      socket.emit('scoreboard:toggle-visible');
+    });
+  }
+
+  if (btnSbResetMatch) {
+    btnSbResetMatch.addEventListener('click', () => {
+      if (confirm('Deseja realmente zerar todos os gols, cartões e cronômetro da partida?')) {
+        socket.emit('scoreboard:reset-match');
+      }
+    });
+  }
+
+  if (sbSportSelect) {
+    sbSportSelect.addEventListener('change', () => {
+      socket.emit('scoreboard:update', { sport: sbSportSelect.value });
+    });
+  }
+
+  if (sbPosSelect) {
+    sbPosSelect.addEventListener('change', () => {
+      socket.emit('scoreboard:update', { position: sbPosSelect.value });
+    });
+  }
+
+  if (btnSbSwitchSides) {
+    btnSbSwitchSides.addEventListener('click', () => {
+      socket.emit('scoreboard:switch-sides');
+    });
+  }
+
+  // Ações de Gols/Pontos Mandante
+  if (btnIncScoreA) {
+    btnIncScoreA.addEventListener('click', () => {
+      socket.emit('scoreboard:score-change', { team: 'teamA', delta: 1, triggerCelebration: true });
+    });
+  }
+  if (btnDecScoreA) {
+    btnDecScoreA.addEventListener('click', () => {
+      socket.emit('scoreboard:score-change', { team: 'teamA', delta: -1 });
+    });
+  }
+  if (btnTriggerGoalA) {
+    btnTriggerGoalA.addEventListener('click', () => {
+      const name = sbInputNameA?.value || 'Mandante';
+      socket.emit('scoreboard:trigger-celebration', { text: 'GOL!', subtext: name, type: 'goal' });
+    });
+  }
+
+  // Ações de Gols/Pontos Visitante
+  if (btnIncScoreB) {
+    btnIncScoreB.addEventListener('click', () => {
+      socket.emit('scoreboard:score-change', { team: 'teamB', delta: 1, triggerCelebration: true });
+    });
+  }
+  if (btnDecScoreB) {
+    btnDecScoreB.addEventListener('click', () => {
+      socket.emit('scoreboard:score-change', { team: 'teamB', delta: -1 });
+    });
+  }
+  if (btnTriggerGoalB) {
+    btnTriggerGoalB.addEventListener('click', () => {
+      const name = sbInputNameB?.value || 'Visitante';
+      socket.emit('scoreboard:trigger-celebration', { text: 'GOL!', subtext: name, type: 'goal' });
+    });
+  }
+
+  // Cartões Mandante
+  if (btnIncYellowA) btnIncYellowA.addEventListener('click', () => {
+    const cur = Number(currentScoreboard?.teamA?.yellowCards) || 0;
+    socket.emit('scoreboard:update', { teamA: { yellowCards: cur + 1 } });
+  });
+  if (btnDecYellowA) btnDecYellowA.addEventListener('click', () => {
+    const cur = Number(currentScoreboard?.teamA?.yellowCards) || 0;
+    socket.emit('scoreboard:update', { teamA: { yellowCards: Math.max(0, cur - 1) } });
+  });
+  if (btnIncRedA) btnIncRedA.addEventListener('click', () => {
+    const cur = Number(currentScoreboard?.teamA?.redCards) || 0;
+    socket.emit('scoreboard:update', { teamA: { redCards: cur + 1 } });
+  });
+  if (btnDecRedA) btnDecRedA.addEventListener('click', () => {
+    const cur = Number(currentScoreboard?.teamA?.redCards) || 0;
+    socket.emit('scoreboard:update', { teamA: { redCards: Math.max(0, cur - 1) } });
+  });
+
+  // Cartões Visitante
+  if (btnIncYellowB) btnIncYellowB.addEventListener('click', () => {
+    const cur = Number(currentScoreboard?.teamB?.yellowCards) || 0;
+    socket.emit('scoreboard:update', { teamB: { yellowCards: cur + 1 } });
+  });
+  if (btnDecYellowB) btnDecYellowB.addEventListener('click', () => {
+    const cur = Number(currentScoreboard?.teamB?.yellowCards) || 0;
+    socket.emit('scoreboard:update', { teamB: { yellowCards: Math.max(0, cur - 1) } });
+  });
+  if (btnIncRedB) btnIncRedB.addEventListener('click', () => {
+    const cur = Number(currentScoreboard?.teamB?.redCards) || 0;
+    socket.emit('scoreboard:update', { teamB: { redCards: cur + 1 } });
+  });
+  if (btnDecRedB) btnDecRedB.addEventListener('click', () => {
+    const cur = Number(currentScoreboard?.teamB?.redCards) || 0;
+    socket.emit('scoreboard:update', { teamB: { redCards: Math.max(0, cur - 1) } });
+  });
+
+  // Sets Vôlei
+  if (btnIncSetsA) btnIncSetsA.addEventListener('click', () => {
+    const cur = Number(currentScoreboard?.teamA?.setsWon) || 0;
+    socket.emit('scoreboard:update', { teamA: { setsWon: cur + 1 } });
+  });
+  if (btnDecSetsA) btnDecSetsA.addEventListener('click', () => {
+    const cur = Number(currentScoreboard?.teamA?.setsWon) || 0;
+    socket.emit('scoreboard:update', { teamA: { setsWon: Math.max(0, cur - 1) } });
+  });
+  if (btnIncSetsB) btnIncSetsB.addEventListener('click', () => {
+    const cur = Number(currentScoreboard?.teamB?.setsWon) || 0;
+    socket.emit('scoreboard:update', { teamB: { setsWon: cur + 1 } });
+  });
+  if (btnDecSetsB) btnDecSetsB.addEventListener('click', () => {
+    const cur = Number(currentScoreboard?.teamB?.setsWon) || 0;
+    socket.emit('scoreboard:update', { teamB: { setsWon: Math.max(0, cur - 1) } });
+  });
+
+  // Saque Vôlei
+  if (radioServingA) radioServingA.addEventListener('change', () => {
+    if (radioServingA.checked) socket.emit('scoreboard:update', { servingTeam: 'teamA' });
+  });
+  if (radioServingB) radioServingB.addEventListener('change', () => {
+    if (radioServingB.checked) socket.emit('scoreboard:update', { servingTeam: 'teamB' });
+  });
+
+  // Inputs de Texto e Cores dos Clubes
+  function syncTeamAInfo() {
+    socket.emit('scoreboard:update', {
+      teamA: {
+        name: sbInputNameA?.value || 'Mandante FC',
+        shortName: (sbInputShortA?.value || 'MAN').toUpperCase(),
+        color: sbInputColorA?.value || '#16a34a'
+      }
+    });
+  }
+
+  function syncTeamBInfo() {
+    socket.emit('scoreboard:update', {
+      teamB: {
+        name: sbInputNameB?.value || 'Visitante EC',
+        shortName: (sbInputShortB?.value || 'VIS').toUpperCase(),
+        color: sbInputColorB?.value || '#2563eb'
+      }
+    });
+  }
+
+  if (sbInputNameA) sbInputNameA.addEventListener('change', syncTeamAInfo);
+  if (sbInputShortA) sbInputShortA.addEventListener('change', syncTeamAInfo);
+  if (sbInputColorA) sbInputColorA.addEventListener('input', () => {
+    if (sbTextColorA) sbTextColorA.value = sbInputColorA.value;
+    if (badgePillA) badgePillA.style.background = sbInputColorA.value;
+  });
+  if (sbInputColorA) sbInputColorA.addEventListener('change', syncTeamAInfo);
+  if (sbTextColorA) sbTextColorA.addEventListener('change', () => {
+    if (sbInputColorA) sbInputColorA.value = sbTextColorA.value;
+    syncTeamAInfo();
+  });
+
+  if (sbInputNameB) sbInputNameB.addEventListener('change', syncTeamBInfo);
+  if (sbInputShortB) sbInputShortB.addEventListener('change', syncTeamBInfo);
+  if (sbInputColorB) sbInputColorB.addEventListener('input', () => {
+    if (sbTextColorB) sbTextColorB.value = sbInputColorB.value;
+    if (badgePillB) badgePillB.style.background = sbInputColorB.value;
+  });
+  if (sbInputColorB) sbInputColorB.addEventListener('change', syncTeamBInfo);
+  if (sbTextColorB) sbTextColorB.addEventListener('change', () => {
+    if (sbInputColorB) sbInputColorB.value = sbTextColorB.value;
+    syncTeamBInfo();
+  });
+
+  // Upload de Escudos Time A e Time B
+  if (btnUploadLogoA && sbFileLogoA) {
+    btnUploadLogoA.addEventListener('click', () => sbFileLogoA.click());
+    sbFileLogoA.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        socket.emit('scoreboard:update', { teamA: { logo: reader.result } });
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  if (btnRemoveLogoA) {
+    btnRemoveLogoA.addEventListener('click', () => {
+      socket.emit('scoreboard:update', { teamA: { logo: '' } });
+      if (sbFileLogoA) sbFileLogoA.value = '';
+    });
+  }
+
+  if (btnUploadLogoB && sbFileLogoB) {
+    btnUploadLogoB.addEventListener('click', () => sbFileLogoB.click());
+    sbFileLogoB.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        socket.emit('scoreboard:update', { teamB: { logo: reader.result } });
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  if (btnRemoveLogoB) {
+    btnRemoveLogoB.addEventListener('click', () => {
+      socket.emit('scoreboard:update', { teamB: { logo: '' } });
+      if (sbFileLogoB) sbFileLogoB.value = '';
+    });
+  }
+
+  // Controles do Cronômetro
+  if (btnSbToggleTimer) {
+    btnSbToggleTimer.addEventListener('click', () => {
+      const isRunning = Boolean(currentScoreboard?.timer?.running);
+      socket.emit('scoreboard:timer-control', { action: isRunning ? 'pause' : 'start' });
+    });
+  }
+
+  if (btnSbPlus1m) {
+    btnSbPlus1m.addEventListener('click', () => {
+      const sec = (currentScoreboard?.timer?.seconds || 0) + 60;
+      socket.emit('scoreboard:timer-control', { action: 'set', seconds: sec });
+    });
+  }
+
+  if (btnSbMinus1m) {
+    btnSbMinus1m.addEventListener('click', () => {
+      const sec = Math.max(0, (currentScoreboard?.timer?.seconds || 0) - 60);
+      socket.emit('scoreboard:timer-control', { action: 'set', seconds: sec });
+    });
+  }
+
+  if (btnSbResetTimer) {
+    btnSbResetTimer.addEventListener('click', () => {
+      socket.emit('scoreboard:timer-control', { action: 'reset' });
+    });
+  }
+
+  if (sbPeriodSelect) {
+    sbPeriodSelect.addEventListener('change', () => {
+      const selOpt = sbPeriodSelect.options[sbPeriodSelect.selectedIndex];
+      socket.emit('scoreboard:update', {
+        period: sbPeriodSelect.value,
+        periodLabel: selOpt ? selOpt.text : sbPeriodSelect.value
+      });
+    });
+  }
+
+  extraPills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      const extra = Number(pill.dataset.extra) || 0;
+      socket.emit('scoreboard:timer-control', { action: 'set', extraMinutes: extra });
+    });
+  });
+
+  // Listeners Socket do Placar
+  socket.on('scoreboard:sync', (sb) => {
+    renderScoreboardControls(sb);
+  });
+
+  socket.on('scoreboard:tick', ({ seconds, running }) => {
+    if (currentScoreboard && currentScoreboard.timer) {
+      currentScoreboard.timer.seconds = seconds;
+      currentScoreboard.timer.running = running;
+    }
+    if (sbTimerDigits) sbTimerDigits.textContent = formatTime(seconds);
+  });
+
+  // ==========================================================================
   // ATALHOS DE TECLADO DE ESTÚDIO AO VIVO (FASE 6)
   // ==========================================================================
   window.addEventListener('keydown', (e) => {
@@ -1602,6 +2049,9 @@
       } else if (key === 's') {
         e.preventDefault();
         switchView('settings');
+      } else if (key === 'p') {
+        e.preventDefault();
+        switchView('sports');
       } else if (key === 'n') {
         e.preventDefault();
         socket.emit('rotation:next');
@@ -1614,6 +2064,36 @@
       } else if (key === 'l') {
         e.preventDefault();
         socket.emit('lowerThird:hide');
+      }
+    }
+
+    // Atalhos Rápidos no Teclado Numérico (Numpad) para Operação do Placar
+    const activeTag = document.activeElement ? document.activeElement.tagName : '';
+    const isTyping = activeTag === 'INPUT' || activeTag === 'TEXTAREA';
+    if (!isTyping) {
+      if (e.code === 'Numpad7') {
+        e.preventDefault();
+        socket.emit('scoreboard:score-change', { team: 'teamA', delta: 1, triggerCelebration: true });
+      } else if (e.code === 'Numpad4') {
+        e.preventDefault();
+        socket.emit('scoreboard:score-change', { team: 'teamA', delta: -1 });
+      } else if (e.code === 'Numpad9') {
+        e.preventDefault();
+        socket.emit('scoreboard:score-change', { team: 'teamB', delta: 1, triggerCelebration: true });
+      } else if (e.code === 'Numpad6') {
+        e.preventDefault();
+        socket.emit('scoreboard:score-change', { team: 'teamB', delta: -1 });
+      } else if (e.code === 'Numpad8') {
+        e.preventDefault();
+        const isRunning = Boolean(currentScoreboard?.timer?.running);
+        socket.emit('scoreboard:timer-control', { action: isRunning ? 'pause' : 'start' });
+      } else if (e.code === 'Numpad5') {
+        e.preventDefault();
+        const nameA = currentScoreboard?.teamA?.name || 'Mandante';
+        socket.emit('scoreboard:trigger-celebration', { text: 'GOL!', subtext: nameA, type: 'goal' });
+      } else if (e.code === 'Numpad0') {
+        e.preventDefault();
+        socket.emit('scoreboard:switch-sides');
       }
     }
   });
@@ -1640,6 +2120,9 @@
     renderMobileQrCodes(currentRuntime);
     renderAudienceQueue(currentState.audienceQueue || [], currentRuntime, currentState.settings);
     renderPhrasesList(currentState.phrases || [], currentRuntime, currentState.settings);
+    if (currentState.scoreboard) {
+      renderScoreboardControls(currentState.scoreboard);
+    }
     updateLiveMonitorTick();
   });
 

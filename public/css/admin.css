@@ -2628,3 +2628,546 @@ body.is-compact-lists .phrase-item-text {
     flex: 1;
   }
 }
+
+/* ==========================================================================
+   MESA DE TRANSMISSÃO ESPORTIVA (PLACAR AO VIVO - VIEW-SPORTS)
+   ========================================================================== */
+.sports-page-wrapper {
+  display: none;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+.sports-page-wrapper.active {
+  display: flex;
+}
+
+.sports-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 18px 24px;
+}
+
+.sports-title-group h1 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+}
+
+.sports-title-group p {
+  font-size: 13px;
+  color: #94A3B8;
+}
+
+.badge-sports-live {
+  font-size: 11px;
+  font-weight: 800;
+  color: #38BDF8;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 2px 8px;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+
+.sports-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-sb-air {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid #EF4444;
+  color: #F87171;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-sb-air.is-on {
+  background: rgba(34, 197, 94, 0.18);
+  border-color: #22C55E;
+  color: #4ADE80;
+}
+
+.btn-sb-air .air-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.btn-sb-air.is-on .air-dot {
+  box-shadow: 0 0 10px #22C55E;
+  animation: airPulse 1.5s infinite;
+}
+
+/* Quickbar */
+.sports-quickbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px 20px;
+}
+
+.quickbar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #CBD5E1;
+}
+
+.sports-console-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 1024px) {
+  .sports-console-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Cards das Equipes */
+.sports-team-card {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.team-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 12px;
+}
+
+.team-card-header h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #F8FAFC;
+}
+
+.team-badge-pill {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.team-inputs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.color-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-picker-row input[type="color"] {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.color-picker-row .hex-text {
+  font-family: monospace;
+  text-transform: uppercase;
+}
+
+.logo-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-preview-text {
+  font-size: 12px;
+  color: #64748B;
+}
+
+/* Controle Gigante de Pontuação */
+.score-control-block {
+  background: rgba(2, 6, 23, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.score-control-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #94A3B8;
+  text-transform: uppercase;
+}
+
+.score-stepper {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.score-big-number {
+  font-size: 56px;
+  font-weight: 900;
+  color: #FFFFFF;
+  font-variant-numeric: tabular-nums;
+  min-width: 60px;
+  text-align: center;
+}
+
+.btn-step {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  font-size: 22px;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-step-inc {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ADE80;
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.btn-step-inc:hover {
+  background: #22C55E;
+  color: #FFFFFF;
+}
+
+.btn-step-dec {
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-step-dec:hover {
+  background: #EF4444;
+  color: #FFFFFF;
+}
+
+/* Ações Esportivas Específicas */
+.sport-specific-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sport-specific-actions.is-hidden {
+  display: none;
+}
+
+.btn-action-goal {
+  background: linear-gradient(135deg, #15803D 0%, #16A34A 100%);
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 800;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+  transition: all 0.15s ease;
+}
+
+.btn-action-goal:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.cards-stepper-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.card-mini-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+}
+
+.card-mini-box.yellow b {
+  color: #FACC15;
+  font-size: 15px;
+}
+
+.card-mini-box.red b {
+  color: #EF4444;
+  font-size: 15px;
+}
+
+.mini-btn-group {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-mini {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #FFFFFF;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.voley-set-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.voley-sets-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.voley-sets-stepper b {
+  font-size: 18px;
+  color: #38BDF8;
+  min-width: 20px;
+  text-align: center;
+}
+
+.serving-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #FACC15;
+  cursor: pointer;
+  background: rgba(250, 204, 21, 0.08);
+  border: 1px solid rgba(250, 204, 21, 0.2);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+/* Coluna Central (Relógio) */
+.sports-center-card {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.center-card-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #F8FAFC;
+}
+
+.timer-console-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(2, 6, 23, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 18px 24px;
+  width: 100%;
+}
+
+.timer-huge-digits {
+  font-family: monospace;
+  font-size: 46px;
+  font-weight: 900;
+  color: #FACC15;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-state-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #64748B;
+  text-transform: uppercase;
+}
+
+.timer-state-label.is-running {
+  color: #4ADE80;
+}
+
+.timer-main-actions {
+  width: 100%;
+}
+
+.btn-timer-start {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 800;
+  background: #0284C7;
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+  transition: all 0.15s ease;
+}
+
+.btn-timer-start.is-running {
+  background: #EAB308;
+  color: #000000;
+  box-shadow: 0 4px 14px rgba(234, 179, 8, 0.35);
+}
+
+.timer-secondary-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+.period-control-block, .extra-time-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.period-control-block label, .extra-time-block label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94A3B8;
+}
+
+.extra-time-pills {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-extra-pill {
+  flex: 1;
+  padding: 6px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #CBD5E1;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-extra-pill.active {
+  background: #DC2626;
+  border-color: #EF4444;
+  color: #FFFFFF;
+}
+
+/* Barra de Atalhos */
+.sports-shortcuts-bar {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.shortcuts-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #94A3B8;
+}
+
+.shortcuts-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.k-tag {
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #CBD5E1;
+}
+
+.k-tag b {
+  color: #38BDF8;
+}
+

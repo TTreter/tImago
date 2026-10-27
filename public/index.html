@@ -32,6 +32,10 @@
           <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
           <span>Operação Ao Vivo</span>
         </button>
+        <button type="button" id="nav-btn-sports" class="nav-tab-btn" data-view="sports" title="Placar Esportivo ao Vivo — Futebol, Vôlei, Basquete (Atalho: Alt + P)">
+          <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <span>Placar Esportivo</span>
+        </button>
         <button type="button" id="nav-btn-settings" class="nav-tab-btn" data-view="settings" title="Página Completa de Configurações (Atalho: Alt + S)">
           <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
           <span>Configurações</span>
@@ -485,6 +489,347 @@
         </section>
 
       </aside>
+
+    </main>
+
+    <!-- ====================================================================
+         VISÃO 3: MESA DE CONTROLE DE TRANSMISSÃO ESPORTIVA (PLACAR AO VIVO)
+         ==================================================================== -->
+    <main id="view-sports" class="sports-page-wrapper view-panel">
+
+      <!-- CABEÇALHO DA MESA ESPORTIVA -->
+      <div class="sports-page-header">
+        <div class="sports-title-group">
+          <div class="title-with-badge">
+            <span class="section-icon sports-icon">
+              <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </span>
+            <h1>Placar Esportivo ao Vivo (Scoreboard OBS)</h1>
+            <span class="badge-sports-live">Módulo Broadcast</span>
+          </div>
+          <p>
+            Controle do placar no topo da transmissão. O overlay de mensagens e anúncios inferiores continua ativo e sincronizado.
+          </p>
+        </div>
+
+        <div class="sports-header-actions">
+          <button type="button" id="btn-toggle-sb-air" class="btn btn-sb-air" title="Alternar visibilidade do Placar no OBS (Atalho: Alt + Shift + S)">
+            <span class="air-dot"></span>
+            <span id="sb-air-label">PLACAR OCULTO</span>
+          </button>
+
+          <button type="button" id="btn-sb-reset-match" class="btn btn-secondary btn-sm" title="Zerar todos os gols, cartões e relógio da partida">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+            <span>Zerar Partida</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- BARRA DE CONFIGURAÇÃO RÁPIDA DA MODALIDADE & POSIÇÃO -->
+      <div class="sports-quickbar">
+        <div class="quickbar-item">
+          <label for="sb-sport-select">Modalidade:</label>
+          <select id="sb-sport-select" class="form-select-sm">
+            <option value="soccer">Futebol &amp; Futsal (Gols, Tempo 45', Cartões)</option>
+            <option value="volleyball">Voleibol (Sets 1 a 5, Pontos e Saque)</option>
+            <option value="basketball">Basquetebol &amp; Genérico (Pontos, Quarto)</option>
+          </select>
+        </div>
+
+        <div class="quickbar-item">
+          <label for="sb-pos-select">Posição no OBS:</label>
+          <select id="sb-pos-select" class="form-select-sm">
+            <option value="top-left">Superior Esquerda (Top-Left)</option>
+            <option value="top-center">Superior Centro (Top-Center)</option>
+            <option value="top-right">Superior Direita (Top-Right)</option>
+          </select>
+        </div>
+
+        <div class="quickbar-item flex-grow text-right">
+          <button type="button" id="btn-sb-switch-sides" class="btn btn-secondary btn-sm" title="Inverte Mandante e Visitante (útil no intervalo ou troca de quadra no vôlei)">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="m16 3 4 4-4 4"></path><path d="M20 7H4"></path><path d="m8 21-4-4 4-4"></path><path d="M4 17h16"></path></svg>
+            <span>Inverter Lados (A &lt;-&gt; B)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- MESA OPERACIONAL: 3 COLUNAS (TIME A | CRONÔMETRO | TIME B) -->
+      <div class="sports-console-grid">
+
+        <!-- COLUNA 1: MANDANTE (TIME A) -->
+        <section class="sports-team-card team-card-a">
+          <div class="team-card-header">
+            <div class="team-badge-pill" id="badge-pill-a" style="background: #16a34a;"></div>
+            <h3>Mandante (Time A)</h3>
+          </div>
+
+          <div class="team-inputs-grid">
+            <div class="form-group">
+              <label for="sb-input-name-a">Nome da Equipe</label>
+              <input type="text" id="sb-input-name-a" value="Mandante FC" placeholder="Ex: Grêmio Pratense" />
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="sb-input-short-a">Sigla (3 letras)</label>
+                <input type="text" id="sb-input-short-a" value="MAN" maxlength="4" style="text-transform: uppercase;" />
+              </div>
+
+              <div class="form-group">
+                <label for="sb-input-color-a">Cor do Clube</label>
+                <div class="color-picker-row">
+                  <input type="color" id="sb-input-color-a" value="#16a34a" />
+                  <input type="text" id="sb-text-color-a" value="#16a34a" class="hex-text" maxlength="7" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Escudo / Logo do Clube</label>
+              <div class="logo-upload-row">
+                <input type="file" id="sb-file-logo-a" accept="image/*" class="file-hidden" />
+                <button type="button" id="btn-upload-logo-a" class="btn btn-xs btn-secondary">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                  <span>Carregar Escudo</span>
+                </button>
+                <button type="button" id="btn-remove-logo-a" class="btn btn-xs btn-ghost is-hidden" title="Remover Escudo">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+                <span id="sb-logo-preview-name-a" class="logo-preview-text">Sem escudo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTROLE GIGANTE DE PONTUAÇÃO MANDANTE -->
+          <div class="score-control-block">
+            <span class="score-control-label" id="label-score-a">GOLS / PONTOS</span>
+            <div class="score-stepper">
+              <button type="button" id="btn-dec-score-a" class="btn-step btn-step-dec" title="Subtrair ponto (Atalho: Num 4)">-1</button>
+              <span id="sb-display-score-a" class="score-big-number">0</span>
+              <button type="button" id="btn-inc-score-a" class="btn-step btn-step-inc" title="Adicionar ponto (Atalho: Num 7)">+1</button>
+            </div>
+          </div>
+
+          <!-- AÇÕES EXCLUSIVAS DE FUTEBOL TIME A -->
+          <div id="sb-soccer-actions-a" class="sport-specific-actions">
+            <button type="button" id="btn-trigger-goal-a" class="btn btn-action-goal" title="Dispara vinheta comemorativa no OBS">
+              <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="12 6 15 11 20 11 16 14 18 19 12 16 6 19 8 14 4 11 9 11 12 6"></polygon></svg>
+              <span>Disparar GOL Mandante!</span>
+            </button>
+
+            <div class="cards-stepper-row">
+              <div class="card-mini-box yellow">
+                <span>Amarelos:</span>
+                <b id="sb-count-yellow-a">0</b>
+                <div class="mini-btn-group">
+                  <button type="button" id="btn-dec-yellow-a" class="btn-mini">-</button>
+                  <button type="button" id="btn-inc-yellow-a" class="btn-mini">+</button>
+                </div>
+              </div>
+
+              <div class="card-mini-box red">
+                <span>Vermelhos:</span>
+                <b id="sb-count-red-a">0</b>
+                <div class="mini-btn-group">
+                  <button type="button" id="btn-dec-red-a" class="btn-mini">-</button>
+                  <button type="button" id="btn-inc-red-a" class="btn-mini">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AÇÕES EXCLUSIVAS DE VÔLEI TIME A -->
+          <div id="sb-voley-actions-a" class="sport-specific-actions is-hidden">
+            <div class="voley-set-row">
+              <span>Sets Vencidos:</span>
+              <div class="voley-sets-stepper">
+                <button type="button" id="btn-dec-sets-a" class="btn-mini">-</button>
+                <b id="sb-count-sets-a">0</b>
+                <button type="button" id="btn-inc-sets-a" class="btn-mini">+</button>
+              </div>
+            </div>
+
+            <label class="serving-toggle-label">
+              <input type="radio" name="serving-radio" id="radio-serving-a" value="teamA" checked />
+              <span>Saque na posse deste time</span>
+            </label>
+          </div>
+
+        </section>
+
+        <!-- COLUNA 2: CRONÔMETRO CENTRAL & PERÍODO -->
+        <section class="sports-center-card">
+          <div class="center-card-header">
+            <h3>Relógio &amp; Período</h3>
+          </div>
+
+          <!-- DISPLAY GIGANTE DO CRONÔMETRO -->
+          <div class="timer-console-box">
+            <span id="sb-timer-digits" class="timer-huge-digits">00:00</span>
+            <span id="sb-timer-state-label" class="timer-state-label">PAUSADO</span>
+          </div>
+
+          <!-- BOTÕES PRINCIPAIS DO RELÓGIO -->
+          <div class="timer-main-actions">
+            <button type="button" id="btn-sb-toggle-timer" class="btn btn-timer-start" title="Iniciar ou Pausar Cronômetro (Atalho: Num 8)">
+              <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <span id="label-btn-timer">Iniciar Tempo</span>
+            </button>
+          </div>
+
+          <div class="timer-secondary-actions">
+            <button type="button" id="btn-sb-minus-1m" class="btn btn-secondary btn-xs" title="Diminuir 1 minuto">-1 min</button>
+            <button type="button" id="btn-sb-plus-1m" class="btn btn-secondary btn-xs" title="Aumentar 1 minuto">+1 min</button>
+            <button type="button" id="btn-sb-reset-timer" class="btn btn-ghost btn-xs" title="Zerar para 00:00">Zerar Relógio</button>
+          </div>
+
+          <!-- CONTROLE DE PERÍODO -->
+          <div class="period-control-block">
+            <label for="sb-period-select">Período de Jogo:</label>
+            <select id="sb-period-select" class="form-select-sm">
+              <option value="PRE">Pré-Jogo</option>
+              <option value="1T" selected>1º Tempo</option>
+              <option value="INT">Intervalo</option>
+              <option value="2T">2º Tempo</option>
+              <option value="PRO1">1ª Prorrogação</option>
+              <option value="PRO2">2ª Prorrogação</option>
+              <option value="PEN">Disputa de Pênaltis</option>
+              <option value="FIM">Fim de Jogo</option>
+            </select>
+          </div>
+
+          <!-- ACRÉSCIMOS / STOPPAGE TIME -->
+          <div class="extra-time-block" id="sb-extra-time-container">
+            <label>Acréscimos (Minutos):</label>
+            <div class="extra-time-pills">
+              <button type="button" class="btn-extra-pill active" data-extra="0">0'</button>
+              <button type="button" class="btn-extra-pill" data-extra="1">+1'</button>
+              <button type="button" class="btn-extra-pill" data-extra="2">+2'</button>
+              <button type="button" class="btn-extra-pill" data-extra="3">+3'</button>
+              <button type="button" class="btn-extra-pill" data-extra="4">+4'</button>
+              <button type="button" class="btn-extra-pill" data-extra="5">+5'</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- COLUNA 3: VISITANTE (TIME B) -->
+        <section class="sports-team-card team-card-b">
+          <div class="team-card-header">
+            <div class="team-badge-pill" id="badge-pill-b" style="background: #2563eb;"></div>
+            <h3>Visitante (Time B)</h3>
+          </div>
+
+          <div class="team-inputs-grid">
+            <div class="form-group">
+              <label for="sb-input-name-b">Nome da Equipe</label>
+              <input type="text" id="sb-input-name-b" value="Visitante EC" placeholder="Ex: Esportivo Bageense" />
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="sb-input-short-b">Sigla (3 letras)</label>
+                <input type="text" id="sb-input-short-b" value="VIS" maxlength="4" style="text-transform: uppercase;" />
+              </div>
+
+              <div class="form-group">
+                <label for="sb-input-color-b">Cor do Clube</label>
+                <div class="color-picker-row">
+                  <input type="color" id="sb-input-color-b" value="#2563eb" />
+                  <input type="text" id="sb-text-color-b" value="#2563eb" class="hex-text" maxlength="7" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Escudo / Logo do Clube</label>
+              <div class="logo-upload-row">
+                <input type="file" id="sb-file-logo-b" accept="image/*" class="file-hidden" />
+                <button type="button" id="btn-upload-logo-b" class="btn btn-xs btn-secondary">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                  <span>Carregar Escudo</span>
+                </button>
+                <button type="button" id="btn-remove-logo-b" class="btn btn-xs btn-ghost is-hidden" title="Remover Escudo">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+                <span id="sb-logo-preview-name-b" class="logo-preview-text">Sem escudo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTROLE GIGANTE DE PONTUAÇÃO VISITANTE -->
+          <div class="score-control-block">
+            <span class="score-control-label" id="label-score-b">GOLS / PONTOS</span>
+            <div class="score-stepper">
+              <button type="button" id="btn-dec-score-b" class="btn-step btn-step-dec" title="Subtrair ponto (Atalho: Num 6)">-1</button>
+              <span id="sb-display-score-b" class="score-big-number">0</span>
+              <button type="button" id="btn-inc-score-b" class="btn-step btn-step-inc" title="Adicionar ponto (Atalho: Num 9)">+1</button>
+            </div>
+          </div>
+
+          <!-- AÇÕES EXCLUSIVAS DE FUTEBOL TIME B -->
+          <div id="sb-soccer-actions-b" class="sport-specific-actions">
+            <button type="button" id="btn-trigger-goal-b" class="btn btn-action-goal" title="Dispara vinheta comemorativa no OBS">
+              <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="12 6 15 11 20 11 16 14 18 19 12 16 6 19 8 14 4 11 9 11 12 6"></polygon></svg>
+              <span>Disparar GOL Visitante!</span>
+            </button>
+
+            <div class="cards-stepper-row">
+              <div class="card-mini-box yellow">
+                <span>Amarelos:</span>
+                <b id="sb-count-yellow-b">0</b>
+                <div class="mini-btn-group">
+                  <button type="button" id="btn-dec-yellow-b" class="btn-mini">-</button>
+                  <button type="button" id="btn-inc-yellow-b" class="btn-mini">+</button>
+                </div>
+              </div>
+
+              <div class="card-mini-box red">
+                <span>Vermelhos:</span>
+                <b id="sb-count-red-b">0</b>
+                <div class="mini-btn-group">
+                  <button type="button" id="btn-dec-red-b" class="btn-mini">-</button>
+                  <button type="button" id="btn-inc-red-b" class="btn-mini">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AÇÕES EXCLUSIVAS DE VÔLEI TIME B -->
+          <div id="sb-voley-actions-b" class="sport-specific-actions is-hidden">
+            <div class="voley-set-row">
+              <span>Sets Vencidos:</span>
+              <div class="voley-sets-stepper">
+                <button type="button" id="btn-dec-sets-b" class="btn-mini">-</button>
+                <b id="sb-count-sets-b">0</b>
+                <button type="button" id="btn-inc-sets-b" class="btn-mini">+</button>
+              </div>
+            </div>
+
+            <label class="serving-toggle-label">
+              <input type="radio" name="serving-radio" id="radio-serving-b" value="teamB" />
+              <span>Saque na posse deste time</span>
+            </label>
+          </div>
+
+        </section>
+
+      </div>
+
+      <!-- GUIA DE ATALHOS RÁPIDOS NO TECLADO NUMÉRICO (NUMPAD) -->
+      <footer class="sports-shortcuts-bar">
+        <span class="shortcuts-title">Atalhos no Teclado Numérico (Numpad):</span>
+        <div class="shortcuts-tags">
+          <span class="k-tag"><b>Num 7</b> +1 Mandante</span>
+          <span class="k-tag"><b>Num 4</b> -1 Mandante</span>
+          <span class="k-tag"><b>Num 8</b> Iniciar/Pausar Relógio</span>
+          <span class="k-tag"><b>Num 9</b> +1 Visitante</span>
+          <span class="k-tag"><b>Num 6</b> -1 Visitante</span>
+          <span class="k-tag"><b>Num 5</b> Disparar Vinheta GOL</span>
+          <span class="k-tag"><b>Num 0</b> Inverter Lados</span>
+        </div>
+      </footer>
+
+    </main>
 
     </main>
 

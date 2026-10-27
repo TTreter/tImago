@@ -214,7 +214,48 @@ const defaultState = {
       enabled: true
     }
   ],
-  audienceQueue: []
+  audienceQueue: [],
+  scoreboard: {
+    visible: false,
+    sport: 'soccer', // 'soccer', 'volleyball', 'basketball', 'generic'
+    position: 'top-left', // 'top-left', 'top-center', 'top-right'
+    theme: 'soccer-pitch', // 'soccer-pitch', 'soccer-champion', 'clean', 'custom'
+    teamA: {
+      name: 'Mandante FC',
+      shortName: 'MAN',
+      color: '#16a34a',
+      logo: '',
+      score: 0,
+      yellowCards: 0,
+      redCards: 0,
+      fouls: 0,
+      setsWon: 0,
+      setHistory: []
+    },
+    teamB: {
+      name: 'Visitante EC',
+      shortName: 'VIS',
+      color: '#2563eb',
+      logo: '',
+      score: 0,
+      yellowCards: 0,
+      redCards: 0,
+      fouls: 0,
+      setsWon: 0,
+      setHistory: []
+    },
+    timer: {
+      seconds: 0,
+      running: false,
+      direction: 'up',
+      extraMinutes: 0
+    },
+    period: '1T',
+    periodLabel: '1º Tempo',
+    currentSet: 1,
+    servingTeam: 'teamA',
+    celebration: null
+  }
 };
 
 let state = loadState();
@@ -348,7 +389,15 @@ function loadState() {
         activePlaylistId: parsed.activePlaylistId || 'pl-inst',
         playlists: Array.isArray(parsed.playlists) ? parsed.playlists : [],
         phrases: Array.isArray(parsed.phrases) ? parsed.phrases : defaultState.phrases,
-        audienceQueue: Array.isArray(parsed.audienceQueue) ? parsed.audienceQueue : []
+        audienceQueue: Array.isArray(parsed.audienceQueue) ? parsed.audienceQueue : [],
+        scoreboard: {
+          ...defaultState.scoreboard,
+          ...(parsed.scoreboard || {}),
+          teamA: { ...defaultState.scoreboard.teamA, ...(parsed.scoreboard?.teamA || {}) },
+          teamB: { ...defaultState.scoreboard.teamB, ...(parsed.scoreboard?.teamB || {}) },
+          timer: { ...defaultState.scoreboard.timer, ...(parsed.scoreboard?.timer || {}), running: false },
+          celebration: null
+        }
       };
       return ensurePlaylistsStructure(sanitizeStateStrings(loaded));
     }
@@ -665,6 +714,9 @@ io.on('connection', (socket) => {
       port: PORT
     }
   });
+
+  // Envia estado inicial do placar esportivo
+  socket.emit('scoreboard:sync', state.scoreboard);
 
   socket.on('settings:update', (partialSettings) => {
     const prevVisible = state.settings.visible;
@@ -1118,6 +1170,135 @@ io.on('connection', (socket) => {
     }
   });
 
+  // --- Eventos do Placar Esportivo (Futebol, Vôlei, Basquete, Futsal) ---
+  socket.on('scoreboard:update', (payload) => {
+    if (!payload || typeof payload !== 'object') return;
+    state.scoreboard = {
+      ...state.scoreboard,
+      ...payload,
+      teamA: { ...state.scoreboard.teamA, ...(payload.teamA || {}) },
+      teamB: { ...state.scoreboard.teamB, ...(payload.teamB || {}) },
+      timer: { ...state.scoreboard.timer, ...(payload.timer || {}) }
+    };
+    saveState();
+    io.emit('scoreboard:sync', state.scoreboard);
+  });
+
+  socket.on('scoreboard:toggle-visible', () => {
+    state.scoreboard.visible = !state.scoreboard.visible;
+    saveState();
+    io.emit('scoreboard:sync', state.scoreboard);
+  });
+
+  socket.on('scoreboard:score-change', ({ team, delta, triggerCelebration }) => {
+    if (!team || (team !== 'teamA' && team !== 'teamB')) return;
+    const current = Number(state.scoreboard[team].score) || 0;
+    const next = Math.max(0, current + Number(delta));
+    state.scoreboard[team].score = next;
+
+    if (delta > 0 && triggerCelebration) {
+      const sport = state.scoreboard.sport || 'soccer';
+      const defaultText = sport === 'volleyball' ? 'PONTO!' : sport === 'basketball' ? 'CESTA!' : 'GOL!';
+      state.scoreboard.celebration = {
+        type: 'score',
+        team,
+        teamName: state.scoreboard[team].name,
+        text: defaultText,
+        timestamp: Date.now()
+      };
+      setTimeout(() => {
+        if (state.scoreboard.celebration) {
+          state.scoreboard.celebration = null;
+          io.emit('scoreboard:sync', state.scoreboard);
+        }
+      }, 5500);
+    }
+
+    saveState();
+    io.emit('scoreboard:sync', state.scoreboard);
+  });
+
+  socket.on('scoreboard:timer-control', ({ action, seconds, extraMinutes, direction }) => {
+    if (!state.scoreboard.timer) {
+      state.scoreboard.timer = { seconds: 0, running: false, direction: 'up', extraMinutes: 0 };
+    }
+
+    if (action === 'start') {
+      state.scoreboard.timer.running = true;
+    } else if (action === 'pause') {
+      state.scoreboard.timer.running = false;
+    } else if (action === 'reset') {
+      state.scoreboard.timer.running = false;
+      state.scoreboard.timer.seconds = 0;
+      state.scoreboard.timer.extraMinutes = 0;
+    } else if (action === 'set') {
+      if (typeof seconds === 'number') state.scoreboard.timer.seconds = Math.max(0, seconds);
+      if (typeof extraMinutes === 'number') state.scoreboard.timer.extraMinutes = Math.max(0, extraMinutes);
+      if (direction) state.scoreboard.timer.direction = direction;
+    }
+
+    saveState();
+    io.emit('scoreboard:sync', state.scoreboard);
+  });
+
+  socket.on('scoreboard:switch-sides', () => {
+    const tempA = JSON.parse(JSON.stringify(state.scoreboard.teamA));
+    state.scoreboard.teamA = JSON.parse(JSON.stringify(state.scoreboard.teamB));
+    state.scoreboard.teamB = tempA;
+    if (state.scoreboard.servingTeam === 'teamA') {
+      state.scoreboard.servingTeam = 'teamB';
+    } else if (state.scoreboard.servingTeam === 'teamB') {
+      state.scoreboard.servingTeam = 'teamA';
+    }
+    saveState();
+    io.emit('scoreboard:sync', state.scoreboard);
+  });
+
+  socket.on('scoreboard:trigger-celebration', ({ text, subtext, type }) => {
+    state.scoreboard.celebration = {
+      type: type || 'custom',
+      text: text || 'GOL!',
+      subtext: subtext || '',
+      timestamp: Date.now()
+    };
+    saveState();
+    io.emit('scoreboard:sync', state.scoreboard);
+
+    setTimeout(() => {
+      if (state.scoreboard.celebration) {
+        state.scoreboard.celebration = null;
+        io.emit('scoreboard:sync', state.scoreboard);
+      }
+    }, 6000);
+  });
+
+  socket.on('scoreboard:reset-match', () => {
+    state.scoreboard.teamA.score = 0;
+    state.scoreboard.teamA.yellowCards = 0;
+    state.scoreboard.teamA.redCards = 0;
+    state.scoreboard.teamA.fouls = 0;
+    state.scoreboard.teamA.setsWon = 0;
+    state.scoreboard.teamA.setHistory = [];
+
+    state.scoreboard.teamB.score = 0;
+    state.scoreboard.teamB.yellowCards = 0;
+    state.scoreboard.teamB.redCards = 0;
+    state.scoreboard.teamB.fouls = 0;
+    state.scoreboard.teamB.setsWon = 0;
+    state.scoreboard.teamB.setHistory = [];
+
+    state.scoreboard.timer.seconds = 0;
+    state.scoreboard.timer.running = false;
+    state.scoreboard.timer.extraMinutes = 0;
+    state.scoreboard.period = '1T';
+    state.scoreboard.periodLabel = '1º Tempo';
+    state.scoreboard.currentSet = 1;
+    state.scoreboard.celebration = null;
+
+    saveState();
+    io.emit('scoreboard:sync', state.scoreboard);
+  });
+
   socket.on('settings:resetDefaults', () => {
     state.settings = {
       ...state.settings,
@@ -1182,6 +1363,36 @@ function getLocalIpAddress() {
   return candidates.length > 0 ? candidates[0].address : 'localhost';
 }
 
+let scoreboardTicker = null;
+
+function startScoreboardTicker() {
+  if (scoreboardTicker) return;
+  scoreboardTicker = setInterval(() => {
+    if (state.scoreboard && state.scoreboard.timer && state.scoreboard.timer.running) {
+      if (state.scoreboard.timer.direction === 'down') {
+        if (state.scoreboard.timer.seconds > 0) {
+          state.scoreboard.timer.seconds--;
+        } else {
+          state.scoreboard.timer.running = false;
+        }
+      } else {
+        state.scoreboard.timer.seconds++;
+      }
+      io.emit('scoreboard:tick', {
+        seconds: state.scoreboard.timer.seconds,
+        running: state.scoreboard.timer.running
+      });
+    }
+  }, 1000);
+}
+
+function stopScoreboardTicker() {
+  if (scoreboardTicker) {
+    clearInterval(scoreboardTicker);
+    scoreboardTicker = null;
+  }
+}
+
 /**
  * Inicializa o servidor HTTP + Socket.IO.
  * Pode ser chamado tanto diretamente via `node server.js` quanto pelo processo principal do Electron.
@@ -1206,6 +1417,7 @@ function startServer(port = PORT) {
       console.log(`[OBS]      Browser Source:       http://localhost:${port}/overlay`);
       console.log('====================================================');
 
+      startScoreboardTicker();
       syncEngineWithSettings(true);
       resolve({ server, port, alreadyRunning: false });
     });
@@ -1217,6 +1429,7 @@ function startServer(port = PORT) {
  */
 function stopServer() {
   clearRotationTimer();
+  stopScoreboardTicker();
   if (global.lowerThirdTimer) {
     clearTimeout(global.lowerThirdTimer);
     global.lowerThirdTimer = null;

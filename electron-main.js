@@ -5,10 +5,11 @@
  * ============================================================================
  * Responsabilidades:
  * 1. Definir o diretório seguro de dados do usuário (%APPDATA%/tImago) antes de iniciar o servidor.
- * 2. Iniciar o servidor Express + Socket.IO em segundo plano sem abrir terminal.
- * 3. Criar a janela nativa do Painel de Controle do tImago.
- * 4. Integrar com a Bandeja do Sistema (System Tray) e Iniciar com o Windows.
- * 5. Gerenciar o comportamento configurável ao fechar a janela no botão X.
+ * 2. Exibir SplashScreen nativa imediata com barra de progresso durante o boot.
+ * 3. Iniciar o servidor Express + Socket.IO em segundo plano sem abrir terminal.
+ * 4. Criar a janela nativa do Painel de Controle do tImago com transição suave.
+ * 5. Integrar com a Bandeja do Sistema (System Tray) e Iniciar com o Windows.
+ * 6. Gerenciar o comportamento configurável ao fechar a janela no botão X.
  * ============================================================================
  */
 
@@ -35,9 +36,71 @@ const {
 } = require('./server');
 
 let mainWindow = null;
+let splashWindow = null;
 let tray = null;
 let isQuitting = false;
 const PORT = process.env.PORT || 3000;
+
+function createSplashWindow() {
+  try {
+    splashWindow = new BrowserWindow({
+      width: 480,
+      height: 290,
+      frame: false,
+      transparent: true,
+      alwaysOnTop: true,
+      resizable: false,
+      center: true,
+      show: true,
+      skipTaskbar: true,
+      backgroundColor: '#00000000',
+      icon: path.join(__dirname, 'public', 'img', 'icon.png'),
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true
+      }
+    });
+
+    splashWindow.loadFile(path.join(__dirname, 'public', 'splash.html'));
+
+    splashWindow.on('closed', () => {
+      splashWindow = null;
+    });
+  } catch (err) {
+    console.warn('Erro ao inicializar splashWindow:', err.message);
+  }
+}
+
+function updateSplash(percent, message) {
+  if (splashWindow && !splashWindow.isDestroyed()) {
+    const safeMsg = JSON.stringify(message || '');
+    splashWindow.webContents.executeJavaScript(
+      `if (window.setSplashProgress) window.setSplashProgress(${percent}, ${safeMsg});`
+    ).catch(() => {});
+  }
+}
+
+function closeSplash() {
+  if (!splashWindow || splashWindow.isDestroyed()) return;
+
+  try {
+    splashWindow.webContents.executeJavaScript(
+      `if (window.fadeOutSplash) window.fadeOutSplash();`
+    ).catch(() => {});
+
+    setTimeout(() => {
+      if (splashWindow && !splashWindow.isDestroyed()) {
+        splashWindow.destroy();
+        splashWindow = null;
+      }
+    }, 320);
+  } catch (err) {
+    if (splashWindow && !splashWindow.isDestroyed()) {
+      splashWindow.destroy();
+      splashWindow = null;
+    }
+  }
+}
 
 function applyWindowsLoginItem(startWithWindows) {
   try {
@@ -133,23 +196,36 @@ function createTray() {
   }
 }
 
-async function createMainWindow() {
+async function startApplication() {
+  const isAutostart = process.argv.includes('--autostart');
+  
+  // Exibe a splashscreen imediatamente ao iniciar manualmente
+  if (!isAutostart) {
+    createSplashWindow();
+    updateSplash(20, 'Iniciando subsistemas do tImago...');
+  }
+
+  // 1. Inicializa o servidor Express e WebSockets
+  updateSplash(45, 'Iniciando servidor local e WebSockets...');
   await startServer(PORT);
 
+  // 2. Carrega configurações do usuário
+  updateSplash(70, 'Carregando preferências e temas...');
   const initialSettings = getSettings();
   applyWindowsLoginItem(initialSettings.startWithWindows);
-
   createTray();
 
-  const isAutostart = process.argv.includes('--autostart');
   const shouldStartHidden = Boolean(initialSettings.startMinimized) || isAutostart;
+
+  // 3. Cria a janela principal do Painel
+  updateSplash(85, 'Preparando painel e overlays...');
 
   mainWindow = new BrowserWindow({
     width: 1460,
     height: 920,
     minWidth: 1024,
     minHeight: 700,
-    show: !shouldStartHidden,
+    show: false, // Inicialmente oculta até que o conteúdo esteja renderizado
     title: 'tImago — Controle de Overlay OBS',
     backgroundColor: '#090d16',
     autoHideMenuBar: true,
@@ -165,6 +241,31 @@ async function createMainWindow() {
 
   // Carrega o Painel de Controle local
   mainWindow.loadURL(`http://localhost:${PORT}`);
+
+  // Transição suave da SplashScreen para a Janela Principal
+  let hasShownMainWindow = false;
+  const revealMainWindow = () => {
+    if (hasShownMainWindow) return;
+    hasShownMainWindow = true;
+
+    updateSplash(100, 'Pronto! Abrindo Painel...');
+    setTimeout(() => {
+      closeSplash();
+      if (!shouldStartHidden && mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    }, 280);
+  };
+
+  mainWindow.once('ready-to-show', revealMainWindow);
+
+  // Fallback de segurança para exibir a janela caso 'ready-to-show' demore mais de 6s
+  setTimeout(() => {
+    if (!hasShownMainWindow) {
+      revealMainWindow();
+    }
+  }, 6000);
 
   // Abre links externos no navegador padrão do sistema
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -224,7 +325,7 @@ app.on('second-instance', () => {
   }
 });
 
-app.whenReady().then(createMainWindow);
+app.whenReady().then(startApplication);
 
 app.on('window-all-closed', () => {
   if (isQuitting) {

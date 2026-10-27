@@ -98,6 +98,79 @@
       </div>
     </div>
 
+    <!-- ====================================================================
+         PLACAR ESPORTIVO AO VIVO (FUTEBOL, VÔLEI, BASQUETE, FUTSAL)
+         Renderizado no topo da transmissão independente do overlay inferior
+         ==================================================================== -->
+    <div id="overlay-scoreboard" class="overlay-scoreboard is-hidden pos-top-left theme-pitch" aria-live="polite">
+      <div class="sb-capsule">
+        
+        <!-- Bloco Time Mandante (A) -->
+        <div class="sb-team sb-team-a">
+          <div id="sb-color-a" class="sb-color-indicator"></div>
+          <div id="sb-logo-box-a" class="sb-logo-box is-hidden">
+            <img id="sb-logo-img-a" class="sb-logo-img" src="" alt="Time A" />
+          </div>
+          <span id="sb-name-a" class="sb-team-name">MAN</span>
+          <div id="sb-cards-a" class="sb-cards-indicator is-hidden">
+            <span id="sb-yellow-a" class="sb-card yellow is-hidden">0</span>
+            <span id="sb-red-a" class="sb-card red is-hidden">0</span>
+          </div>
+        </div>
+
+        <!-- Bloco Central de Placar / Pontuação -->
+        <div class="sb-score-container">
+          <span id="sb-score-a" class="sb-score-val">0</span>
+          <span class="sb-score-x">:</span>
+          <span id="sb-score-b" class="sb-score-val">0</span>
+        </div>
+
+        <!-- Bloco Time Visitante (B) -->
+        <div class="sb-team sb-team-b">
+          <div id="sb-cards-b" class="sb-cards-indicator is-hidden">
+            <span id="sb-yellow-b" class="sb-card yellow is-hidden">0</span>
+            <span id="sb-red-b" class="sb-card red is-hidden">0</span>
+          </div>
+          <span id="sb-name-b" class="sb-team-name">VIS</span>
+          <div id="sb-logo-box-b" class="sb-logo-box is-hidden">
+            <img id="sb-logo-img-b" class="sb-logo-img" src="" alt="Time B" />
+          </div>
+          <div id="sb-color-b" class="sb-color-indicator"></div>
+        </div>
+
+        <!-- Bloco de Tempo e Período (Futebol / Futsal / Basquete) -->
+        <div id="sb-time-block" class="sb-time-block">
+          <span id="sb-period-badge" class="sb-period-badge">1T</span>
+          <span id="sb-timer-val" class="sb-timer-val">00:00</span>
+          <span id="sb-extra-badge" class="sb-extra-badge is-hidden">+3'</span>
+        </div>
+
+        <!-- Bloco de Sets e Saque (Exclusivo Vôlei) -->
+        <div id="sb-voley-block" class="sb-voley-block is-hidden">
+          <div class="sb-sets-display">
+            <span class="sb-sets-label">SETS</span>
+            <span class="sb-sets-count"><b id="sb-sets-a">0</b> - <b id="sb-sets-b">0</b></span>
+          </div>
+          <div id="sb-serving-ball" class="sb-serving-indicator serving-a" title="Posse de Saque">
+            <svg class="sb-ball-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+              <circle cx="12" cy="12" r="10" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+              <path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z" stroke="#FFFFFF" stroke-width="1.5" fill="none"/>
+            </svg>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Banner Expansivo de Celebração (GOL! / PONTO! / SET!) -->
+      <div id="sb-celebration-banner" class="sb-celebration-banner is-hidden">
+        <div class="sb-celebration-glow"></div>
+        <div class="sb-celebration-content">
+          <span id="sb-celebration-title" class="sb-celebration-title">GOL!</span>
+          <span id="sb-celebration-subtext" class="sb-celebration-subtext">Mandante FC</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="/socket.io/socket.io.js"></script>

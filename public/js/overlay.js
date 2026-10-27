@@ -26,6 +26,36 @@
   const tickerTrackEl = document.getElementById('ticker-track');
   let lastTickerSignature = '';
 
+  // Elementos do Placar Esportivo ao Vivo (Futebol, Vôlei, Basquete)
+  const scoreboardEl = document.getElementById('overlay-scoreboard');
+  const sbColorA = document.getElementById('sb-color-a');
+  const sbColorB = document.getElementById('sb-color-b');
+  const sbLogoBoxA = document.getElementById('sb-logo-box-a');
+  const sbLogoImgA = document.getElementById('sb-logo-img-a');
+  const sbLogoBoxB = document.getElementById('sb-logo-box-b');
+  const sbLogoImgB = document.getElementById('sb-logo-img-b');
+  const sbNameA = document.getElementById('sb-name-a');
+  const sbNameB = document.getElementById('sb-name-b');
+  const sbScoreA = document.getElementById('sb-score-a');
+  const sbScoreB = document.getElementById('sb-score-b');
+  const sbCardsA = document.getElementById('sb-cards-a');
+  const sbYellowA = document.getElementById('sb-yellow-a');
+  const sbRedA = document.getElementById('sb-red-a');
+  const sbCardsB = document.getElementById('sb-cards-b');
+  const sbYellowB = document.getElementById('sb-yellow-b');
+  const sbRedB = document.getElementById('sb-red-b');
+  const sbTimeBlock = document.getElementById('sb-time-block');
+  const sbPeriodBadge = document.getElementById('sb-period-badge');
+  const sbTimerVal = document.getElementById('sb-timer-val');
+  const sbExtraBadge = document.getElementById('sb-extra-badge');
+  const sbVoleyBlock = document.getElementById('sb-voley-block');
+  const sbSetsA = document.getElementById('sb-sets-a');
+  const sbSetsB = document.getElementById('sb-sets-b');
+  const sbServingBall = document.getElementById('sb-serving-ball');
+  const sbCelebrationBanner = document.getElementById('sb-celebration-banner');
+  const sbCelebrationTitle = document.getElementById('sb-celebration-title');
+  const sbCelebrationSubtext = document.getElementById('sb-celebration-subtext');
+
   let renderedPhraseId = null;
   let renderedPhaseStartedAt = null;
   let switchTimeout = null;
@@ -409,10 +439,150 @@
     }
   }
 
+  function formatScoreboardTime(totalSeconds) {
+    const sec = Math.max(0, Number(totalSeconds) || 0);
+    const m = String(Math.floor(sec / 60)).padStart(2, '0');
+    const s = String(sec % 60).padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  function renderScoreboard(sb) {
+    if (!scoreboardEl) return;
+
+    if (!sb || !sb.visible) {
+      scoreboardEl.classList.remove('is-visible');
+      scoreboardEl.classList.add('is-hidden');
+      return;
+    }
+
+    // Posição no topo
+    const validPositions = ['pos-top-left', 'pos-top-center', 'pos-top-right'];
+    validPositions.forEach((cls) => scoreboardEl.classList.remove(cls));
+    const targetPos = `pos-${sb.position || 'top-left'}`;
+    scoreboardEl.classList.add(targetPos);
+
+    // Time Mandante (A)
+    const teamA = sb.teamA || {};
+    if (sbColorA) sbColorA.style.background = teamA.color || '#16a34a';
+    if (sbNameA) sbNameA.textContent = teamA.shortName || teamA.name || 'MAN';
+    if (sbScoreA) sbScoreA.textContent = teamA.score ?? 0;
+
+    if (sbLogoBoxA && sbLogoImgA) {
+      if (teamA.logo) {
+        sbLogoImgA.src = teamA.logo;
+        sbLogoBoxA.classList.remove('is-hidden');
+      } else {
+        sbLogoBoxA.classList.add('is-hidden');
+      }
+    }
+
+    // Time Visitante (B)
+    const teamB = sb.teamB || {};
+    if (sbColorB) sbColorB.style.background = teamB.color || '#2563eb';
+    if (sbNameB) sbNameB.textContent = teamB.shortName || teamB.name || 'VIS';
+    if (sbScoreB) sbScoreB.textContent = teamB.score ?? 0;
+
+    if (sbLogoBoxB && sbLogoImgB) {
+      if (teamB.logo) {
+        sbLogoImgB.src = teamB.logo;
+        sbLogoBoxB.classList.remove('is-hidden');
+      } else {
+        sbLogoBoxB.classList.add('is-hidden');
+      }
+    }
+
+    // Cartões Futebol
+    const sport = sb.sport || 'soccer';
+    if (sport === 'soccer') {
+      if (sbCardsA) {
+        const yA = Number(teamA.yellowCards) || 0;
+        const rA = Number(teamA.redCards) || 0;
+        sbYellowA.textContent = yA;
+        sbYellowA.classList.toggle('is-hidden', yA <= 0);
+        sbRedA.textContent = rA;
+        sbRedA.classList.toggle('is-hidden', rA <= 0);
+        sbCardsA.classList.toggle('is-hidden', yA <= 0 && rA <= 0);
+      }
+      if (sbCardsB) {
+        const yB = Number(teamB.yellowCards) || 0;
+        const rB = Number(teamB.redCards) || 0;
+        sbYellowB.textContent = yB;
+        sbYellowB.classList.toggle('is-hidden', yB <= 0);
+        sbRedB.textContent = rB;
+        sbRedB.classList.toggle('is-hidden', rB <= 0);
+        sbCardsB.classList.toggle('is-hidden', yB <= 0 && rB <= 0);
+      }
+    } else {
+      if (sbCardsA) sbCardsA.classList.add('is-hidden');
+      if (sbCardsB) sbCardsB.classList.add('is-hidden');
+    }
+
+    // Modalidade: Vôlei vs Futebol / Basquete
+    if (sport === 'volleyball') {
+      if (sbTimeBlock) sbTimeBlock.classList.add('is-hidden');
+      if (sbVoleyBlock) {
+        sbVoleyBlock.classList.remove('is-hidden');
+        if (sbSetsA) sbSetsA.textContent = teamA.setsWon ?? 0;
+        if (sbSetsB) sbSetsB.textContent = teamB.setsWon ?? 0;
+        if (sbServingBall) {
+          const isServingA = sb.servingTeam === 'teamA';
+          sbServingBall.classList.toggle('serving-a', isServingA);
+          sbServingBall.classList.toggle('serving-b', !isServingA);
+          sbServingBall.title = isServingA ? `Saque: ${teamA.name}` : `Saque: ${teamB.name}`;
+        }
+      }
+    } else {
+      if (sbVoleyBlock) sbVoleyBlock.classList.add('is-hidden');
+      if (sbTimeBlock) {
+        sbTimeBlock.classList.remove('is-hidden');
+        if (sbPeriodBadge) sbPeriodBadge.textContent = sb.period || '1T';
+        if (sbTimerVal) sbTimerVal.textContent = formatScoreboardTime(sb.timer?.seconds || 0);
+        if (sbExtraBadge) {
+          const extra = Number(sb.timer?.extraMinutes) || 0;
+          if (extra > 0) {
+            sbExtraBadge.textContent = `+${extra}'`;
+            sbExtraBadge.classList.remove('is-hidden');
+          } else {
+            sbExtraBadge.classList.add('is-hidden');
+          }
+        }
+      }
+    }
+
+    // Banner de Celebração de Gol/Ponto
+    if (sbCelebrationBanner && sbCelebrationTitle) {
+      if (sb.celebration && sb.celebration.text) {
+        sbCelebrationTitle.textContent = sb.celebration.text;
+        if (sbCelebrationSubtext) {
+          sbCelebrationSubtext.textContent = sb.celebration.subtext || sb.celebration.teamName || '';
+        }
+        sbCelebrationBanner.classList.remove('is-hidden');
+      } else {
+        sbCelebrationBanner.classList.add('is-hidden');
+      }
+    }
+
+    scoreboardEl.classList.remove('is-hidden');
+    scoreboardEl.classList.add('is-visible');
+  }
+
   socket.on('state:sync', (payload) => {
     if (!payload) return;
     applySettings(payload.state?.settings);
     renderRuntime(payload.state, payload.runtime);
+    if (payload.state?.scoreboard) {
+      renderScoreboard(payload.state.scoreboard);
+    }
+  });
+
+  socket.on('scoreboard:sync', (sb) => {
+    renderScoreboard(sb);
+  });
+
+  socket.on('scoreboard:tick', ({ seconds }) => {
+    if (sbTimerVal) {
+      sbTimerVal.textContent = formatScoreboardTime(seconds);
+    }
   });
 
   // Quando o aplicativo desktop (tImago.exe) ou o servidor é fechado, recolhe imediatamente o card no OBS
@@ -420,11 +590,13 @@
     hideCard();
     if (lowerThirdEl) lowerThirdEl.classList.replace('is-visible', 'is-hidden');
     if (tickerEl) tickerEl.classList.replace('is-visible', 'is-hidden');
+    if (scoreboardEl) scoreboardEl.classList.replace('is-visible', 'is-hidden');
   });
 
   socket.on('disconnect', () => {
     hideCard();
     if (lowerThirdEl) lowerThirdEl.classList.replace('is-visible', 'is-hidden');
     if (tickerEl) tickerEl.classList.replace('is-visible', 'is-hidden');
+    if (scoreboardEl) scoreboardEl.classList.replace('is-visible', 'is-hidden');
   });
 })();

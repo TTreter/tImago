@@ -1389,4 +1389,313 @@ html, body {
   }
 }
 
+/* ==========================================================================
+   PLACAR ESPORTIVO AO VIVO (FUTEBOL, VÔLEI, BASQUETE, FUTSAL)
+   Totalmente desacoplado do overlay inferior — Coexistência Dual no OBS
+   ========================================================================== */
+.overlay-scoreboard {
+  position: absolute;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+}
+
+.overlay-scoreboard.is-hidden {
+  opacity: 0;
+  transform: translateY(-24px);
+  pointer-events: none;
+}
+
+.overlay-scoreboard.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Posições do Placar */
+.overlay-scoreboard.pos-top-left {
+  top: 36px;
+  left: 48px;
+  align-items: flex-start;
+}
+
+.overlay-scoreboard.pos-top-center {
+  top: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+}
+
+.overlay-scoreboard.pos-top-center.is-hidden {
+  transform: translate(-50%, -24px);
+}
+
+.overlay-scoreboard.pos-top-right {
+  top: 36px;
+  right: 48px;
+  align-items: flex-end;
+}
+
+/* Cápsula Principal do Placar */
+.sb-capsule {
+  display: flex;
+  align-items: center;
+  height: 52px;
+  background: rgba(10, 15, 29, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+/* Blocos de Equipe (A e B) */
+.sb-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  height: 100%;
+  position: relative;
+}
+
+.sb-color-indicator {
+  width: 6px;
+  height: 32px;
+  border-radius: 3px;
+  background: #16a34a;
+}
+
+.sb-team-b .sb-color-indicator {
+  background: #2563eb;
+}
+
+.sb-logo-box {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sb-logo-box.is-hidden {
+  display: none;
+}
+
+.sb-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.sb-team-name {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #FFFFFF;
+  text-transform: uppercase;
+}
+
+/* Indicador de Cartões (Futebol) */
+.sb-cards-indicator {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.sb-cards-indicator.is-hidden {
+  display: none;
+}
+
+.sb-card {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 3px;
+  line-height: 1.1;
+}
+
+.sb-card.yellow {
+  background: #EAB308;
+  color: #000000;
+}
+
+.sb-card.red {
+  background: #EF4444;
+  color: #FFFFFF;
+}
+
+.sb-card.is-hidden {
+  display: none;
+}
+
+/* Container de Pontuação Central */
+.sb-score-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  height: 100%;
+  background: rgba(2, 6, 23, 0.85);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 6px;
+}
+
+.sb-score-val {
+  font-size: 26px;
+  font-weight: 900;
+  color: #FFFFFF;
+  font-variant-numeric: tabular-nums;
+  min-width: 22px;
+  text-align: center;
+}
+
+.sb-score-x {
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Bloco de Tempo e Período */
+.sb-time-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.7);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sb-time-block.is-hidden {
+  display: none;
+}
+
+.sb-period-badge {
+  font-size: 13px;
+  font-weight: 800;
+  color: #94A3B8;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sb-timer-val {
+  font-family: 'Roboto Mono', 'SF Mono', monospace;
+  font-size: 17px;
+  font-weight: 800;
+  color: #FACC15;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.sb-extra-badge {
+  font-size: 12px;
+  font-weight: 800;
+  background: #DC2626;
+  color: #FFFFFF;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.sb-extra-badge.is-hidden {
+  display: none;
+}
+
+/* Bloco Exclusivo Vôlei (Sets e Saque) */
+.sb-voley-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.7);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sb-voley-block.is-hidden {
+  display: none;
+}
+
+.sb-sets-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #94A3B8;
+}
+
+.sb-sets-label {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: #64748B;
+}
+
+.sb-sets-count {
+  font-size: 15px;
+  color: #FFFFFF;
+}
+
+.sb-sets-count b {
+  color: #38BDF8;
+}
+
+.sb-serving-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FACC15;
+  animation: pulseBall 1.4s infinite ease-in-out;
+}
+
+@keyframes pulseBall {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 6px #FACC15); }
+}
+
+/* Banner de Celebração de Gol/Ponto */
+.sb-celebration-banner {
+  margin-top: 8px;
+  background: linear-gradient(135deg, #052E16 0%, #14532D 60%, #166534 100%);
+  border: 1px solid #4ADE80;
+  border-radius: 8px;
+  padding: 8px 24px;
+  box-shadow: 0 8px 24px rgba(74, 222, 128, 0.35), 0 0 20px rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: celebrationPulse 0.5s infinite alternate ease-in-out;
+}
+
+.sb-celebration-banner.is-hidden {
+  display: none;
+}
+
+@keyframes celebrationPulse {
+  0% { transform: scale(1); box-shadow: 0 0 15px rgba(74, 222, 128, 0.4); }
+  100% { transform: scale(1.03); box-shadow: 0 0 30px rgba(74, 222, 128, 0.8); }
+}
+
+.sb-celebration-title {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #FACC15;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(250, 204, 21, 0.6);
+}
+
+.sb-celebration-subtext {
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+
 

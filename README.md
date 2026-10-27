@@ -8,6 +8,15 @@ Ideal para **Assessorias de Comunicação (ASCOM) de Prefeituras Municipais**, t
 
 ## ✨ Principais Recursos
 
+- **⚽ Módulo de Transmissão Esportiva & Placar ao Vivo (*Scoreboard*)**:
+  - Placar dinâmico em padrão broadcast para transmissões de **Futebol & Futsal**, **Voleibol**, **Basquetebol** e esportes em geral.
+  - **Coexistência Dual Overlay**: O placar esportivo ocupa o topo da tela (*Top-Left*, *Top-Center* ou *Top-Right*), enquanto o overlay clássico de frases, anúncios, patrocinadores e mensagens da torcida/cidadãos continua rodando normalmente e simultaneamente na parte inferior da tela.
+  - **Futebol**: Cronômetro progressivo em tempo real sincronizado pelo servidor, acréscimos dinâmicos (`+3'`), cartões amarelos/vermelhos e vinheta animada de comemoração de **GOL!**.
+  - **Voleibol**: Sets conquistados (Melhor de 3 / 5), pontuação do set em disputa, indicador luminoso de posse de saque e histórico set a set.
+  - **Mesa do Operador de Jogos (`Alt + P`)**: Botões táteis gigantes de pontuação (`+1` / `-1`), botão para **Inverter Lados (A <-> B)** no intervalo/troca de quadra e atalhos completos no teclado numérico (*Numpad*).
+- **🚀 Nova SplashScreen Nativa com Barra de Progresso**:
+  - Inicialização instantânea do aplicativo Windows com feedback visual dinâmico em menos de 50ms, eliminando a tela em branco ao clicar no executável.
+  - Barra de progresso animada com etapas reais de inicialização (subsistemas, banco de dados, servidor HTTP e WebSockets) e transição suave (*fade-out*) ao abrir o painel principal.
 - **💬 Fila Prioritária do Público / Cidadãos (com modo Acumular)**:
   - Cadastre mensagens da população/chat ao vivo com nome do morador/bairro e etiqueta personalizada (*Comentário do Cidadão*, *Pergunta da População*, *Bairro / Comunidade*, *Elogio / Sugestão*, *Utilidade Pública*, *Mensagem de Natal*, *Homenagem* ou sem etiqueta).
   - Edite, reordene (`↑` / `↓`) ou acumule quantas mensagens quiser (ex: 7 mensagens) sem interromper a transmissão e clique em **Iniciar Exibição da Fila** quando desejar soltar a bateria.
@@ -44,7 +53,7 @@ Ideal para **Assessorias de Comunicação (ASCOM) de Prefeituras Municipais**, t
 ## 🚀 Como Usar
 
 ### Opção 1: Aplicativo Executável Windows (`.exe`)
-1. Abra o executável portátil gerado em `dist/tImago-Portable-1.0.8.exe` (ou rode `npm run app`).
+1. Abra o executável portátil gerado em `dist/tImago-Portable-1.1.0.exe` (ou rode `npm run app`).
 2. O **tImago** abrirá em sua própria janela dedicada, sem precisar manter nenhum terminal aberto.
 3. Quando você fechar a janela do **tImago**, o servidor e o overlay no OBS são encerrados automaticamente.
 
