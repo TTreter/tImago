@@ -1590,7 +1590,16 @@
   // ==========================================================================
   // MÓDULO DE TRANSMISSÃO ESPORTIVA (PLACAR AO VIVO - VIEW-SPORTS)
   // ==========================================================================
-  let currentScoreboard = null;
+  let currentScoreboard = {
+    visible: false,
+    sport: 'soccer',
+    position: 'top-left',
+    theme: 'soccer-pitch',
+    teamA: { name: 'Mandante FC', shortName: 'MAN', color: '#16a34a', score: 0, yellowCards: 0, redCards: 0, setsWon: 0, logo: '' },
+    teamB: { name: 'Visitante EC', shortName: 'VIS', color: '#2563eb', score: 0, yellowCards: 0, redCards: 0, setsWon: 0, logo: '' },
+    timer: { seconds: 0, running: false, extraMinutes: 0, direction: 'up' },
+    period: '1T'
+  };
 
   const btnToggleSbAir = document.getElementById('btn-toggle-sb-air');
   const sbAirLabel = document.getElementById('sb-air-label');
@@ -1598,6 +1607,142 @@
   const sbSportSelect = document.getElementById('sb-sport-select');
   const sbPosSelect = document.getElementById('sb-pos-select');
   const btnSbSwitchSides = document.getElementById('btn-sb-switch-sides');
+
+  // Elementos do Mini-Preview do Placar
+  const sbPreviewStatusDot = document.getElementById('sb-preview-status-dot');
+  const sbPreviewAirBadge = document.getElementById('sb-preview-air-badge');
+  const sbPreviewPosLabel = document.getElementById('sb-preview-pos-label');
+  const sbPreviewStage = document.querySelector('.sports-preview-stage');
+  const sbPreviewCapsule = document.querySelector('.sb-preview-capsule');
+  const prevColorA = document.getElementById('prev-color-a');
+  const prevColorB = document.getElementById('prev-color-b');
+  const prevNameA = document.getElementById('prev-name-a');
+  const prevNameB = document.getElementById('prev-name-b');
+  const prevScoreA = document.getElementById('prev-score-a');
+  const prevScoreB = document.getElementById('prev-score-b');
+  const prevYellowA = document.getElementById('prev-yellow-a');
+  const prevYellowB = document.getElementById('prev-yellow-b');
+  const prevRedA = document.getElementById('prev-red-a');
+  const prevRedB = document.getElementById('prev-red-b');
+  const prevLogoBoxA = document.getElementById('prev-logo-box-a');
+  const prevLogoImgA = document.getElementById('prev-logo-img-a');
+  const prevLogoBoxB = document.getElementById('prev-logo-box-b');
+  const prevLogoImgB = document.getElementById('prev-logo-img-b');
+  const prevTimeBlock = document.getElementById('prev-time-block');
+  const prevVoleyBlock = document.getElementById('prev-voley-block');
+  const prevPeriod = document.getElementById('prev-period');
+  const prevTimer = document.getElementById('prev-timer');
+  const prevExtra = document.getElementById('prev-extra');
+  const prevSetsA = document.getElementById('prev-sets-a');
+  const prevSetsB = document.getElementById('prev-sets-b');
+
+  function updateScoreboardMiniPreview() {
+    if (!currentScoreboard) return;
+    const isLive = Boolean(currentScoreboard.visible);
+
+    if (sbPreviewStatusDot) sbPreviewStatusDot.classList.toggle('is-live', isLive);
+    if (sbPreviewAirBadge) {
+      sbPreviewAirBadge.textContent = isLive ? 'NO AR NO OBS' : 'PLACAR OCULTO';
+      sbPreviewAirBadge.classList.toggle('is-live', isLive);
+    }
+    if (sbPreviewCapsule) sbPreviewCapsule.classList.toggle('is-live', isLive);
+
+    const pos = currentScoreboard.position || 'top-left';
+    if (sbPreviewPosLabel) {
+      sbPreviewPosLabel.textContent = pos === 'top-center' ? 'POSIÇÃO: SUPERIOR CENTRO' :
+                                      pos === 'top-right' ? 'POSIÇÃO: SUPERIOR DIREITA' :
+                                      'POSIÇÃO: SUPERIOR ESQUERDA';
+    }
+    if (sbPreviewStage) {
+      sbPreviewStage.classList.toggle('pos-top-center', pos === 'top-center');
+      sbPreviewStage.classList.toggle('pos-top-right', pos === 'top-right');
+    }
+
+    const tA = currentScoreboard.teamA || {};
+    const tB = currentScoreboard.teamB || {};
+
+    if (prevColorA) prevColorA.style.background = tA.color || '#16a34a';
+    if (prevNameA) prevNameA.textContent = (tA.shortName || tA.name || 'MAN').toUpperCase();
+    if (prevScoreA) prevScoreA.textContent = tA.score ?? 0;
+
+    const yA = Number(tA.yellowCards) || 0;
+    const rA = Number(tA.redCards) || 0;
+    if (prevYellowA) {
+      prevYellowA.textContent = yA;
+      prevYellowA.classList.toggle('is-hidden', yA <= 0);
+    }
+    if (prevRedA) {
+      prevRedA.textContent = rA;
+      prevRedA.classList.toggle('is-hidden', rA <= 0);
+    }
+    if (prevLogoBoxA && prevLogoImgA) {
+      if (tA.logo) {
+        prevLogoImgA.src = tA.logo;
+        prevLogoBoxA.classList.remove('is-hidden');
+      } else {
+        prevLogoBoxA.classList.add('is-hidden');
+      }
+    }
+
+    if (prevColorB) prevColorB.style.background = tB.color || '#2563eb';
+    if (prevNameB) prevNameB.textContent = (tB.shortName || tB.name || 'VIS').toUpperCase();
+    if (prevScoreB) prevScoreB.textContent = tB.score ?? 0;
+
+    const yB = Number(tB.yellowCards) || 0;
+    const rB = Number(tB.redCards) || 0;
+    if (prevYellowB) {
+      prevYellowB.textContent = yB;
+      prevYellowB.classList.toggle('is-hidden', yB <= 0);
+    }
+    if (prevRedB) {
+      prevRedB.textContent = rB;
+      prevRedB.classList.toggle('is-hidden', rB <= 0);
+    }
+    if (prevLogoBoxB && prevLogoImgB) {
+      if (tB.logo) {
+        prevLogoImgB.src = tB.logo;
+        prevLogoBoxB.classList.remove('is-hidden');
+      } else {
+        prevLogoBoxB.classList.add('is-hidden');
+      }
+    }
+
+    const isVoley = currentScoreboard.sport === 'volleyball';
+    if (prevTimeBlock) prevTimeBlock.classList.toggle('is-hidden', isVoley);
+    if (prevVoleyBlock) prevVoleyBlock.classList.toggle('is-hidden', !isVoley);
+
+    if (isVoley) {
+      if (prevSetsA) prevSetsA.textContent = tA.setsWon ?? 0;
+      if (prevSetsB) prevSetsB.textContent = tB.setsWon ?? 0;
+    } else {
+      const timer = currentScoreboard.timer || {};
+      if (prevPeriod) prevPeriod.textContent = currentScoreboard.period || '1T';
+      if (prevTimer) prevTimer.textContent = formatTime(timer.seconds || 0);
+      const extra = Number(timer.extraMinutes) || 0;
+      if (prevExtra) {
+        prevExtra.textContent = `+${extra}'`;
+        prevExtra.classList.toggle('is-hidden', extra <= 0);
+      }
+    }
+  }
+
+  // Ticker Local Resiliente no Painel do Operador
+  let localTimerInterval = null;
+  function updateLocalTimerTick() {
+    if (currentScoreboard && currentScoreboard.timer && currentScoreboard.timer.running) {
+      if (currentScoreboard.timer.direction === 'down') {
+        currentScoreboard.timer.seconds = Math.max(0, (currentScoreboard.timer.seconds || 0) - 1);
+      } else {
+        currentScoreboard.timer.seconds = (currentScoreboard.timer.seconds || 0) + 1;
+      }
+      if (sbTimerDigits) sbTimerDigits.textContent = formatTime(currentScoreboard.timer.seconds);
+      updateScoreboardMiniPreview();
+    }
+  }
+
+  if (!localTimerInterval) {
+    localTimerInterval = setInterval(updateLocalTimerTick, 1000);
+  }
 
   // Mandante (Time A)
   const sbInputNameA = document.getElementById('sb-input-name-a');
@@ -1748,6 +1893,8 @@
     extraPills.forEach((p) => {
       p.classList.toggle('active', Number(p.dataset.extra) === currentExtra);
     });
+
+    updateScoreboardMiniPreview();
   }
 
   // Interações de controle
@@ -1757,7 +1904,8 @@
       if (currentScoreboard) currentScoreboard.visible = nextVis;
       btnToggleSbAir.classList.toggle('is-on', nextVis);
       if (sbAirLabel) sbAirLabel.textContent = nextVis ? 'PLACAR NO AR (VISÍVEL)' : 'PLACAR OCULTO';
-      socket.emit('scoreboard:toggle-visible');
+      socket.emit('scoreboard:update', { visible: nextVis });
+      updateScoreboardMiniPreview();
     });
   }
 
@@ -1771,13 +1919,17 @@
 
   if (sbSportSelect) {
     sbSportSelect.addEventListener('change', () => {
+      if (currentScoreboard) currentScoreboard.sport = sbSportSelect.value;
       socket.emit('scoreboard:update', { sport: sbSportSelect.value });
+      updateScoreboardMiniPreview();
     });
   }
 
   if (sbPosSelect) {
     sbPosSelect.addEventListener('change', () => {
+      if (currentScoreboard) currentScoreboard.position = sbPosSelect.value;
       socket.emit('scoreboard:update', { position: sbPosSelect.value });
+      updateScoreboardMiniPreview();
     });
   }
 
@@ -1792,6 +1944,7 @@
         renderScoreboardControls(currentScoreboard);
       }
       socket.emit('scoreboard:switch-sides');
+      updateScoreboardMiniPreview();
     });
   }
 
@@ -1804,6 +1957,7 @@
       currentScoreboard.teamA.score = next;
       if (sbDisplayScoreA) sbDisplayScoreA.textContent = next;
       socket.emit('scoreboard:score-change', { team: 'teamA', delta: 1, triggerCelebration: true });
+      updateScoreboardMiniPreview();
     });
   }
   if (btnDecScoreA) {
@@ -1814,6 +1968,7 @@
       currentScoreboard.teamA.score = next;
       if (sbDisplayScoreA) sbDisplayScoreA.textContent = next;
       socket.emit('scoreboard:score-change', { team: 'teamA', delta: -1 });
+      updateScoreboardMiniPreview();
     });
   }
   if (btnTriggerGoalA) {
@@ -1832,6 +1987,7 @@
       currentScoreboard.teamB.score = next;
       if (sbDisplayScoreB) sbDisplayScoreB.textContent = next;
       socket.emit('scoreboard:score-change', { team: 'teamB', delta: 1, triggerCelebration: true });
+      updateScoreboardMiniPreview();
     });
   }
   if (btnDecScoreB) {
@@ -1842,6 +1998,7 @@
       currentScoreboard.teamB.score = next;
       if (sbDisplayScoreB) sbDisplayScoreB.textContent = next;
       socket.emit('scoreboard:score-change', { team: 'teamB', delta: -1 });
+      updateScoreboardMiniPreview();
     });
   }
   if (btnTriggerGoalB) {
@@ -1857,24 +2014,28 @@
     if (currentScoreboard?.teamA) currentScoreboard.teamA.yellowCards = cur;
     if (sbCountYellowA) sbCountYellowA.textContent = cur;
     socket.emit('scoreboard:update', { teamA: { yellowCards: cur } });
+    updateScoreboardMiniPreview();
   });
   if (btnDecYellowA) btnDecYellowA.addEventListener('click', () => {
     const cur = Math.max(0, (Number(currentScoreboard?.teamA?.yellowCards) || 0) - 1);
     if (currentScoreboard?.teamA) currentScoreboard.teamA.yellowCards = cur;
     if (sbCountYellowA) sbCountYellowA.textContent = cur;
     socket.emit('scoreboard:update', { teamA: { yellowCards: cur } });
+    updateScoreboardMiniPreview();
   });
   if (btnIncRedA) btnIncRedA.addEventListener('click', () => {
     const cur = (Number(currentScoreboard?.teamA?.redCards) || 0) + 1;
     if (currentScoreboard?.teamA) currentScoreboard.teamA.redCards = cur;
     if (sbCountRedA) sbCountRedA.textContent = cur;
     socket.emit('scoreboard:update', { teamA: { redCards: cur } });
+    updateScoreboardMiniPreview();
   });
   if (btnDecRedA) btnDecRedA.addEventListener('click', () => {
     const cur = Math.max(0, (Number(currentScoreboard?.teamA?.redCards) || 0) - 1);
     if (currentScoreboard?.teamA) currentScoreboard.teamA.redCards = cur;
     if (sbCountRedA) sbCountRedA.textContent = cur;
     socket.emit('scoreboard:update', { teamA: { redCards: cur } });
+    updateScoreboardMiniPreview();
   });
 
   // Cartões Visitante
@@ -1883,24 +2044,28 @@
     if (currentScoreboard?.teamB) currentScoreboard.teamB.yellowCards = cur;
     if (sbCountYellowB) sbCountYellowB.textContent = cur;
     socket.emit('scoreboard:update', { teamB: { yellowCards: cur } });
+    updateScoreboardMiniPreview();
   });
   if (btnDecYellowB) btnDecYellowB.addEventListener('click', () => {
     const cur = Math.max(0, (Number(currentScoreboard?.teamB?.yellowCards) || 0) - 1);
     if (currentScoreboard?.teamB) currentScoreboard.teamB.yellowCards = cur;
     if (sbCountYellowB) sbCountYellowB.textContent = cur;
     socket.emit('scoreboard:update', { teamB: { yellowCards: cur } });
+    updateScoreboardMiniPreview();
   });
   if (btnIncRedB) btnIncRedB.addEventListener('click', () => {
     const cur = (Number(currentScoreboard?.teamB?.redCards) || 0) + 1;
     if (currentScoreboard?.teamB) currentScoreboard.teamB.redCards = cur;
     if (sbCountRedB) sbCountRedB.textContent = cur;
     socket.emit('scoreboard:update', { teamB: { redCards: cur } });
+    updateScoreboardMiniPreview();
   });
   if (btnDecRedB) btnDecRedB.addEventListener('click', () => {
     const cur = Math.max(0, (Number(currentScoreboard?.teamB?.redCards) || 0) - 1);
     if (currentScoreboard?.teamB) currentScoreboard.teamB.redCards = cur;
     if (sbCountRedB) sbCountRedB.textContent = cur;
     socket.emit('scoreboard:update', { teamB: { redCards: cur } });
+    updateScoreboardMiniPreview();
   });
 
   // Sets Vôlei
@@ -1909,24 +2074,28 @@
     if (currentScoreboard?.teamA) currentScoreboard.teamA.setsWon = cur;
     if (sbCountSetsA) sbCountSetsA.textContent = cur;
     socket.emit('scoreboard:update', { teamA: { setsWon: cur } });
+    updateScoreboardMiniPreview();
   });
   if (btnDecSetsA) btnDecSetsA.addEventListener('click', () => {
     const cur = Math.max(0, (Number(currentScoreboard?.teamA?.setsWon) || 0) - 1);
     if (currentScoreboard?.teamA) currentScoreboard.teamA.setsWon = cur;
     if (sbCountSetsA) sbCountSetsA.textContent = cur;
     socket.emit('scoreboard:update', { teamA: { setsWon: cur } });
+    updateScoreboardMiniPreview();
   });
   if (btnIncSetsB) btnIncSetsB.addEventListener('click', () => {
     const cur = (Number(currentScoreboard?.teamB?.setsWon) || 0) + 1;
     if (currentScoreboard?.teamB) currentScoreboard.teamB.setsWon = cur;
     if (sbCountSetsB) sbCountSetsB.textContent = cur;
     socket.emit('scoreboard:update', { teamB: { setsWon: cur } });
+    updateScoreboardMiniPreview();
   });
   if (btnDecSetsB) btnDecSetsB.addEventListener('click', () => {
     const cur = Math.max(0, (Number(currentScoreboard?.teamB?.setsWon) || 0) - 1);
     if (currentScoreboard?.teamB) currentScoreboard.teamB.setsWon = cur;
     if (sbCountSetsB) sbCountSetsB.textContent = cur;
     socket.emit('scoreboard:update', { teamB: { setsWon: cur } });
+    updateScoreboardMiniPreview();
   });
 
   // Saque Vôlei
@@ -1939,23 +2108,33 @@
 
   // Inputs de Texto e Cores dos Clubes
   function syncTeamAInfo() {
+    if (!currentScoreboard.teamA) currentScoreboard.teamA = {};
+    currentScoreboard.teamA.name = sbInputNameA?.value || 'Mandante FC';
+    currentScoreboard.teamA.shortName = (sbInputShortA?.value || 'MAN').toUpperCase();
+    currentScoreboard.teamA.color = sbInputColorA?.value || '#16a34a';
     socket.emit('scoreboard:update', {
       teamA: {
-        name: sbInputNameA?.value || 'Mandante FC',
-        shortName: (sbInputShortA?.value || 'MAN').toUpperCase(),
-        color: sbInputColorA?.value || '#16a34a'
+        name: currentScoreboard.teamA.name,
+        shortName: currentScoreboard.teamA.shortName,
+        color: currentScoreboard.teamA.color
       }
     });
+    updateScoreboardMiniPreview();
   }
 
   function syncTeamBInfo() {
+    if (!currentScoreboard.teamB) currentScoreboard.teamB = {};
+    currentScoreboard.teamB.name = sbInputNameB?.value || 'Visitante EC';
+    currentScoreboard.teamB.shortName = (sbInputShortB?.value || 'VIS').toUpperCase();
+    currentScoreboard.teamB.color = sbInputColorB?.value || '#2563eb';
     socket.emit('scoreboard:update', {
       teamB: {
-        name: sbInputNameB?.value || 'Visitante EC',
-        shortName: (sbInputShortB?.value || 'VIS').toUpperCase(),
-        color: sbInputColorB?.value || '#2563eb'
+        name: currentScoreboard.teamB.name,
+        shortName: currentScoreboard.teamB.shortName,
+        color: currentScoreboard.teamB.color
       }
     });
+    updateScoreboardMiniPreview();
   }
 
   if (sbInputNameA) sbInputNameA.addEventListener('change', syncTeamAInfo);
@@ -1990,15 +2169,24 @@
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
+        if (!currentScoreboard.teamA) currentScoreboard.teamA = {};
+        currentScoreboard.teamA.logo = reader.result;
         socket.emit('scoreboard:update', { teamA: { logo: reader.result } });
+        if (btnRemoveLogoA) btnRemoveLogoA.classList.remove('is-hidden');
+        if (sbLogoPreviewNameA) sbLogoPreviewNameA.textContent = 'Escudo ativo';
+        updateScoreboardMiniPreview();
       };
       reader.readAsDataURL(file);
     });
   }
   if (btnRemoveLogoA) {
     btnRemoveLogoA.addEventListener('click', () => {
+      if (currentScoreboard?.teamA) currentScoreboard.teamA.logo = '';
       socket.emit('scoreboard:update', { teamA: { logo: '' } });
       if (sbFileLogoA) sbFileLogoA.value = '';
+      btnRemoveLogoA.classList.add('is-hidden');
+      if (sbLogoPreviewNameA) sbLogoPreviewNameA.textContent = 'Sem escudo';
+      updateScoreboardMiniPreview();
     });
   }
 
@@ -2009,15 +2197,24 @@
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
+        if (!currentScoreboard.teamB) currentScoreboard.teamB = {};
+        currentScoreboard.teamB.logo = reader.result;
         socket.emit('scoreboard:update', { teamB: { logo: reader.result } });
+        if (btnRemoveLogoB) btnRemoveLogoB.classList.remove('is-hidden');
+        if (sbLogoPreviewNameB) sbLogoPreviewNameB.textContent = 'Escudo ativo';
+        updateScoreboardMiniPreview();
       };
       reader.readAsDataURL(file);
     });
   }
   if (btnRemoveLogoB) {
     btnRemoveLogoB.addEventListener('click', () => {
+      if (currentScoreboard?.teamB) currentScoreboard.teamB.logo = '';
       socket.emit('scoreboard:update', { teamB: { logo: '' } });
       if (sbFileLogoB) sbFileLogoB.value = '';
+      btnRemoveLogoB.classList.add('is-hidden');
+      if (sbLogoPreviewNameB) sbLogoPreviewNameB.textContent = 'Sem escudo';
+      updateScoreboardMiniPreview();
     });
   }
 
@@ -2033,7 +2230,8 @@
         sbTimerStateLabel.textContent = nextRunning ? 'EM ANDAMENTO' : 'PAUSADO';
         sbTimerStateLabel.classList.toggle('is-running', nextRunning);
       }
-      socket.emit('scoreboard:timer-control', { action: isRunning ? 'pause' : 'start' });
+      socket.emit('scoreboard:timer-control', { action: nextRunning ? 'start' : 'pause' });
+      updateScoreboardMiniPreview();
     });
   }
 
@@ -2043,6 +2241,7 @@
       if (currentScoreboard?.timer) currentScoreboard.timer.seconds = sec;
       if (sbTimerDigits) sbTimerDigits.textContent = formatTime(sec);
       socket.emit('scoreboard:timer-control', { action: 'set', seconds: sec });
+      updateScoreboardMiniPreview();
     });
   }
 
@@ -2052,6 +2251,7 @@
       if (currentScoreboard?.timer) currentScoreboard.timer.seconds = sec;
       if (sbTimerDigits) sbTimerDigits.textContent = formatTime(sec);
       socket.emit('scoreboard:timer-control', { action: 'set', seconds: sec });
+      updateScoreboardMiniPreview();
     });
   }
 
@@ -2071,16 +2271,19 @@
       if (labelBtnTimer) labelBtnTimer.textContent = 'Iniciar Tempo';
       extraPills.forEach(p => p.classList.toggle('active', Number(p.dataset.extra) === 0));
       socket.emit('scoreboard:timer-control', { action: 'reset' });
+      updateScoreboardMiniPreview();
     });
   }
 
   if (sbPeriodSelect) {
     sbPeriodSelect.addEventListener('change', () => {
       const selOpt = sbPeriodSelect.options[sbPeriodSelect.selectedIndex];
+      if (currentScoreboard) currentScoreboard.period = sbPeriodSelect.value;
       socket.emit('scoreboard:update', {
         period: sbPeriodSelect.value,
         periodLabel: selOpt ? selOpt.text : sbPeriodSelect.value
       });
+      updateScoreboardMiniPreview();
     });
   }
 
@@ -2090,6 +2293,7 @@
       if (currentScoreboard?.timer) currentScoreboard.timer.extraMinutes = extra;
       extraPills.forEach(p => p.classList.toggle('active', Number(p.dataset.extra) === extra));
       socket.emit('scoreboard:timer-control', { action: 'set', extraMinutes: extra });
+      updateScoreboardMiniPreview();
     });
   });
 
@@ -2100,10 +2304,21 @@
 
   socket.on('scoreboard:tick', ({ seconds, running }) => {
     if (currentScoreboard && currentScoreboard.timer) {
-      currentScoreboard.timer.seconds = seconds;
-      currentScoreboard.timer.running = running;
+      if (typeof seconds === 'number') currentScoreboard.timer.seconds = seconds;
+      if (typeof running === 'boolean') currentScoreboard.timer.running = running;
     }
-    if (sbTimerDigits) sbTimerDigits.textContent = formatTime(seconds);
+    if (sbTimerDigits && typeof seconds === 'number') sbTimerDigits.textContent = formatTime(seconds);
+    if (typeof running === 'boolean') {
+      if (sbTimerStateLabel) {
+        sbTimerStateLabel.textContent = running ? 'EM ANDAMENTO' : 'PAUSADO';
+        sbTimerStateLabel.classList.toggle('is-running', running);
+      }
+      if (btnSbToggleTimer && labelBtnTimer) {
+        btnSbToggleTimer.classList.toggle('is-running', running);
+        labelBtnTimer.textContent = running ? 'Pausar Relógio' : 'Iniciar Tempo';
+      }
+    }
+    updateScoreboardMiniPreview();
   });
 
   // ==========================================================================

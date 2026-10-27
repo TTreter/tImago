@@ -1239,6 +1239,10 @@ io.on('connection', (socket) => {
 
     saveState();
     io.emit('scoreboard:sync', state.scoreboard);
+    io.emit('scoreboard:tick', {
+      seconds: state.scoreboard.timer.seconds,
+      running: state.scoreboard.timer.running
+    });
   });
 
   socket.on('scoreboard:switch-sides', () => {
@@ -1397,30 +1401,48 @@ function stopScoreboardTicker() {
  * Inicializa o servidor HTTP + Socket.IO.
  * Pode ser chamado tanto diretamente via `node server.js` quanto pelo processo principal do Electron.
  */
-function startServer(port = PORT) {
+function startServer(preferredPort = PORT) {
   return new Promise((resolve, reject) => {
-    server.once('error', (err) => {
-      if (err.code === 'EADDRINUSE') {
-        console.log(`Porta ${port} já está em uso. Conectando à instância ativa...`);
-        resolve({ server, port, alreadyRunning: true });
-      } else {
-        reject(err);
-      }
-    });
+    let currentPort = Number(preferredPort) || 3000;
+    const maxPort = currentPort + 20;
 
-    server.listen(port, () => {
-      const localIp = getLocalIpAddress();
-      console.log('====================================================');
-      console.log('[tImago] SISTEMA DE OVERLAY OBS INICIADO');
-      console.log(`[PC]       Painel de Controle:   http://localhost:${port}`);
-      console.log(`[REDE]     Painel no Celular:    http://${localIp}:${port}`);
-      console.log(`[OBS]      Browser Source:       http://localhost:${port}/overlay`);
-      console.log('====================================================');
+    function tryListen() {
+      const onError = (err) => {
+        server.removeListener('listening', onListening);
+        if (err.code === 'EADDRINUSE') {
+          console.warn(`[tImago] Porta ${currentPort} ocupada por outro processo. Tentando porta ${currentPort + 1}...`);
+          currentPort++;
+          if (currentPort <= maxPort) {
+            setTimeout(tryListen, 50);
+          } else {
+            reject(new Error(`Não foi possível encontrar uma porta livre entre ${preferredPort} e ${maxPort}`));
+          }
+        } else {
+          reject(err);
+        }
+      };
 
-      startScoreboardTicker();
-      syncEngineWithSettings(true);
-      resolve({ server, port, alreadyRunning: false });
-    });
+      const onListening = () => {
+        server.removeListener('error', onError);
+        const localIp = getLocalIpAddress();
+        console.log('====================================================');
+        console.log('[tImago] SISTEMA DE OVERLAY OBS INICIADO');
+        console.log(`[PC]       Painel de Controle:   http://localhost:${currentPort}`);
+        console.log(`[REDE]     Painel no Celular:    http://${localIp}:${currentPort}`);
+        console.log(`[OBS]      Browser Source:       http://localhost:${currentPort}/overlay`);
+        console.log('====================================================');
+
+        startScoreboardTicker();
+        syncEngineWithSettings(true);
+        resolve({ server, port: currentPort, alreadyRunning: false });
+      };
+
+      server.once('error', onError);
+      server.once('listening', onListening);
+      server.listen(currentPort);
+    }
+
+    tryListen();
   });
 }
 

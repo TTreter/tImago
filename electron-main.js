@@ -43,6 +43,7 @@ let lastSplashMessage = 'Iniciando subsistemas do tImago...';
 let tray = null;
 let isQuitting = false;
 const PORT = process.env.PORT || 3000;
+let activePort = PORT;
 
 function createSplashWindow() {
   try {
@@ -155,7 +156,7 @@ function updateTrayMenu() {
     {
       label: 'Abrir Overlay no Navegador',
       click: () => {
-        shell.openExternal(`http://localhost:${PORT}/overlay`);
+        shell.openExternal(`http://localhost:${activePort}/overlay`);
       }
     },
     { type: 'separator' },
@@ -217,7 +218,8 @@ async function startApplication() {
 
   // 1. Inicializa o servidor Express e WebSockets
   updateSplash(45, 'Iniciando servidor local e WebSockets...');
-  await startServer(PORT);
+  const serverInfo = await startServer(PORT);
+  activePort = serverInfo?.port || PORT;
 
   // 2. Carrega configurações do usuário
   updateSplash(70, 'Carregando preferências e temas...');
@@ -249,8 +251,8 @@ async function startApplication() {
   // Remove a barra de menu superior padrão (File, Edit, View...)
   mainWindow.setMenuBarVisibility(false);
 
-  // Carrega o Painel de Controle local
-  mainWindow.loadURL(`http://localhost:${PORT}`);
+  // Carrega o Painel de Controle local na porta confirmada
+  mainWindow.loadURL(`http://localhost:${activePort}`);
 
   // Transição suave da SplashScreen para a Janela Principal
   let hasShownMainWindow = false;

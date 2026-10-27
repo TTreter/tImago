@@ -163,5 +163,46 @@
       "enabled": true
     }
   ],
-  "audienceQueue": []
+  "audienceQueue": [],
+  "scoreboard": {
+    "visible": true,
+    "sport": "soccer",
+    "position": "top-center",
+    "theme": "soccer-pitch",
+    "teamA": {
+      "name": "Mandante FC",
+      "shortName": "MAN",
+      "color": "#16a34a",
+      "logo": "",
+      "score": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "fouls": 0,
+      "setsWon": 0,
+      "setHistory": []
+    },
+    "teamB": {
+      "name": "Visitante EC",
+      "shortName": "VIS",
+      "color": "#2563eb",
+      "logo": "",
+      "score": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "fouls": 0,
+      "setsWon": 0,
+      "setHistory": []
+    },
+    "timer": {
+      "seconds": 0,
+      "running": false,
+      "direction": "up",
+      "extraMinutes": 0
+    },
+    "period": "1T",
+    "periodLabel": "1º Tempo",
+    "currentSet": 1,
+    "servingTeam": "teamA",
+    "celebration": null
+  }
 }

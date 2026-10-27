@@ -1406,13 +1406,11 @@ html, body {
 
 .overlay-scoreboard.is-hidden {
   opacity: 0;
-  transform: translateY(-24px);
   pointer-events: none;
 }
 
 .overlay-scoreboard.is-visible {
   opacity: 1;
-  transform: translateY(0);
 }
 
 /* Posições do Placar */
@@ -1420,12 +1418,17 @@ html, body {
   top: 36px;
   left: 48px;
   align-items: flex-start;
+  transform: translateY(0);
+}
+
+.overlay-scoreboard.pos-top-left.is-hidden {
+  transform: translateY(-24px);
 }
 
 .overlay-scoreboard.pos-top-center {
   top: 36px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, 0);
   align-items: center;
 }
 
@@ -1437,6 +1440,11 @@ html, body {
   top: 36px;
   right: 48px;
   align-items: flex-end;
+  transform: translateY(0);
+}
+
+.overlay-scoreboard.pos-top-right.is-hidden {
+  transform: translateY(-24px);
 }
 
 /* Cápsula Principal do Placar */

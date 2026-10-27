@@ -447,13 +447,8 @@
   }
 
   function renderScoreboard(sb) {
-    if (!scoreboardEl) return;
-
-    if (!sb || !sb.visible) {
-      scoreboardEl.classList.remove('is-visible');
-      scoreboardEl.classList.add('is-hidden');
-      return;
-    }
+    if (!scoreboardEl || !sb) return;
+    currentScoreboardState = sb;
 
     // Posição no topo
     const validPositions = ['pos-top-left', 'pos-top-center', 'pos-top-right'];
@@ -562,8 +557,33 @@
       }
     }
 
-    scoreboardEl.classList.remove('is-hidden');
-    scoreboardEl.classList.add('is-visible');
+    if (!sb.visible) {
+      scoreboardEl.classList.remove('is-visible');
+      scoreboardEl.classList.add('is-hidden');
+    } else {
+      scoreboardEl.classList.remove('is-hidden');
+      scoreboardEl.classList.add('is-visible');
+    }
+  }
+
+  let currentScoreboardState = null;
+  let overlayTimerInterval = null;
+
+  function updateOverlayTimerTick() {
+    if (currentScoreboardState && currentScoreboardState.timer && currentScoreboardState.timer.running) {
+      if (currentScoreboardState.timer.direction === 'down') {
+        currentScoreboardState.timer.seconds = Math.max(0, (currentScoreboardState.timer.seconds || 0) - 1);
+      } else {
+        currentScoreboardState.timer.seconds = (currentScoreboardState.timer.seconds || 0) + 1;
+      }
+      if (sbTimerVal) {
+        sbTimerVal.textContent = formatScoreboardTime(currentScoreboardState.timer.seconds);
+      }
+    }
+  }
+
+  if (!overlayTimerInterval) {
+    overlayTimerInterval = setInterval(updateOverlayTimerTick, 1000);
   }
 
   socket.on('state:sync', (payload) => {
@@ -579,8 +599,12 @@
     renderScoreboard(sb);
   });
 
-  socket.on('scoreboard:tick', ({ seconds }) => {
-    if (sbTimerVal) {
+  socket.on('scoreboard:tick', ({ seconds, running }) => {
+    if (currentScoreboardState && currentScoreboardState.timer) {
+      if (typeof seconds === 'number') currentScoreboardState.timer.seconds = seconds;
+      if (typeof running === 'boolean') currentScoreboardState.timer.running = running;
+    }
+    if (sbTimerVal && typeof seconds === 'number') {
       sbTimerVal.textContent = formatScoreboardTime(seconds);
     }
   });
