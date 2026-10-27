@@ -1479,6 +1479,19 @@
 
   const qrSvgParticipar = document.getElementById('qr-svg-participar');
   const qrUrlParticipar = document.getElementById('qr-url-participar');
+  const diagUrlParticipar = document.getElementById('diag-url-participar');
+
+  function updateDiagnosticsUrls(runtime) {
+    const port = runtime?.port || window.location.port || 3000;
+    const domain = runtime?.localDomain || 'timago.local';
+    const baseUrl = `http://${domain}:${port}`;
+    const participarUrl = `${baseUrl}/participar`;
+    const receptionUrl = `${baseUrl}/?mode=recepcao`;
+
+    if (diagUrlParticipar) diagUrlParticipar.textContent = participarUrl;
+    if (diagUrlReception) diagUrlReception.textContent = receptionUrl;
+    if (diagUrlFull) diagUrlFull.textContent = baseUrl;
+  }
 
   function renderMobileQrCodes(runtime) {
     const ip = runtime?.localIp || window.location.hostname || 'localhost';
@@ -1495,8 +1508,7 @@
     if (qrUrlParticipar) qrUrlParticipar.textContent = participarUrl;
     if (qrUrlReception) qrUrlReception.textContent = receptionUrl;
     if (qrUrlFull) qrUrlFull.textContent = baseUrl;
-    if (diagUrlReception) diagUrlReception.textContent = receptionUrl;
-    if (diagUrlFull) diagUrlFull.textContent = baseUrl;
+    updateDiagnosticsUrls(runtime);
 
     if (window.tImagoQR && typeof window.tImagoQR.renderQrSvg === 'function') {
       if (qrSvgParticipar) qrSvgParticipar.innerHTML = window.tImagoQR.renderQrSvg(participarUrl);
@@ -2874,6 +2886,7 @@
     renderSecurityStatus(currentState.settings?.security, currentRuntime);
     renderLowerThirdControls(currentState.lowerThird);
     renderPlaylistsSelector(currentState.playlists || [], currentState.activePlaylistId);
+    updateDiagnosticsUrls(currentRuntime);
     if (mobileQrModal && !mobileQrModal.classList.contains('is-hidden')) {
       renderMobileQrCodes(currentRuntime);
     }
