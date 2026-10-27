@@ -7,6 +7,8 @@
 
   const stageEl = document.getElementById('overlay-stage');
   const cardEl = document.getElementById('overlay-card');
+  const cardLogoBoxEl = document.getElementById('card-logo-box');
+  const cardLogoImgEl = document.getElementById('card-logo-img');
   const themeBadgeIconEl = document.getElementById('theme-badge-icon');
   const audienceKickerEl = document.getElementById('audience-kicker');
   const phraseTextEl = document.getElementById('phrase-text');
@@ -47,7 +49,16 @@
     'soccer-champion',
     'new-year',
     'youth-neon',
-    'junina-fest'
+    'junina-fest',
+    'custom'
+  ];
+
+  const VALID_ANIMATIONS = [
+    'slide-up',
+    'slide-left',
+    'slide-right',
+    'zoom',
+    'fade'
   ];
 
   // Ícones SVG exclusivos para o medalhão de cada tema
@@ -89,6 +100,33 @@
     const pos = VALID_POSITIONS.includes(settings.position) ? settings.position : 'bottom-left';
     VALID_POSITIONS.forEach((p) => stageEl.classList.remove(`pos-${p}`));
     stageEl.classList.add(`pos-${pos}`);
+
+    // Estilo de Animação (Fase 4)
+    const anim = VALID_ANIMATIONS.includes(settings.animationStyle) ? settings.animationStyle : 'slide-up';
+    VALID_ANIMATIONS.forEach((a) => stageEl.classList.remove(`anim-${a}`));
+    stageEl.classList.add(`anim-${anim}`);
+
+    // Cores Personalizadas do 19º Tema (Custom Theme)
+    if (settings.customThemeColors && typeof settings.customThemeColors === 'object') {
+      const c = settings.customThemeColors;
+      if (c.bg1) document.documentElement.style.setProperty('--custom-bg1', c.bg1);
+      if (c.bg2) document.documentElement.style.setProperty('--custom-bg2', c.bg2);
+      if (c.border) document.documentElement.style.setProperty('--custom-border', c.border);
+      if (c.text) document.documentElement.style.setProperty('--custom-text', c.text);
+      if (c.author) document.documentElement.style.setProperty('--custom-author', c.author);
+    }
+
+    // Logo / Ícone Personalizado no Card
+    if (cardLogoBoxEl && cardLogoImgEl) {
+      if (settings.showLogo && settings.logoDataUrl) {
+        if (cardLogoImgEl.getAttribute('src') !== settings.logoDataUrl) {
+          cardLogoImgEl.setAttribute('src', settings.logoDataUrl);
+        }
+        cardLogoBoxEl.classList.remove('is-hidden');
+      } else {
+        cardLogoBoxEl.classList.add('is-hidden');
+      }
+    }
 
     // Barra de progresso
     if (settings.showProgress === false) {

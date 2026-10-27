@@ -1831,3 +1831,86 @@ body.is-reception-mode .settings-tabs-card {
 body.is-reception-mode .main-grid {
   max-width: 1020px;
 }
+
+/* ==========================================================================
+   PERSONALIZAÇÃO VISUAL AVANÇADA: TEMA CUSTOM, ANIMAÇÃO E LOGO (FASE 4)
+   ========================================================================== */
+.swatch-custom {
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #38bdf8 100%);
+  border: 1px solid #f472b6;
+}
+
+.custom-theme-colors-box {
+  margin-top: 8px;
+  padding: 12px;
+  background: var(--bg-input);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.custom-theme-colors-box.is-hidden {
+  display: none;
+}
+
+.color-pickers-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.color-picker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.color-picker-item input[type="color"] {
+  width: 100%;
+  height: 30px;
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  cursor: pointer;
+}
+
+.logo-upload-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.logo-upload-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-title {
+  display: block;
+  font-size: 12.5px;
+  color: #f1f5f9;
+}
+
+.logo-subtitle {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.logo-upload-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

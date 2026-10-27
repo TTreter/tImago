@@ -123,6 +123,67 @@ html, body {
   transition-duration: 0.28s;
 }
 
+/* Estilos de Animação de Entrada/Saída Configuráveis (Fase 4) */
+.stage.anim-slide-left .overlay-card.is-hidden {
+  transform: translateX(-56px) scale(calc(var(--overlay-scale, 1) * 0.975));
+}
+.stage.anim-slide-left .overlay-card.is-switching {
+  transform: translateX(-28px) scale(calc(var(--overlay-scale, 1) * 0.985));
+}
+
+.stage.anim-slide-right .overlay-card.is-hidden {
+  transform: translateX(56px) scale(calc(var(--overlay-scale, 1) * 0.975));
+}
+.stage.anim-slide-right .overlay-card.is-switching {
+  transform: translateX(28px) scale(calc(var(--overlay-scale, 1) * 0.985));
+}
+
+.stage.anim-zoom .overlay-card.is-hidden {
+  transform: scale(calc(var(--overlay-scale, 1) * 0.84));
+}
+.stage.anim-zoom .overlay-card.is-switching {
+  transform: scale(calc(var(--overlay-scale, 1) * 0.92));
+}
+
+.stage.anim-fade .overlay-card.is-hidden,
+.stage.anim-fade .overlay-card.is-switching {
+  transform: scale(var(--overlay-scale, 1));
+  filter: blur(0px);
+}
+
+/* Linha de Conteúdo do Card (Logo Personalizado + Texto) */
+.card-content-row {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.card-logo-box {
+  flex-shrink: 0;
+  width: 68px;
+  height: 68px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.card-logo-box.is-hidden {
+  display: none;
+}
+
+.card-logo-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 /* Elementos ornamentais desligados por padrão e ativados por tema */
 .christmas-ornaments,
 .clean-accent-bar,
@@ -147,6 +208,8 @@ html, body {
 .card-inner {
   position: relative;
   z-index: 2;
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -825,3 +888,47 @@ html, body {
   text-transform: uppercase; color: #FDE047;
 }
 .theme-junina-fest .progress-bar { background: linear-gradient(90deg, #F97316, #FACC15, #22C55E); }
+
+/* 19. MEU TEMA PERSONALIZADO (CUSTOM THEME - FASE 4) */
+.theme-custom .overlay-card {
+  background: linear-gradient(135deg, var(--custom-bg1, #1e1b4b) 0%, var(--custom-bg2, #0f172a) 100%);
+  border-radius: 18px;
+  padding: 28px 36px 26px 40px;
+  border: 2px solid var(--custom-border, #38bdf8);
+  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.72), 0 0 28px rgba(0, 0, 0, 0.35);
+}
+.theme-custom .clean-accent-bar {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 16px;
+  bottom: 16px;
+  width: 5px;
+  border-radius: 0 4px 4px 0;
+  background: var(--custom-border, #38bdf8);
+  box-shadow: 0 0 14px var(--custom-border, #38bdf8);
+}
+.theme-custom .phrase-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(28px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1.38;
+  color: var(--custom-text, #f8fafc);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+.theme-custom .author-divider {
+  width: 28px;
+  height: 2px;
+  background: var(--custom-border, #38bdf8);
+}
+.theme-custom .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--custom-author, #fde047);
+}
+.theme-custom .progress-wrapper { background: rgba(255, 255, 255, 0.12); }
+.theme-custom .progress-bar { background: linear-gradient(90deg, var(--custom-border, #38bdf8), var(--custom-author, #fde047)); }
+

@@ -552,6 +552,43 @@
                     <small>Festa Junina • Terracota</small>
                   </div>
                 </button>
+
+                <button type="button" class="theme-option-btn" data-theme="custom" data-cat="extra">
+                  <div class="theme-swatch swatch-custom">🎨</div>
+                  <div class="theme-info">
+                    <strong>Meu Tema Custom</strong>
+                    <small>Personalizado • Suas Cores</small>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Painel de Cores do 19º Tema (Visível ao escolher "Meu Tema Custom") -->
+              <div id="custom-theme-colors-box" class="custom-theme-colors-box is-hidden">
+                <div class="sizing-header">
+                  <strong>🎨 Cores do Meu Tema Personalizado</strong>
+                </div>
+                <div class="color-pickers-grid">
+                  <label class="color-picker-item">
+                    <span>Fundo 1</span>
+                    <input type="color" id="color-custom-bg1" value="#1e1b4b" />
+                  </label>
+                  <label class="color-picker-item">
+                    <span>Fundo 2</span>
+                    <input type="color" id="color-custom-bg2" value="#0f172a" />
+                  </label>
+                  <label class="color-picker-item">
+                    <span>Borda / Barra</span>
+                    <input type="color" id="color-custom-border" value="#38bdf8" />
+                  </label>
+                  <label class="color-picker-item">
+                    <span>Texto</span>
+                    <input type="color" id="color-custom-text" value="#f8fafc" />
+                  </label>
+                  <label class="color-picker-item">
+                    <span>Autor</span>
+                    <input type="color" id="color-custom-author" value="#fde047" />
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -612,6 +649,42 @@
                   step="20"
                   value="1020"
                 />
+              </div>
+            </div>
+
+            <!-- Animação de Entrada e Logo Personalizado no Card (Fase 4) -->
+            <div class="sizing-controls-box">
+              <div class="form-group">
+                <label for="setting-animation-style">Estilo de Animação de Entrada / Saída</label>
+                <select id="setting-animation-style">
+                  <option value="slide-up">⬆️ Elevação Suave (Vertical Padrão)</option>
+                  <option value="slide-left">➡️ Deslizar da Esquerda</option>
+                  <option value="slide-right">⬅️ Deslizar da Direita</option>
+                  <option value="zoom">🔍 Expansão Central (Zoom)</option>
+                  <option value="fade">✨ Dissolver Suave (Fade)</option>
+                </select>
+              </div>
+
+              <div class="logo-upload-row">
+                <div class="logo-upload-left">
+                  <label class="switch" title="Exibir ou ocultar o logo ao lado do texto no card">
+                    <input type="checkbox" id="toggle-show-logo" />
+                    <span class="slider"></span>
+                  </label>
+                  <div>
+                    <strong class="logo-title">Logo / Ícone no Card</strong>
+                    <small class="logo-subtitle">Exibe sua marca (PNG/SVG) ao lado da frase</small>
+                  </div>
+                </div>
+                <div class="logo-upload-actions">
+                  <button type="button" id="btn-upload-logo" class="btn btn-sm btn-secondary">
+                    <span>🖼️ Enviar Logo</span>
+                  </button>
+                  <button type="button" id="btn-remove-logo" class="btn btn-sm btn-ghost is-hidden" title="Remover logo enviado">
+                    <span>🗑️</span>
+                  </button>
+                  <input type="file" id="input-logo-file" accept="image/*" class="is-hidden" />
+                </div>
               </div>
             </div>
           </div>

@@ -21,7 +21,7 @@ const os = require('os');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, { maxHttpBufferSize: 5e6 });
 
 const PORT = process.env.PORT || 3000;
 
@@ -66,7 +66,17 @@ const defaultState = {
     audienceHoldMode: true,
     audienceBatchPlaying: false,
     showKicker: true,
-    defaultKickerText: 'MENSAGEM DO PÚBLICO'
+    defaultKickerText: 'MENSAGEM DO PÚBLICO',
+    animationStyle: 'slide-up',
+    showLogo: false,
+    logoDataUrl: '',
+    customThemeColors: {
+      bg1: '#1e1b4b',
+      bg2: '#0f172a',
+      border: '#38bdf8',
+      text: '#f8fafc',
+      author: '#fde047'
+    }
   },
   activePlaylistId: 'pl-christmas',
   playlists: [

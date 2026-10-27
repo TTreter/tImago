@@ -121,6 +121,19 @@
   const labelCardWidth = document.getElementById('label-card-width');
   const btnResetSizes = document.getElementById('btn-reset-sizes');
 
+  // Animação, Logo e Cores do Tema Custom (Fase 4)
+  const customThemeColorsBox = document.getElementById('custom-theme-colors-box');
+  const colorCustomBg1 = document.getElementById('color-custom-bg1');
+  const colorCustomBg2 = document.getElementById('color-custom-bg2');
+  const colorCustomBorder = document.getElementById('color-custom-border');
+  const colorCustomText = document.getElementById('color-custom-text');
+  const colorCustomAuthor = document.getElementById('color-custom-author');
+  const settingAnimationStyle = document.getElementById('setting-animation-style');
+  const toggleShowLogo = document.getElementById('toggle-show-logo');
+  const btnUploadLogo = document.getElementById('btn-upload-logo');
+  const btnRemoveLogo = document.getElementById('btn-remove-logo');
+  const inputLogoFile = document.getElementById('input-logo-file');
+
   // Controles de Resolução
   const resPresetBtns = document.querySelectorAll('.res-preset-btn');
   const settingResWidth = document.getElementById('setting-res-width');
@@ -241,6 +254,28 @@
         if (strongEl) activeThemeNamePill.textContent = strongEl.textContent;
       }
     });
+
+    if (customThemeColorsBox) {
+      customThemeColorsBox.classList.toggle('is-hidden', settings.theme !== 'custom');
+    }
+    if (settings.customThemeColors) {
+      const c = settings.customThemeColors;
+      if (colorCustomBg1 && c.bg1) colorCustomBg1.value = c.bg1;
+      if (colorCustomBg2 && c.bg2) colorCustomBg2.value = c.bg2;
+      if (colorCustomBorder && c.border) colorCustomBorder.value = c.border;
+      if (colorCustomText && c.text) colorCustomText.value = c.text;
+      if (colorCustomAuthor && c.author) colorCustomAuthor.value = c.author;
+    }
+
+    if (settingAnimationStyle && document.activeElement !== settingAnimationStyle) {
+      settingAnimationStyle.value = settings.animationStyle || 'slide-up';
+    }
+    if (toggleShowLogo) {
+      toggleShowLogo.checked = Boolean(settings.showLogo);
+    }
+    if (btnRemoveLogo) {
+      btnRemoveLogo.classList.toggle('is-hidden', !settings.logoDataUrl);
+    }
 
     posBtns.forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.pos === settings.position);
@@ -1227,6 +1262,75 @@
   }
   if (btnCloseQrModal) btnCloseQrModal.addEventListener('click', closeQrModal);
   if (btnCloseQrFooter) btnCloseQrFooter.addEventListener('click', closeQrModal);
+
+  // ==========================================================================
+  // ANIMAÇÕES DE ENTRADA, LOGO PERSONALIZADO E CORES DO TEMA CUSTOM (FASE 4)
+  // ==========================================================================
+  function emitCustomColorsUpdate() {
+    socket.emit('settings:update', {
+      customThemeColors: {
+        bg1: colorCustomBg1 ? colorCustomBg1.value : '#1e1b4b',
+        bg2: colorCustomBg2 ? colorCustomBg2.value : '#0f172a',
+        border: colorCustomBorder ? colorCustomBorder.value : '#38bdf8',
+        text: colorCustomText ? colorCustomText.value : '#f8fafc',
+        author: colorCustomAuthor ? colorCustomAuthor.value : '#fde047'
+      }
+    });
+  }
+
+  [colorCustomBg1, colorCustomBg2, colorCustomBorder, colorCustomText, colorCustomAuthor].forEach((input) => {
+    if (input) {
+      input.addEventListener('input', emitCustomColorsUpdate);
+    }
+  });
+
+  if (settingAnimationStyle) {
+    settingAnimationStyle.addEventListener('change', () => {
+      socket.emit('settings:update', { animationStyle: settingAnimationStyle.value });
+    });
+  }
+
+  if (toggleShowLogo) {
+    toggleShowLogo.addEventListener('change', () => {
+      socket.emit('settings:update', { showLogo: toggleShowLogo.checked });
+    });
+  }
+
+  if (btnUploadLogo && inputLogoFile) {
+    btnUploadLogo.addEventListener('click', () => {
+      inputLogoFile.value = '';
+      inputLogoFile.click();
+    });
+
+    inputLogoFile.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        window.alert('Por favor, escolha uma imagem leve (até 2MB) em PNG, SVG ou WebP.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const dataUrl = String(ev.target?.result || '');
+        if (dataUrl.startsWith('data:image/')) {
+          socket.emit('settings:update', {
+            logoDataUrl: dataUrl,
+            showLogo: true
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (btnRemoveLogo) {
+    btnRemoveLogo.addEventListener('click', () => {
+      socket.emit('settings:update', {
+        logoDataUrl: '',
+        showLogo: false
+      });
+    });
+  }
 
   // ==========================================================================
   // SINCRONIZAÇÃO SOCKET.IO
