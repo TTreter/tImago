@@ -1,7 +1,7 @@
 {
   "name": "timago",
   "productName": "tImago",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "tImago — Sistema de Controle de Overlay em Tempo Real para OBS Studio",
   "main": "electron-main.js",
   "author": "Tiago Treter (TTreter)",
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "express": "^4.19.2",
+    "multicast-dns": "^7.2.5",
     "socket.io": "^4.7.5"
   },
   "devDependencies": {
@@ -26,6 +27,7 @@
       "electron-main.js",
       "server.js",
       "updater-service.js",
+      "mdns-service.js",
       "public/**/*",
       "data/**/*",
       "package.json"

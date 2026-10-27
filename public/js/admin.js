@@ -1477,21 +1477,29 @@
     });
   }
 
+  const qrSvgParticipar = document.getElementById('qr-svg-participar');
+  const qrUrlParticipar = document.getElementById('qr-url-participar');
+
   function renderMobileQrCodes(runtime) {
     const ip = runtime?.localIp || window.location.hostname || 'localhost';
     const port = runtime?.port || window.location.port || 3000;
-    const baseUrl = `http://${ip}:${port}`;
+    const domain = runtime?.localDomain || 'timago.local';
+
+    const baseUrl = `http://${domain}:${port}`;
+    const participarUrl = `${baseUrl}/participar`;
     const receptionUrl = `${baseUrl}/?mode=recepcao`;
 
-    if (labelMobileQr && ip !== 'localhost') {
-      labelMobileQr.textContent = `Celular (${ip})`;
+    if (labelMobileQr) {
+      labelMobileQr.textContent = `Acesso Móvel (${domain})`;
     }
+    if (qrUrlParticipar) qrUrlParticipar.textContent = participarUrl;
     if (qrUrlReception) qrUrlReception.textContent = receptionUrl;
     if (qrUrlFull) qrUrlFull.textContent = baseUrl;
     if (diagUrlReception) diagUrlReception.textContent = receptionUrl;
     if (diagUrlFull) diagUrlFull.textContent = baseUrl;
 
     if (window.tImagoQR && typeof window.tImagoQR.renderQrSvg === 'function') {
+      if (qrSvgParticipar) qrSvgParticipar.innerHTML = window.tImagoQR.renderQrSvg(participarUrl);
       if (qrSvgReception) qrSvgReception.innerHTML = window.tImagoQR.renderQrSvg(receptionUrl);
       if (qrSvgFull) qrSvgFull.innerHTML = window.tImagoQR.renderQrSvg(baseUrl);
     }
@@ -1923,10 +1931,18 @@
     if (sbPosSelect) sbPosSelect.value = sb.position || 'top-left';
 
     const isVoley = sb.sport === 'volleyball';
-    if (sbSoccerActionsA) sbSoccerActionsA.classList.toggle('is-hidden', isVoley);
-    if (sbSoccerActionsB) sbSoccerActionsB.classList.toggle('is-hidden', isVoley);
+    const isBasket = sb.sport === 'basketball';
+    const isSoccer = !isVoley && !isBasket;
+
+    if (sbSoccerActionsA) sbSoccerActionsA.classList.toggle('is-hidden', !isSoccer);
+    if (sbSoccerActionsB) sbSoccerActionsB.classList.toggle('is-hidden', !isSoccer);
     if (sbVoleyActionsA) sbVoleyActionsA.classList.toggle('is-hidden', !isVoley);
     if (sbVoleyActionsB) sbVoleyActionsB.classList.toggle('is-hidden', !isVoley);
+
+    const sbBasketActionsA = document.getElementById('sb-basket-actions-a');
+    const sbBasketActionsB = document.getElementById('sb-basket-actions-b');
+    if (sbBasketActionsA) sbBasketActionsA.classList.toggle('is-hidden', !isBasket);
+    if (sbBasketActionsB) sbBasketActionsB.classList.toggle('is-hidden', !isBasket);
 
     // Time Mandante (A)
     const tA = sb.teamA || {};
@@ -1939,6 +1955,8 @@
     if (sbCountYellowA) sbCountYellowA.textContent = tA.yellowCards ?? 0;
     if (sbCountRedA) sbCountRedA.textContent = tA.redCards ?? 0;
     if (sbCountSetsA) sbCountSetsA.textContent = tA.setsWon ?? 0;
+    const sbCountFoulsA = document.getElementById('sb-count-fouls-a');
+    if (sbCountFoulsA) sbCountFoulsA.textContent = tA.fouls ?? 0;
     if (btnRemoveLogoA) btnRemoveLogoA.classList.toggle('is-hidden', !tA.logo);
     if (sbLogoPreviewNameA) sbLogoPreviewNameA.textContent = tA.logo ? 'Escudo ativo' : 'Sem escudo';
 
@@ -1953,6 +1971,8 @@
     if (sbCountYellowB) sbCountYellowB.textContent = tB.yellowCards ?? 0;
     if (sbCountRedB) sbCountRedB.textContent = tB.redCards ?? 0;
     if (sbCountSetsB) sbCountSetsB.textContent = tB.setsWon ?? 0;
+    const sbCountFoulsB = document.getElementById('sb-count-fouls-b');
+    if (sbCountFoulsB) sbCountFoulsB.textContent = tB.fouls ?? 0;
     if (btnRemoveLogoB) btnRemoveLogoB.classList.toggle('is-hidden', !tB.logo);
     if (sbLogoPreviewNameB) sbLogoPreviewNameB.textContent = tB.logo ? 'Escudo ativo' : 'Sem escudo';
 
@@ -1969,8 +1989,9 @@
     const timer = sb.timer || {};
     if (sbTimerDigits) sbTimerDigits.textContent = formatTime(timer.seconds || 0);
     if (sbTimerStateLabel) {
-      sbTimerStateLabel.textContent = timer.running ? 'EM ANDAMENTO' : 'PAUSADO';
+      sbTimerStateLabel.textContent = timer.running ? 'EM ANDAMENTO' : (timer.isExpired ? 'TEMPO ESGOTADO' : 'PAUSADO');
       sbTimerStateLabel.classList.toggle('is-running', Boolean(timer.running));
+      sbTimerStateLabel.classList.toggle('is-expired', Boolean(timer.isExpired));
     }
     if (btnSbToggleTimer && labelBtnTimer) {
       btnSbToggleTimer.classList.toggle('is-running', Boolean(timer.running));
@@ -1979,6 +2000,15 @@
     if (sbPeriodSelect && document.activeElement !== sbPeriodSelect) {
       sbPeriodSelect.value = sb.period || '1T';
     }
+
+    // Direção do Cronômetro
+    const isDown = timer.direction === 'down';
+    const btnTimerDirUp = document.getElementById('btn-timer-dir-up');
+    const btnTimerDirDown = document.getElementById('btn-timer-dir-down');
+    const countdownPresetsRow = document.getElementById('countdown-presets-row');
+    if (btnTimerDirUp) btnTimerDirUp.classList.toggle('active', !isDown);
+    if (btnTimerDirDown) btnTimerDirDown.classList.toggle('active', isDown);
+    if (countdownPresetsRow) countdownPresetsRow.classList.toggle('is-hidden', !isDown);
 
     // Acréscimos
     const currentExtra = Number(timer.extraMinutes) || 0;
@@ -2415,6 +2445,316 @@
     updateScoreboardMiniPreview();
   });
 
+  // Direção do Cronômetro & Presets Regressivos (Item 2.F)
+  const btnTimerDirUp = document.getElementById('btn-timer-dir-up');
+  const btnTimerDirDown = document.getElementById('btn-timer-dir-down');
+  const timerPresetButtons = document.querySelectorAll('.btn-preset-timer');
+
+  btnTimerDirUp?.addEventListener('click', () => {
+    socket.emit('scoreboard:set-direction', { direction: 'up' });
+  });
+
+  btnTimerDirDown?.addEventListener('click', () => {
+    socket.emit('scoreboard:set-direction', { direction: 'down', initialMinutes: 20 });
+  });
+
+  timerPresetButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const mins = Number(btn.dataset.preset) || 10;
+      socket.emit('scoreboard:set-direction', { direction: 'down', initialMinutes: mins });
+    });
+  });
+
+  // Pontuação Rápida de Basquete (+1, +2, +3, -1)
+  const btnPointsList = document.querySelectorAll('.btn-pts');
+  btnPointsList.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const team = btn.dataset.team;
+      const pts = Number(btn.dataset.pts) || 1;
+      if (team) {
+        socket.emit('scoreboard:adjust-points', { team, amount: pts });
+      }
+    });
+  });
+
+  // Faltas Coletivas / Individuais
+  const btnIncFoulsA = document.getElementById('btn-inc-fouls-a');
+  const btnDecFoulsA = document.getElementById('btn-dec-fouls-a');
+  const btnIncFoulsB = document.getElementById('btn-inc-fouls-b');
+  const btnDecFoulsB = document.getElementById('btn-dec-fouls-b');
+
+  btnIncFoulsA?.addEventListener('click', () => socket.emit('scoreboard:adjust-fouls', { team: 'teamA', amount: 1 }));
+  btnDecFoulsA?.addEventListener('click', () => socket.emit('scoreboard:adjust-fouls', { team: 'teamA', amount: -1 }));
+  btnIncFoulsB?.addEventListener('click', () => socket.emit('scoreboard:adjust-fouls', { team: 'teamB', amount: 1 }));
+  btnDecFoulsB?.addEventListener('click', () => socket.emit('scoreboard:adjust-fouls', { team: 'teamB', amount: -1 }));
+
+  // ==========================================================================
+  // ESTILOS ESTRUTURAIS DE BROADCAST & SAFE AREA (ITEM 2.D)
+  // ==========================================================================
+  const bcastThemeCards = document.querySelectorAll('.theme-bcast-card');
+  const safeAreaButtons = document.querySelectorAll('.btn-safe-area');
+
+  function renderBroadcastThemeControls(overlayStyle) {
+    const theme = overlayStyle?.theme || 'modern';
+    const safe = overlayStyle?.safeArea || 'standard';
+
+    bcastThemeCards.forEach((card) => {
+      card.classList.toggle('active', card.dataset.bcastTheme === theme);
+    });
+
+    safeAreaButtons.forEach((btn) => {
+      const isAct = btn.dataset.safe === safe;
+      btn.classList.toggle('active', isAct);
+      btn.classList.toggle('btn-primary', isAct);
+      btn.classList.toggle('btn-secondary', !isAct);
+    });
+  }
+
+  bcastThemeCards.forEach((card) => {
+    card.addEventListener('click', () => {
+      const theme = card.dataset.bcastTheme;
+      if (theme) {
+        socket.emit('settings:update', { overlayStyle: { theme } });
+      }
+    });
+  });
+
+  safeAreaButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const safe = btn.dataset.safe;
+      if (safe) {
+        socket.emit('settings:update', { overlayStyle: { safeArea: safe } });
+      }
+    });
+  });
+
+  // ==========================================================================
+  // CONTROLE DE ACESSO, IDENTIFICAÇÃO DE HOST & PIN (ITEM 1.C)
+  // ==========================================================================
+  const hostDetectorBadge = document.getElementById('host-detector-badge');
+  const hostDetectorText = document.getElementById('host-detector-text');
+  const settingPinEnabled = document.getElementById('setting-pin-enabled');
+  const btnOpenChangePin = document.getElementById('btn-open-change-pin');
+
+  const securityOnboardingModal = document.getElementById('security-onboarding-modal');
+  const inpOnboardPin = document.getElementById('inp-onboard-pin');
+  const inpOnboardPinConfirm = document.getElementById('inp-onboard-pin-confirm');
+  const btnSavePinOnboard = document.getElementById('btn-save-pin-onboard');
+  const btnSkipPinOnboard = document.getElementById('btn-skip-pin-onboard');
+
+  const changePinModal = document.getElementById('change-pin-modal');
+  const btnCloseChangePinModal = document.getElementById('btn-close-change-pin-modal');
+  const inpNewPin = document.getElementById('inp-new-pin');
+  const inpNewPinConfirm = document.getElementById('inp-new-pin-confirm');
+  const btnConfirmSavePin = document.getElementById('btn-confirm-save-pin');
+  const btnDisablePinAction = document.getElementById('btn-disable-pin-action');
+
+  const remoteLockscreenModal = document.getElementById('remote-lockscreen-modal');
+  const lockscreenPinDots = document.getElementById('lockscreen-pin-dots');
+  const lockscreenErrorMsg = document.getElementById('lockscreen-error-msg');
+  const keypadButtons = document.querySelectorAll('.keypad-btn[data-key]');
+  const btnKeypadClear = document.getElementById('btn-keypad-clear');
+  const btnKeypadBackspace = document.getElementById('btn-keypad-backspace');
+
+  let currentKeypadPin = '';
+  let isAuthenticatedRemote = false;
+
+  function updateLockscreenDots() {
+    if (!lockscreenPinDots) return;
+    const dots = lockscreenPinDots.querySelectorAll('.pin-dot');
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('active', index < currentKeypadPin.length);
+    });
+  }
+
+  function submitPinAttempt(pin) {
+    if (!pin || pin.length < 4) return;
+    if (lockscreenErrorMsg) lockscreenErrorMsg.textContent = 'Verificando PIN...';
+    socket.emit('auth:verify-pin', { pin });
+  }
+
+  keypadButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.key;
+      if (currentKeypadPin.length < 6) {
+        currentKeypadPin += key;
+        updateLockscreenDots();
+        if (lockscreenErrorMsg) lockscreenErrorMsg.textContent = '';
+        if (currentKeypadPin.length >= 4) {
+          submitPinAttempt(currentKeypadPin);
+        }
+      }
+    });
+  });
+
+  btnKeypadClear?.addEventListener('click', () => {
+    currentKeypadPin = '';
+    updateLockscreenDots();
+    if (lockscreenErrorMsg) lockscreenErrorMsg.textContent = '';
+  });
+
+  btnKeypadBackspace?.addEventListener('click', () => {
+    if (currentKeypadPin.length > 0) {
+      currentKeypadPin = currentKeypadPin.slice(0, -1);
+      updateLockscreenDots();
+      if (lockscreenErrorMsg) lockscreenErrorMsg.textContent = '';
+    }
+  });
+
+  // Suporte a digitação direta pelo teclado no lockscreen
+  window.addEventListener('keydown', (e) => {
+    if (!remoteLockscreenModal || remoteLockscreenModal.classList.contains('is-hidden')) return;
+    if (e.key >= '0' && e.key <= '9') {
+      if (currentKeypadPin.length < 6) {
+        currentKeypadPin += e.key;
+        updateLockscreenDots();
+        if (currentKeypadPin.length >= 4) {
+          submitPinAttempt(currentKeypadPin);
+        }
+      }
+    } else if (e.key === 'Backspace') {
+      currentKeypadPin = currentKeypadPin.slice(0, -1);
+      updateLockscreenDots();
+    } else if (e.key === 'Escape') {
+      currentKeypadPin = '';
+      updateLockscreenDots();
+    }
+  });
+
+  // Resposta de Autenticação do Servidor
+  socket.on('auth:success', ({ token, isLocalHost }) => {
+    if (token) {
+      localStorage.setItem('tImago_auth_token', token);
+    }
+    isAuthenticatedRemote = true;
+    if (remoteLockscreenModal) {
+      remoteLockscreenModal.classList.add('is-hidden');
+    }
+    currentKeypadPin = '';
+    updateLockscreenDots();
+    if (lockscreenErrorMsg) lockscreenErrorMsg.textContent = '';
+  });
+
+  socket.on('auth:error', ({ message }) => {
+    if (lockscreenErrorMsg) {
+      lockscreenErrorMsg.textContent = message || 'PIN incorreto. Tente novamente.';
+    }
+    currentKeypadPin = '';
+    updateLockscreenDots();
+  });
+
+  socket.on('auth:configured', () => {
+    if (changePinModal) changePinModal.classList.add('is-hidden');
+    if (securityOnboardingModal) securityOnboardingModal.classList.add('is-hidden');
+  });
+
+  // Ações do Modal de Onboarding no Host
+  btnSavePinOnboard?.addEventListener('click', () => {
+    const pin = inpOnboardPin?.value?.trim();
+    const confirm = inpOnboardPinConfirm?.value?.trim();
+    if (!pin || pin.length < 4 || pin.length > 6 || !/^\d+$/.test(pin)) {
+      window.alert('O PIN deve conter entre 4 e 6 dígitos numéricos.');
+      return;
+    }
+    if (pin !== confirm) {
+      window.alert('A confirmação do PIN não coincide.');
+      return;
+    }
+    socket.emit('auth:set-pin', { pin, enablePin: true });
+    if (securityOnboardingModal) securityOnboardingModal.classList.add('is-hidden');
+  });
+
+  btnSkipPinOnboard?.addEventListener('click', () => {
+    socket.emit('auth:skip-onboarding');
+    if (securityOnboardingModal) securityOnboardingModal.classList.add('is-hidden');
+  });
+
+  // Ações do Modal de Alteração de PIN
+  btnOpenChangePin?.addEventListener('click', () => {
+    if (inpNewPin) inpNewPin.value = '';
+    if (inpNewPinConfirm) inpNewPinConfirm.value = '';
+    if (changePinModal) changePinModal.classList.remove('is-hidden');
+  });
+
+  btnCloseChangePinModal?.addEventListener('click', () => {
+    if (changePinModal) changePinModal.classList.add('is-hidden');
+  });
+
+  btnConfirmSavePin?.addEventListener('click', () => {
+    const pin = inpNewPin?.value?.trim();
+    const confirm = inpNewPinConfirm?.value?.trim();
+    if (!pin || pin.length < 4 || pin.length > 6 || !/^\d+$/.test(pin)) {
+      window.alert('O PIN deve conter entre 4 e 6 dígitos numéricos.');
+      return;
+    }
+    if (pin !== confirm) {
+      window.alert('A confirmação do PIN não coincide.');
+      return;
+    }
+    socket.emit('auth:set-pin', { pin, enablePin: true });
+    if (changePinModal) changePinModal.classList.add('is-hidden');
+  });
+
+  btnDisablePinAction?.addEventListener('click', () => {
+    if (window.confirm('Deseja realmente desativar a exigência de PIN para celulares e tablets na rede local?')) {
+      socket.emit('auth:disable-pin');
+      if (changePinModal) changePinModal.classList.add('is-hidden');
+    }
+  });
+
+  settingPinEnabled?.addEventListener('change', () => {
+    const enabled = settingPinEnabled.checked;
+    socket.emit('settings:update', { security: { pinEnabled: enabled } });
+  });
+
+  function renderSecurityStatus(security, runtime) {
+    const isHost = Boolean(runtime?.isLocalHost);
+    const pinEnabled = Boolean(security?.pinEnabled);
+    const pinConfigured = Boolean(security?.pinConfigured);
+
+    // Atualiza badge de Host Local vs Remoto
+    if (hostDetectorBadge && hostDetectorText) {
+      if (isHost) {
+        hostDetectorBadge.className = 'security-host-badge badge-host';
+        hostDetectorText.textContent = 'Computador Principal (Host Local) — Acesso Livre';
+      } else {
+        hostDetectorBadge.className = 'security-host-badge badge-remote';
+        hostDetectorText.textContent = 'Dispositivo Remoto (Wi-Fi/LAN)';
+      }
+    }
+
+    // Atualiza checkbox de PIN em Configurações
+    if (settingPinEnabled && document.activeElement !== settingPinEnabled) {
+      settingPinEnabled.checked = pinEnabled;
+    }
+
+    // Modal de Boas-Vindas / Onboarding de Segurança:
+    // Apenas para o Computador Principal quando ainda não foi configurado
+    if (securityOnboardingModal) {
+      if (isHost && !pinConfigured) {
+        securityOnboardingModal.classList.remove('is-hidden');
+      } else {
+        securityOnboardingModal.classList.add('is-hidden');
+      }
+    }
+
+    // Tela de Bloqueio por PIN para Dispositivos Remotos:
+    // Exibida apenas se NÃO for o computador principal e o PIN estiver habilitado
+    if (remoteLockscreenModal) {
+      if (!isHost && pinEnabled && !isAuthenticatedRemote) {
+        // Se houver um token salvo no localStorage, mantém desbloqueado
+        const savedToken = localStorage.getItem('tImago_auth_token');
+        if (savedToken) {
+          remoteLockscreenModal.classList.add('is-hidden');
+        } else {
+          remoteLockscreenModal.classList.remove('is-hidden');
+        }
+      } else {
+        remoteLockscreenModal.classList.add('is-hidden');
+      }
+    }
+  }
+
   // ==========================================================================
   // ATALHOS DE TECLADO DE ESTÚDIO AO VIVO (FASE 6)
   // ==========================================================================
@@ -2424,6 +2764,7 @@
       closeEditModal();
       closePlaylistModal();
       closeQrModal();
+      if (changePinModal) changePinModal.classList.add('is-hidden');
       return;
     }
 
@@ -2529,6 +2870,8 @@
     };
 
     renderMasterControls(currentState.settings);
+    renderBroadcastThemeControls(currentState.settings?.overlayStyle);
+    renderSecurityStatus(currentState.settings?.security, currentRuntime);
     renderLowerThirdControls(currentState.lowerThird);
     renderPlaylistsSelector(currentState.playlists || [], currentState.activePlaylistId);
     if (mobileQrModal && !mobileQrModal.classList.contains('is-hidden')) {

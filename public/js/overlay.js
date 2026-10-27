@@ -65,12 +65,18 @@
     'bottom-left',
     'bottom-center',
     'bottom-right',
+    'full-width',
     'top-left',
     'top-center',
     'top-right'
   ];
 
   const ALL_THEMES = [
+    'modern',
+    'newsroom',
+    'minimalist',
+    'cyber',
+    'classic',
     'christmas',
     'christmas-snow',
     'christmas-pine',
@@ -145,7 +151,8 @@
   function applySettings(settings) {
     if (!settings) return;
 
-    const theme = ALL_THEMES.includes(settings.theme) ? settings.theme : 'christmas';
+    const rawTheme = settings.overlayStyle?.theme || settings.theme;
+    const theme = ALL_THEMES.includes(rawTheme) ? rawTheme : 'modern';
     if (theme !== _lastAppliedTheme) {
       ALL_THEMES.forEach((t) => stageEl.classList.remove(`theme-${t}`));
       stageEl.classList.add(`theme-${theme}`);
@@ -163,12 +170,18 @@
     }
 
     // Posição
-    const pos = VALID_POSITIONS.includes(settings.position) ? settings.position : 'bottom-left';
+    const rawPos = settings.overlayStyle?.position || settings.position;
+    const pos = VALID_POSITIONS.includes(rawPos) ? rawPos : 'bottom-left';
     if (pos !== _lastAppliedPos) {
       VALID_POSITIONS.forEach((p) => stageEl.classList.remove(`pos-${p}`));
       stageEl.classList.add(`pos-${pos}`);
       _lastAppliedPos = pos;
     }
+
+    // Área de Segurança (Safe Area)
+    const rawSafe = settings.overlayStyle?.safeArea || 'standard';
+    ['safe-none', 'safe-standard', 'safe-wide'].forEach((s) => stageEl.classList.remove(s));
+    stageEl.classList.add(`safe-${rawSafe}`);
 
     // Estilo de Animação (Fase 4)
     const anim = VALID_ANIMATIONS.includes(settings.animationStyle) ? settings.animationStyle : 'slide-up';
@@ -552,11 +565,15 @@
       if (sbTimeBlock) {
         sbTimeBlock.classList.remove('is-hidden');
         if (sbPeriodBadge) sbPeriodBadge.textContent = sb.period || '1T';
-        if (sbTimerVal) sbTimerVal.textContent = formatScoreboardTime(sb.timer?.seconds || 0);
+        if (sbTimerVal) {
+          sbTimerVal.textContent = formatScoreboardTime(sb.timer?.seconds || 0);
+          const isExpired = Boolean(sb.timer?.isExpired || (sb.timer?.direction === 'down' && sb.timer?.seconds === 0));
+          sbTimerVal.classList.toggle('timer-expired', isExpired);
+        }
         if (sbExtraBadge) {
-          const extra = Number(sb.timer?.extraMinutes) || 0;
-          if (extra > 0) {
-            sbExtraBadge.textContent = `+${extra}'`;
+          const extraStr = sb.extraTime || (sb.timer?.extraMinutes ? `+${sb.timer.extraMinutes}'` : '');
+          if (extraStr) {
+            sbExtraBadge.textContent = extraStr.startsWith('+') ? extraStr : `+${extraStr}`;
             sbExtraBadge.classList.remove('is-hidden');
           } else {
             sbExtraBadge.classList.add('is-hidden');
@@ -620,14 +637,20 @@
     renderScoreboard(sb);
   });
 
-  socket.on('scoreboard:tick', ({ seconds, running }) => {
+  socket.on('scoreboard:tick', ({ seconds, running, isExpired }) => {
     if (currentScoreboardState && currentScoreboardState.timer) {
       if (typeof seconds === 'number') currentScoreboardState.timer.seconds = seconds;
       if (typeof running === 'boolean') currentScoreboardState.timer.running = running;
+      if (typeof isExpired === 'boolean') currentScoreboardState.timer.isExpired = isExpired;
     }
     if (sbTimerVal && typeof seconds === 'number') {
       sbTimerVal.textContent = formatScoreboardTime(seconds);
+      sbTimerVal.classList.toggle('timer-expired', Boolean(isExpired));
     }
+  });
+
+  socket.on('scoreboard:timeExpired', () => {
+    if (sbTimerVal) sbTimerVal.classList.add('timer-expired');
   });
 
   // Quando o aplicativo desktop (tImago.exe) ou o servidor é fechado, recolhe imediatamente o card no OBS

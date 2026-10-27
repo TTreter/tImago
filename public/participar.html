@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>tImago — Participação da Audiência</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #090d16;
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 24px 16px;
+    }
+    .participar-card {
+      width: 100%;
+      max-width: 480px;
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 28px 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(56, 189, 248, 0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px solid rgba(14, 165, 233, 0.3);
+      color: #38bdf8;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+    .label .required {
+      color: #f43f5e;
+      margin-left: 2px;
+    }
+    .input-field, .textarea-field {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #ffffff;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .input-field:focus, .textarea-field:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+      background: #1a2436;
+    }
+    .textarea-field {
+      resize: none;
+      height: 110px;
+    }
+    .char-count {
+      text-align: right;
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+      font-family: monospace;
+    }
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-submit:hover:not(:disabled) {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .success-box {
+      text-align: center;
+      padding: 24px 10px;
+      display: none;
+    }
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin-bottom: 16px;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .success-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #f1f5f9;
+      margin-bottom: 8px;
+    }
+    .success-desc {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .btn-reset {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-reset:hover {
+      background: #334155;
+      color: #ffffff;
+    }
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="participar-card">
+    <div id="form-container">
+      <div class="header">
+        <div class="logo-badge">
+          <i class="fas fa-broadcast-tower"></i> Transmissão Ao Vivo
+        </div>
+        <h1 class="title">Envie sua Mensagem</h1>
+        <p class="subtitle">Compartilhe sua pergunta, comentário ou saudação diretamente com a equipe de transmissão.</p>
+      </div>
+
+      <form id="participar-form">
+        <div class="form-group">
+          <label class="label" for="inp-author">Seu Nome / Identificação <span class="required">*</span></label>
+          <input type="text" id="inp-author" class="input-field" placeholder="Ex: Maria Silva" maxlength="50" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="inp-kicker">Cidade / Bairro ou Cargo <span style="color:#64748b; font-weight:normal;">(opcional)</span></label>
+          <input type="text" id="inp-kicker" class="input-field" placeholder="Ex: São Paulo / SP" maxlength="40">
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="inp-text">Sua Mensagem ou Pergunta <span class="required">*</span></label>
+          <textarea id="inp-text" class="textarea-field" placeholder="Escreva aqui o que você gostaria de dizer..." maxlength="200" required></textarea>
+          <div class="char-count" id="char-count">0 / 200</div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btn-submit">
+          <i class="fas fa-paper-plane"></i> Enviar para a Produção
+        </button>
+      </form>
+    </div>
+
+    <!-- Tela de Sucesso -->
+    <div class="success-box" id="success-box">
+      <div class="success-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <h2 class="success-title">Mensagem Enviada!</h2>
+      <p class="success-desc">Sua participação foi enviada com sucesso para a mesa de corte da transmissão. Obrigado por participar!</p>
+      <button type="button" class="btn-reset" id="btn-send-another">
+        <i class="fas fa-redo-alt"></i> Enviar Outra Mensagem
+      </button>
+    </div>
+  </div>
+
+  <div class="footer">
+    Desenvolvido com <strong>tImago</strong> Broadcast
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const form = document.getElementById('participar-form');
+    const formContainer = document.getElementById('form-container');
+    const successBox = document.getElementById('success-box');
+    const inpAuthor = document.getElementById('inp-author');
+    const inpKicker = document.getElementById('inp-kicker');
+    const inpText = document.getElementById('inp-text');
+    const charCount = document.getElementById('char-count');
+    const btnSubmit = document.getElementById('btn-submit');
+    const btnSendAnother = document.getElementById('btn-send-another');
+
+    inpText.addEventListener('input', () => {
+      charCount.textContent = `${inpText.value.length} / 200`;
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = inpText.value.trim();
+      const author = inpAuthor.value.trim();
+      const kicker = inpKicker.value.trim();
+
+      if (!text || !author) return;
+
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+      socket.emit('audience:submit', {
+        text,
+        author,
+        kicker
+      });
+
+      setTimeout(() => {
+        formContainer.style.display = 'none';
+        successBox.style.display = 'block';
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar para a Produção';
+      }, 400);
+    });
+
+    btnSendAnother.addEventListener('click', () => {
+      inpText.value = '';
+      charCount.textContent = '0 / 200';
+      successBox.style.display = 'none';
+      formContainer.style.display = 'block';
+      inpText.focus();
+    });
+  </script>
+</body>
+</html>

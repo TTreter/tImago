@@ -18,12 +18,14 @@ const { Server } = require('socket.io');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const crypto = require('crypto');
 const {
   checkForUpdates,
   registerUpdaterSocketEvents
 } = require('./updater-service');
+const { startMdns, stopMdns } = require('./mdns-service');
 
-let appVersion = '1.4.0';
+let appVersion = '1.5.0';
 try {
   const pkg = require('./package.json');
   if (pkg && pkg.version) appVersion = pkg.version;
@@ -74,6 +76,25 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Rota pública exclusiva para participação do público via celular/QR Code (sem painel administrativo)
+app.get('/participar', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'participar.html'));
+});
+
+// Endpoint leve para verificação do status de autenticação e identificação de Host Local
+app.get('/api/auth/status', (req, res) => {
+  const clientIp = req.ip || req.socket?.remoteAddress;
+  const isLocal = isLocalHostAddress(clientIp);
+  res.json({
+    isLocalHost: isLocal,
+    pinEnabled: Boolean(state.settings?.security?.pinEnabled),
+    pinConfigured: Boolean(state.settings?.security?.pinConfigured),
+    localDomain: 'timago.local',
+    localIp: getLocalIpAddress(),
+    port: activePort
+  });
+});
+
 /**
  * Estado padrão inicial caso o arquivo JSON ainda não exista
  */
@@ -83,6 +104,20 @@ const defaultState = {
     autoRotate: true,
     theme: 'christmas',
     position: 'bottom-left',
+    security: {
+      pinEnabled: false,
+      pinConfigured: false,
+      pinHash: '',
+      sessionDurationHours: 24,
+      maxFailedAttempts: 5,
+      lockoutMinutes: 5
+    },
+    overlayStyle: {
+      theme: 'modern',
+      position: 'bottom-left',
+      safeArea: 'standard',
+      showClock: true
+    },
     intervalSeconds: 4,
     defaultDurationSeconds: 10,
     showProgress: true,
@@ -276,8 +311,11 @@ const defaultState = {
       seconds: 0,
       running: false,
       direction: 'up',
-      extraMinutes: 0
+      initialMinutes: 45,
+      extraMinutes: 0,
+      isExpired: false
     },
+    extraTime: '',
     period: '1T',
     periodLabel: '1º Tempo',
     currentSet: 1,
@@ -418,7 +456,12 @@ function loadState() {
       const raw = fs.readFileSync(STATE_FILE, 'utf-8');
       const parsed = JSON.parse(raw);
       const loaded = {
-        settings: { ...defaultState.settings, ...(parsed.settings || {}) },
+        settings: {
+          ...defaultState.settings,
+          ...(parsed.settings || {}),
+          security: { ...defaultState.settings.security, ...(parsed.settings?.security || {}) },
+          overlayStyle: { ...defaultState.settings.overlayStyle, ...(parsed.settings?.overlayStyle || {}) }
+        },
         lowerThird: { ...defaultState.lowerThird, ...(parsed.lowerThird || {}), active: false },
         activePlaylistId: parsed.activePlaylistId || 'pl-inst',
         playlists: Array.isArray(parsed.playlists) ? parsed.playlists : [],
@@ -552,7 +595,12 @@ function broadcastState() {
       serverNow: Date.now(),
       pendingAudienceCount: getPendingAudiencePhrases().length,
       localIp: getLocalIpAddress(),
-      port: activePort
+      localDomain: 'timago.local',
+      port: activePort,
+      security: {
+        pinEnabled: Boolean(state.settings?.security?.pinEnabled),
+        pinConfigured: Boolean(state.settings?.security?.pinConfigured)
+      }
     }
   });
 }
@@ -785,6 +833,9 @@ function syncEngineWithSettings(forceRestart = false) {
 // EVENTOS WEBSOCKET (SOCKET.IO)
 // ============================================================================
 io.on('connection', (socket) => {
+  const clientIp = socket.handshake.address;
+  const isLocal = isLocalHostAddress(clientIp);
+
   socket.emit('state:sync', {
     state,
     runtime: {
@@ -793,7 +844,13 @@ io.on('connection', (socket) => {
       serverNow: Date.now(),
       pendingAudienceCount: getPendingAudiencePhrases().length,
       localIp: getLocalIpAddress(),
-      port: activePort
+      localDomain: 'timago.local',
+      port: activePort,
+      isLocalHost: isLocal,
+      security: {
+        pinEnabled: Boolean(state.settings?.security?.pinEnabled),
+        pinConfigured: Boolean(state.settings?.security?.pinConfigured)
+      }
     }
   });
 
@@ -803,13 +860,153 @@ io.on('connection', (socket) => {
   // Envia estado inicial do placar esportivo
   socket.emit('scoreboard:sync', state.scoreboard);
 
+  // --- Eventos de Segurança e Autenticação PIN (Item 1.C) ---
+  socket.on('auth:verify-pin', ({ pin }) => {
+    if (isLocal) {
+      return socket.emit('auth:success', { isLocalHost: true, token: 'local-host-token' });
+    }
+
+    if (!state.settings.security?.pinEnabled) {
+      return socket.emit('auth:success', { isLocalHost: false, token: 'open-access-token' });
+    }
+
+    if (isIpLocked(clientIp)) {
+      return socket.emit('auth:error', {
+        message: 'Muitas tentativas incorretas. Aguarde 5 minutos antes de tentar novamente.'
+      });
+    }
+
+    const providedHash = hashPin(pin);
+    const expectedHash = state.settings.security?.pinHash;
+
+    if (expectedHash && providedHash === expectedHash) {
+      clearFailedPin(clientIp);
+      const token = crypto.randomBytes(24).toString('hex');
+      authenticatedTokens.add(token);
+      socket.emit('auth:success', { token, isLocalHost: false });
+    } else {
+      recordFailedPin(clientIp);
+      const attempts = pinAttempts.get(clientIp);
+      const remaining = Math.max(0, 5 - (attempts ? attempts.count : 1));
+      if (remaining === 0) {
+        socket.emit('auth:error', {
+          message: 'PIN incorreto. Limite de tentativas atingido. Bloqueado por 5 minutos.'
+        });
+      } else {
+        socket.emit('auth:error', {
+          message: `PIN incorreto. Restam ${remaining} tentativa(s).`
+        });
+      }
+    }
+  });
+
+  socket.on('auth:set-pin', ({ pin, enablePin }) => {
+    const token = socket.handshake.auth?.token;
+    if (!isLocal && (!token || !authenticatedTokens.has(token))) {
+      return socket.emit('auth:error', { message: 'Ação não autorizada. Apenas o Host Principal pode alterar o PIN.' });
+    }
+
+    if (!state.settings.security) state.settings.security = {};
+    if (pin && String(pin).trim()) {
+      state.settings.security.pinHash = hashPin(pin);
+      state.settings.security.pinEnabled = enablePin !== undefined ? Boolean(enablePin) : true;
+    } else if (enablePin === false) {
+      state.settings.security.pinEnabled = false;
+    }
+    state.settings.security.pinConfigured = true;
+    saveState();
+    broadcastState();
+    socket.emit('auth:configured', { pinEnabled: state.settings.security.pinEnabled });
+  });
+
+  socket.on('auth:disable-pin', () => {
+    const token = socket.handshake.auth?.token;
+    if (!isLocal && (!token || !authenticatedTokens.has(token))) {
+      return socket.emit('auth:error', { message: 'Ação não autorizada. Apenas o Host Principal pode desativar o PIN.' });
+    }
+    if (!state.settings.security) state.settings.security = {};
+    state.settings.security.pinEnabled = false;
+    state.settings.security.pinConfigured = true;
+    saveState();
+    broadcastState();
+    socket.emit('auth:configured', { pinEnabled: false });
+  });
+
+  socket.on('auth:skip-onboarding', () => {
+    if (!isLocal) return;
+    if (!state.settings.security) state.settings.security = {};
+    state.settings.security.pinConfigured = true;
+    state.settings.security.pinEnabled = false;
+    saveState();
+    broadcastState();
+  });
+
+  // --- Eventos Avançados de Placar Esportivo (Item 2.F) ---
+  socket.on('scoreboard:set-direction', ({ direction, initialMinutes }) => {
+    if (!state.scoreboard.timer) state.scoreboard.timer = {};
+    state.scoreboard.timer.direction = direction === 'down' ? 'down' : 'up';
+    if (typeof initialMinutes === 'number') {
+      state.scoreboard.timer.initialMinutes = Math.max(1, initialMinutes);
+      if (state.scoreboard.timer.direction === 'down' && !state.scoreboard.timer.running) {
+        state.scoreboard.timer.seconds = state.scoreboard.timer.initialMinutes * 60;
+        state.scoreboard.timer.baseSeconds = state.scoreboard.timer.seconds;
+      }
+    }
+    state.scoreboard.timer.isExpired = false;
+    saveState();
+    io.emit('scoreboard:sync', state.scoreboard);
+  });
+
+  socket.on('scoreboard:set-extra-time', ({ extraTime }) => {
+    state.scoreboard.extraTime = String(extraTime || '').trim();
+    saveState();
+    io.emit('scoreboard:sync', state.scoreboard);
+  });
+
+  socket.on('scoreboard:adjust-points', ({ team, amount }) => {
+    const targetTeam = team === 'teamB' ? state.scoreboard.teamB : state.scoreboard.teamA;
+    if (targetTeam) {
+      targetTeam.score = Math.max(0, (targetTeam.score || 0) + Number(amount || 0));
+      saveState();
+      io.emit('scoreboard:sync', state.scoreboard);
+    }
+  });
+
+  socket.on('scoreboard:adjust-fouls', ({ team, amount }) => {
+    const targetTeam = team === 'teamB' ? state.scoreboard.teamB : state.scoreboard.teamA;
+    if (targetTeam) {
+      targetTeam.fouls = Math.max(0, (targetTeam.fouls || 0) + Number(amount || 0));
+      saveState();
+      io.emit('scoreboard:sync', state.scoreboard);
+    }
+  });
+
+  socket.on('scoreboard:adjust-sets', ({ team, amount }) => {
+    const targetTeam = team === 'teamB' ? state.scoreboard.teamB : state.scoreboard.teamA;
+    if (targetTeam) {
+      targetTeam.setsWon = Math.max(0, (targetTeam.setsWon || 0) + Number(amount || 0));
+      saveState();
+      io.emit('scoreboard:sync', state.scoreboard);
+    }
+  });
+
   socket.on('settings:update', (partialSettings) => {
     const prevVisible = state.settings.visible;
     const prevAutoRotate = state.settings.autoRotate;
 
+    const mergedOverlayStyle = partialSettings.overlayStyle
+      ? { ...(state.settings.overlayStyle || {}), ...partialSettings.overlayStyle }
+      : state.settings.overlayStyle;
+
+    const mergedSecurity = partialSettings.security
+      ? { ...(state.settings.security || {}), ...partialSettings.security }
+      : state.settings.security;
+
     state.settings = {
       ...state.settings,
-      ...partialSettings
+      ...partialSettings,
+      overlayStyle: mergedOverlayStyle,
+      security: mergedSecurity
     };
     saveState();
     notifySettingsChanged(state.settings);
@@ -1486,6 +1683,58 @@ function getLocalIpAddress() {
   return cachedLocalIp;
 }
 
+function getAllLocalIps() {
+  const interfaces = os.networkInterfaces();
+  const ips = [];
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        ips.push(iface.address);
+      }
+    }
+  }
+  return ips;
+}
+
+function isLocalHostAddress(clientIp) {
+  if (!clientIp) return true;
+  const cleanIp = String(clientIp).replace(/^::ffff:/, '').trim();
+  if (cleanIp === '127.0.0.1' || cleanIp === '::1' || cleanIp === 'localhost') return true;
+  const allIps = getAllLocalIps();
+  return allIps.includes(cleanIp);
+}
+
+const authenticatedTokens = new Set();
+const pinAttempts = new Map(); // ip -> { count, lockedUntil }
+
+function hashPin(pin) {
+  return crypto.createHash('sha256').update(String(pin || '').trim()).digest('hex');
+}
+
+function isIpLocked(ip) {
+  const record = pinAttempts.get(ip);
+  if (!record) return false;
+  if (record.lockedUntil && Date.now() < record.lockedUntil) return true;
+  if (record.lockedUntil && Date.now() >= record.lockedUntil) {
+    pinAttempts.delete(ip);
+    return false;
+  }
+  return false;
+}
+
+function recordFailedPin(ip) {
+  const record = pinAttempts.get(ip) || { count: 0, lockedUntil: 0 };
+  record.count += 1;
+  if (record.count >= 5) {
+    record.lockedUntil = Date.now() + 5 * 60 * 1000;
+  }
+  pinAttempts.set(ip, record);
+}
+
+function clearFailedPin(ip) {
+  pinAttempts.delete(ip);
+}
+
 let scoreboardTicker = null;
 
 function startScoreboardTicker() {
@@ -1504,13 +1753,16 @@ function startScoreboardTicker() {
         if (nextSec === 0) {
           timer.running = false;
           timer.startedAtMs = null;
+          timer.isExpired = true;
+          io.emit('scoreboard:timeExpired');
         }
       } else {
         timer.seconds = (timer.baseSeconds || 0) + elapsedSec;
       }
       io.emit('scoreboard:tick', {
         seconds: timer.seconds,
-        running: timer.running
+        running: timer.running,
+        isExpired: Boolean(timer.isExpired)
       });
     }
   }, 1000);
@@ -1555,10 +1807,13 @@ function startServer(preferredPort = PORT) {
         console.log('====================================================');
         console.log('[tImago] SISTEMA DE OVERLAY OBS INICIADO');
         console.log(`[PC]       Painel de Controle:   http://localhost:${currentPort}`);
+        console.log(`[mDNS]     Domínio Amigável:     http://timago.local:${currentPort}`);
+        console.log(`[PÚBLICO]  Envio Audiência:      http://timago.local:${currentPort}/participar`);
         console.log(`[REDE]     Painel no Celular:    http://${localIp}:${currentPort}`);
         console.log(`[OBS]      Browser Source:       http://localhost:${currentPort}/overlay`);
         console.log('====================================================');
 
+        startMdns('timago', getAllLocalIps);
         startScoreboardTicker();
         syncEngineWithSettings(true);
         resolve({ server, port: currentPort, alreadyRunning: false });
@@ -1580,6 +1835,7 @@ function stopServer() {
   saveState(true);
   clearRotationTimer();
   stopScoreboardTicker();
+  stopMdns();
   if (global.lowerThirdTimer) {
     clearTimeout(global.lowerThirdTimer);
     global.lowerThirdTimer = null;

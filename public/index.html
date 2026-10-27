@@ -713,6 +713,25 @@
             </label>
           </div>
 
+          <!-- AÇÕES EXCLUSIVAS DE BASQUETE & PONTUAÇÃO RÁPIDA TIME A -->
+          <div id="sb-basket-actions-a" class="sport-specific-actions is-hidden">
+            <span style="font-size: 12px; color: #94a3b8; font-weight: 700; margin-bottom: 6px; display: block;">Pontuação Rápida:</span>
+            <div class="basket-points-row">
+              <button type="button" class="btn btn-secondary btn-xs btn-pts" data-team="teamA" data-pts="1">+1</button>
+              <button type="button" class="btn btn-primary btn-xs btn-pts" data-team="teamA" data-pts="2">+2</button>
+              <button type="button" class="btn btn-success btn-xs btn-pts" data-team="teamA" data-pts="3">+3</button>
+              <button type="button" class="btn btn-ghost btn-xs btn-pts" data-team="teamA" data-pts="-1">-1</button>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; background: rgba(0,0,0,0.25); padding: 6px 10px; border-radius: 8px;">
+              <span style="font-size: 12px; color: #cbd5e1; font-weight: 600;">Faltas Coletivas:</span>
+              <div class="mini-btn-group">
+                <button type="button" id="btn-dec-fouls-a" class="btn-mini">-</button>
+                <b id="sb-count-fouls-a" style="font-size: 14px; min-width: 20px; text-align: center;">0</b>
+                <button type="button" id="btn-inc-fouls-a" class="btn-mini">+</button>
+              </div>
+            </div>
+          </div>
+
         </section>
 
         <!-- COLUNA 2: CRONÔMETRO CENTRAL & PERÍODO -->
@@ -735,10 +754,26 @@
             </button>
           </div>
 
+          <!-- DIREÇÃO DO CRONÔMETRO (CRESCENTE / DECRESCENTE) -->
+          <div class="timer-direction-row">
+            <div class="btn-group-toggle">
+              <button type="button" id="btn-timer-dir-up" class="btn-toggle active" title="Cronômetro progressivo: 00:00 até o fim">▲ Crescente</button>
+              <button type="button" id="btn-timer-dir-down" class="btn-toggle" title="Cronômetro regressivo com alarme de estouro de tempo ao zerar">▼ Decrescente</button>
+            </div>
+            <div id="countdown-presets-row" class="countdown-presets is-hidden">
+              <span style="font-size: 11px; color: #94a3b8; font-weight: 700;">Tempo Inicial:</span>
+              <button type="button" class="btn-pill-xs btn-preset-timer" data-preset="45">45'</button>
+              <button type="button" class="btn-pill-xs btn-preset-timer" data-preset="20">20' (Futsal)</button>
+              <button type="button" class="btn-pill-xs btn-preset-timer" data-preset="12">12' (NBA)</button>
+              <button type="button" class="btn-pill-xs btn-preset-timer" data-preset="10">10' (FIBA)</button>
+              <button type="button" class="btn-pill-xs btn-preset-timer" data-preset="3">3' (Round)</button>
+            </div>
+          </div>
+
           <div class="timer-secondary-actions">
             <button type="button" id="btn-sb-minus-1m" class="btn btn-secondary btn-xs" title="Diminuir 1 minuto">-1 min</button>
             <button type="button" id="btn-sb-plus-1m" class="btn btn-secondary btn-xs" title="Aumentar 1 minuto">+1 min</button>
-            <button type="button" id="btn-sb-reset-timer" class="btn btn-ghost btn-xs" title="Zerar para 00:00">Zerar Relógio</button>
+            <button type="button" id="btn-sb-reset-timer" class="btn btn-ghost btn-xs" title="Zerar Relógio">Zerar Relógio</button>
           </div>
 
           <!-- CONTROLE DE PERÍODO -->
@@ -867,6 +902,25 @@
               <input type="radio" name="serving-radio" id="radio-serving-b" value="teamB" />
               <span>Saque na posse deste time</span>
             </label>
+          </div>
+
+          <!-- AÇÕES EXCLUSIVAS DE BASQUETE & PONTUAÇÃO RÁPIDA TIME B -->
+          <div id="sb-basket-actions-b" class="sport-specific-actions is-hidden">
+            <span style="font-size: 12px; color: #94a3b8; font-weight: 700; margin-bottom: 6px; display: block;">Pontuação Rápida:</span>
+            <div class="basket-points-row">
+              <button type="button" class="btn btn-secondary btn-xs btn-pts" data-team="teamB" data-pts="1">+1</button>
+              <button type="button" class="btn btn-primary btn-xs btn-pts" data-team="teamB" data-pts="2">+2</button>
+              <button type="button" class="btn btn-success btn-xs btn-pts" data-team="teamB" data-pts="3">+3</button>
+              <button type="button" class="btn btn-ghost btn-xs btn-pts" data-team="teamB" data-pts="-1">-1</button>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; background: rgba(0,0,0,0.25); padding: 6px 10px; border-radius: 8px;">
+              <span style="font-size: 12px; color: #cbd5e1; font-weight: 600;">Faltas Coletivas:</span>
+              <div class="mini-btn-group">
+                <button type="button" id="btn-dec-fouls-b" class="btn-mini">-</button>
+                <b id="sb-count-fouls-b" style="font-size: 14px; min-width: 20px; text-align: center;">0</b>
+                <button type="button" id="btn-inc-fouls-b" class="btn-mini">+</button>
+              </div>
+            </div>
           </div>
 
         </section>
@@ -1454,6 +1508,91 @@
           </div>
         </section>
 
+        <!-- SEÇÃO: ESTILOS ESTRUTURAIS DE BROADCAST & SAFE AREA (ITEM 2.D) -->
+        <section class="settings-section-card">
+          <div class="section-card-header">
+            <div class="section-card-icon" style="background: rgba(14, 165, 233, 0.15); border-color: rgba(14, 165, 233, 0.4); color: #38bdf8;">
+              <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            </div>
+            <div>
+              <h2>Estilos Estruturais de Broadcast &amp; Área de Segurança</h2>
+              <p>Formato arquitetural do lower third, área de segurança de TV (Safe Area) e posição na tela.</p>
+            </div>
+          </div>
+
+          <div class="section-card-body">
+            <label style="font-size: 13px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 8px;">
+              Formato Estrutural do GC / Lower Third:
+            </label>
+            <div class="broadcast-themes-grid">
+              <!-- 1. MODERN SLATE -->
+              <div class="theme-bcast-card active" data-bcast-theme="modern">
+                <div class="theme-preview-box" style="background: rgba(15,23,42,0.92); border: 1px solid rgba(56,189,248,0.4); border-radius: 8px;">
+                  <span style="font-size: 10px; color: #38bdf8; font-weight: 800;">DESTAQUE</span>
+                  <span style="font-size: 11px; color: #ffffff; font-weight: 700;">Modern Slate</span>
+                </div>
+                <strong class="theme-bcast-title">Modern Slate</strong>
+                <span class="theme-bcast-desc">Design translúcido escuro, cantos arredondados e gradientes ciano/azul.</span>
+              </div>
+
+              <!-- 2. NEWSROOM -->
+              <div class="theme-bcast-card" data-bcast-theme="newsroom">
+                <div class="theme-preview-box" style="background: #0f172a; border-left: 4px solid #ef4444; border-radius: 3px;">
+                  <span style="font-size: 10px; background: #ef4444; color: #fff; padding: 1px 4px; font-weight: 900; width: fit-content;">AO VIVO</span>
+                  <span style="font-size: 11px; color: #ffffff; font-weight: 800;">Newsroom TV</span>
+                </div>
+                <strong class="theme-bcast-title">Newsroom / Notícias</strong>
+                <span class="theme-bcast-desc">Tarja estilo telejornal de TV com caixa de orador sólida e tipografia direta.</span>
+              </div>
+
+              <!-- 3. MINIMALIST CLEAN -->
+              <div class="theme-bcast-card" data-bcast-theme="minimalist">
+                <div class="theme-preview-box" style="background: #ffffff; border-left: 4px solid #0284c7; border-radius: 0;">
+                  <span style="font-size: 10px; color: #0284c7; font-weight: 800;">CONFERÊNCIA</span>
+                  <span style="font-size: 11px; color: #0f172a; font-weight: 700;">Minimalist Clean</span>
+                </div>
+                <strong class="theme-bcast-title">Minimalist Clean</strong>
+                <span class="theme-bcast-desc">Visual plano (flat), alto contraste preto/branco e cantos retos corporativos.</span>
+              </div>
+
+              <!-- 4. ESPORTS / CYBER -->
+              <div class="theme-bcast-card" data-bcast-theme="cyber">
+                <div class="theme-preview-box" style="background: #0a0f1d; border: 1px solid #22d3ee; border-radius: 0; clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));">
+                  <span style="font-size: 10px; color: #22d3ee; font-weight: 900;">HUD // LIVE</span>
+                  <span style="font-size: 11px; color: #ffffff; font-weight: 800;">Cyber Esports</span>
+                </div>
+                <strong class="theme-bcast-title">Esports / Cyber</strong>
+                <span class="theme-bcast-desc">Cortes chanfrados em 45º, glow neon brilhante e estilo gamer futurista.</span>
+              </div>
+
+              <!-- 5. CLÁSSICO / CERIMONIAL -->
+              <div class="theme-bcast-card" data-bcast-theme="classic">
+                <div class="theme-preview-box" style="background: linear-gradient(135deg, #0f172a, #1e293b); border: 1px solid #eab308; border-radius: 6px;">
+                  <span style="font-size: 10px; color: #fde047; font-style: italic;">Solene</span>
+                  <span style="font-size: 11px; color: #fef08a; font-family: serif; font-weight: 700;">Clássico Dourado</span>
+                </div>
+                <strong class="theme-bcast-title">Clássico / Cerimonial</strong>
+                <span class="theme-bcast-desc">Gradiente sóbrio escuro com filetes dourados nobres para cultos e formaturas.</span>
+              </div>
+            </div>
+
+            <!-- ÁREA DE SEGURANÇA (SAFE AREA) -->
+            <div class="sizing-controls-box" style="margin-top: 18px;">
+              <div class="sizing-header">
+                <strong>Área de Segurança de Transmissão (Safe Area)</strong>
+              </div>
+              <p class="text-xs text-muted" style="margin-bottom: 10px;">
+                Adiciona recuo nas bordas para evitar que os textos fiquem colados ou cortados em televisores e celulares.
+              </p>
+              <div class="flex gap-2" id="safe-area-group">
+                <button type="button" class="btn btn-secondary btn-sm btn-safe-area" data-safe="none">0% (Sem Margem)</button>
+                <button type="button" class="btn btn-primary btn-sm btn-safe-area active" data-safe="standard">5% (Padrão TV Broadcast)</button>
+                <button type="button" class="btn btn-secondary btn-sm btn-safe-area" data-safe="wide">10% (Margem Ampla)</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- SEÇÃO 4: AUTOMAÇÃO, TEMPORIZAÇÃO & ETIQUETAS -->
         <section class="settings-section-card">
           <div class="section-card-header">
@@ -1578,6 +1717,68 @@
                   <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                   <span>Nova Versão Disponível</span>
                 </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO: SEGURANÇA & CONTROLE DE ACESSO NA REDE LOCAL (ITEM 1.C & 1.D) -->
+        <section class="settings-section-card">
+          <div class="section-card-header">
+            <div class="section-card-icon" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: #34d399;">
+              <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <div>
+              <h2>Segurança, PIN &amp; Controle de Acesso Local</h2>
+              <p>Proteja o painel contra alterações indevidas de celulares e computadores na mesma rede Wi-Fi.</p>
+            </div>
+          </div>
+
+          <div class="section-card-body">
+            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <span class="security-host-badge" id="host-detector-badge">
+                  <span class="host-dot"></span>
+                  <span id="host-detector-text">Computador Principal (Host Local)</span>
+                </span>
+                <p style="font-size: 12px; color: #94a3b8; margin-top: 6px;">
+                  Neste computador onde o tImago está instalado, o acesso de administrador é <strong>sempre direto e sem senha</strong>.
+                </p>
+              </div>
+              <div class="flex items-center gap-3">
+                <button type="button" id="btn-open-change-pin" class="btn btn-secondary btn-sm">
+                  <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  <span>Configurar / Alterar PIN</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="setting-item-toggle">
+              <div>
+                <strong>Exigir PIN para Dispositivos Remotos na Rede Wi-Fi</strong>
+                <small>Celulares, tablets e outros computadores precisarão digitar o PIN numérico para acessar o painel administrativo</small>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-pin-enabled" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <!-- DOMÍNIO AMIGÁVEL & ROTA DE PARTICIPAÇÃO -->
+            <div style="margin-top: 16px; background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px; padding: 14px 16px;">
+              <strong style="font-size: 13px; color: #38bdf8; display: flex; align-items: center; gap: 6px;">
+                <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                Domínio Local Amigável mDNS (Zeroconf Ativo)
+              </strong>
+              <div style="margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;">
+                <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 8px;">
+                  <span style="font-size: 11px; color: #94a3b8; display: block;">Painel da Produção:</span>
+                  <a href="http://timago.local:3000" target="_blank" style="font-size: 13px; color: #38bdf8; font-family: monospace; font-weight: 700; text-decoration: none;">http://timago.local:3000</a>
+                </div>
+                <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 8px;">
+                  <span style="font-size: 11px; color: #94a3b8; display: block;">Página Pública para o Público (QR Code):</span>
+                  <a href="http://timago.local:3000/participar" target="_blank" style="font-size: 13px; color: #34d399; font-family: monospace; font-weight: 700; text-decoration: none;">http://timago.local:3000/participar</a>
+                </div>
               </div>
             </div>
           </div>
@@ -1752,19 +1953,27 @@
 
       <div class="qr-cards-grid">
         <div class="qr-card-option highlight">
-          <span class="qr-badge">EQUIPE DE TRIAGEM / RECEPÇÃO</span>
-          <h4>Modo Recepção (Fila do Cidadão)</h4>
-          <p>Visão simplificada para cadastrar mensagens da população durante o evento sem risco de alterar as configurações de cena.</p>
-          <div id="qr-svg-reception" class="qr-svg-container"></div>
-          <code id="qr-url-reception" class="qr-url-code">http://localhost:3000/?mode=recepcao</code>
+          <span class="qr-badge" style="background:#10b981; color:#fff;">PÚBLICO / AUDIÊNCIA</span>
+          <h4>Página Pública de Participação</h4>
+          <p>Link exclusivo para o auditório ou espectadores enviarem perguntas diretamente para a produção. <strong>Não exige PIN e não exibe o painel de corte.</strong></p>
+          <div id="qr-svg-participar" class="qr-svg-container"></div>
+          <code id="qr-url-participar" class="qr-url-code">http://timago.local:3000/participar</code>
         </div>
 
         <div class="qr-card-option">
-          <span class="qr-badge subtle">OPERADOR PRINCIPAL</span>
-          <h4>Painel de Transmissão Completo</h4>
-          <p>Acesso integral à Fila do Cidadão, Pautas de Avisos, Tarjas Lower Third, Preview e Configurações de Palco.</p>
+          <span class="qr-badge">EQUIPE DE TRIAGEM</span>
+          <h4>Modo Recepção (Triagem)</h4>
+          <p>Visão simplificada para cadastrar mensagens da população durante o evento sem risco de alterar as configurações de cena.</p>
+          <div id="qr-svg-reception" class="qr-svg-container"></div>
+          <code id="qr-url-reception" class="qr-url-code">http://timago.local:3000/?mode=recepcao</code>
+        </div>
+
+        <div class="qr-card-option">
+          <span class="qr-badge subtle">OPERADOR REMOTO</span>
+          <h4>Painel Completo (Exige PIN)</h4>
+          <p>Acesso integral ao painel de corte, pautas, tarjas e placar (dispositivos remotos na rede exigem autenticação por PIN).</p>
           <div id="qr-svg-full" class="qr-svg-container"></div>
-          <code id="qr-url-full" class="qr-url-code">http://localhost:3000</code>
+          <code id="qr-url-full" class="qr-url-code">http://timago.local:3000</code>
         </div>
       </div>
 
@@ -1868,6 +2077,124 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- MODAL: ONBOARDING DE SEGURANÇA NO PRIMEIRO ACESSO (HOST PRINCIPAL) -->
+  <div id="security-onboarding-modal" class="modal-backdrop is-hidden">
+    <div class="modal-box" style="max-width: 480px;">
+      <div class="modal-header">
+        <div class="modal-title-with-badge">
+          <svg class="icon-svg" viewBox="0 0 24 24" stroke="#34d399"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <h3>Segurança da Rede Local</h3>
+        </div>
+      </div>
+      <div class="modal-body" style="padding: 24px; text-align: left;">
+        <p style="font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 16px;">
+          Detectamos que você está no <strong>computador principal do estúdio</strong>. Você deseja definir um <strong>PIN de 4 a 6 dígitos</strong> para impedir que celulares ou outros dispositivos na mesma rede Wi-Fi alterem o painel da sua transmissão?
+        </p>
+
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 12px; margin-bottom: 20px;">
+          <small style="color: #34d399; font-weight: 700; display: block; margin-bottom: 2px;">🛡️ Acesso Local Inteligente:</small>
+          <small style="color: #94a3b8; display: block; font-size: 12px;">Neste computador principal, o tImago <strong>nunca pedirá senha</strong>. O PIN será solicitado apenas para outros celulares na rede Wi-Fi.</small>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="inp-onboard-pin" style="font-size: 13px; font-weight: 700;">Definir PIN de Acesso (4 a 6 dígitos numéricos):</label>
+          <input type="password" id="inp-onboard-pin" maxlength="6" inputmode="numeric" placeholder="Ex: 1234" style="font-size: 18px; letter-spacing: 4px; text-align: center;" />
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label for="inp-onboard-pin-confirm" style="font-size: 13px; font-weight: 700;">Confirmar PIN:</label>
+          <input type="password" id="inp-onboard-pin-confirm" maxlength="6" inputmode="numeric" placeholder="Repita o PIN" style="font-size: 18px; letter-spacing: 4px; text-align: center;" />
+        </div>
+
+        <div class="flex items-center justify-between gap-3 pt-2">
+          <button type="button" id="btn-skip-pin-onboard" class="btn btn-secondary">
+            Manter Acesso Livre (Sem PIN)
+          </button>
+          <button type="button" id="btn-save-pin-onboard" class="btn btn-primary">
+            Salvar e Ativar PIN
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ALTERAÇÃO / CONFIGURAÇÃO DE PIN (VIA CONFIGURAÇÕES) -->
+  <div id="change-pin-modal" class="modal-backdrop is-hidden">
+    <div class="modal-box" style="max-width: 440px;">
+      <div class="modal-header">
+        <div class="modal-title-with-badge">
+          <svg class="icon-svg" viewBox="0 0 24 24" stroke="#38bdf8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <h3>Gerenciar PIN de Segurança</h3>
+        </div>
+        <button type="button" class="btn-icon" id="btn-close-change-pin-modal" title="Fechar">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">
+          Defina ou atualize o PIN numérico exigido para dispositivos remotos conectados na mesma rede Wi-Fi.
+        </p>
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="inp-new-pin">Novo PIN (4 a 6 dígitos):</label>
+          <input type="password" id="inp-new-pin" maxlength="6" inputmode="numeric" placeholder="Ex: 2026" style="font-size: 18px; letter-spacing: 4px; text-align: center;" />
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label for="inp-new-pin-confirm">Confirmar Novo PIN:</label>
+          <input type="password" id="inp-new-pin-confirm" maxlength="6" inputmode="numeric" placeholder="Repita o novo PIN" style="font-size: 18px; letter-spacing: 4px; text-align: center;" />
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <button type="button" id="btn-disable-pin-action" class="btn btn-ghost text-red-400">
+            Desativar PIN
+          </button>
+          <button type="button" id="btn-confirm-save-pin" class="btn btn-primary">
+            Salvar PIN
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA DE BLOQUEIO POR PIN PARA DISPOSITIVOS REMOTOS (ITEM 1.C) -->
+  <div id="remote-lockscreen-modal" class="lockscreen-modal is-hidden">
+    <div class="lockscreen-box">
+      <div class="lockscreen-icon">
+        <svg class="icon-svg" viewBox="0 0 24 24" stroke="#38bdf8" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      </div>
+      <h2 class="lockscreen-title">Painel Protegido por PIN</h2>
+      <p class="lockscreen-subtitle">Digite o PIN configurado no computador principal do tImago para acessar este painel.</p>
+
+      <!-- Indicador de Dígitos (Bolinhas) -->
+      <div class="pin-dots-row" id="lockscreen-pin-dots">
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+      </div>
+
+      <div id="lockscreen-error-msg" style="color: #f87171; font-size: 13px; font-weight: 700; min-height: 20px; margin-bottom: 12px;"></div>
+
+      <!-- Teclado Numérico Touch / Click -->
+      <div class="pin-keypad">
+        <button type="button" class="keypad-btn" data-key="1">1</button>
+        <button type="button" class="keypad-btn" data-key="2">2</button>
+        <button type="button" class="keypad-btn" data-key="3">3</button>
+        <button type="button" class="keypad-btn" data-key="4">4</button>
+        <button type="button" class="keypad-btn" data-key="5">5</button>
+        <button type="button" class="keypad-btn" data-key="6">6</button>
+        <button type="button" class="keypad-btn" data-key="7">7</button>
+        <button type="button" class="keypad-btn" data-key="8">8</button>
+        <button type="button" class="keypad-btn" data-key="9">9</button>
+        <button type="button" class="keypad-btn action-btn" id="btn-keypad-clear">Limpar</button>
+        <button type="button" class="keypad-btn" data-key="0">0</button>
+        <button type="button" class="keypad-btn action-btn" id="btn-keypad-backspace">⌫</button>
+      </div>
+
+      <div style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
+        <a href="/participar" style="font-size: 13px; color: #38bdf8; text-decoration: none; font-weight: 600;">
+          Apenas enviar mensagem para a live? Clique aqui
+        </a>
+      </div>
     </div>
   </div>
 
