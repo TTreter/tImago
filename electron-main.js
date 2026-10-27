@@ -38,6 +38,8 @@ const {
 let mainWindow = null;
 let splashWindow = null;
 let splashStartTime = 0;
+let lastSplashPercent = 15;
+let lastSplashMessage = 'Iniciando subsistemas do tImago...';
 let tray = null;
 let isQuitting = false;
 const PORT = process.env.PORT || 3000;
@@ -65,6 +67,10 @@ function createSplashWindow() {
 
     splashWindow.loadFile(path.join(__dirname, 'public', 'splash.html'));
 
+    splashWindow.webContents.once('did-finish-load', () => {
+      updateSplash(lastSplashPercent, lastSplashMessage);
+    });
+
     splashWindow.on('closed', () => {
       splashWindow = null;
     });
@@ -74,8 +80,10 @@ function createSplashWindow() {
 }
 
 function updateSplash(percent, message) {
+  lastSplashPercent = percent;
+  if (message) lastSplashMessage = message;
   if (splashWindow && !splashWindow.isDestroyed()) {
-    const safeMsg = JSON.stringify(message || '');
+    const safeMsg = JSON.stringify(lastSplashMessage);
     splashWindow.webContents.executeJavaScript(
       `if (window.setSplashProgress) window.setSplashProgress(${percent}, ${safeMsg});`
     ).catch(() => {});

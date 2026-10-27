@@ -38,7 +38,6 @@
       "signAndEditExecutable": false
     },
     "portable": {
-      "splashImage": "public/img/splash.bmp",
       "unpackDirName": "tImago-App",
       "useZip": true,
       "artifactName": "tImago-Portable-${version}.exe"
