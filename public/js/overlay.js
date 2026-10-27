@@ -143,6 +143,19 @@
         if (cardLogoImgEl.getAttribute('src') !== settings.logoDataUrl) {
           cardLogoImgEl.setAttribute('src', settings.logoDataUrl);
         }
+        const logoSize = Math.min(140, Math.max(36, Number(settings.logoSizePx) || 56));
+        cardLogoImgEl.style.width = `${logoSize}px`;
+        cardLogoImgEl.style.height = `${logoSize}px`;
+
+        const logoPos = settings.logoPosition === 'right' ? 'right' : 'left';
+        const cardContentRow = cardEl.querySelector('.card-content-row');
+        if (cardContentRow) {
+          if (logoPos === 'right') {
+            cardContentRow.classList.add('logo-pos-right');
+          } else {
+            cardContentRow.classList.remove('logo-pos-right');
+          }
+        }
         cardLogoBoxEl.classList.remove('is-hidden');
       } else {
         cardLogoBoxEl.classList.add('is-hidden');
@@ -252,7 +265,7 @@
             ${item.kicker ? `<span class="ticker-item-kicker">${escapeHtml(item.kicker)}</span>` : ''}
             <span>${escapeHtml(item.text)}</span>
             ${item.author ? `<span class="ticker-item-author">— ${escapeHtml(item.author)}</span>` : ''}
-            <span class="ticker-sep">✦</span>
+            <span class="ticker-sep">•</span>
           </span>
         `
         )

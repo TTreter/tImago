@@ -160,6 +160,10 @@ html, body {
   gap: 22px;
 }
 
+.card-content-row.logo-pos-right {
+  flex-direction: row-reverse;
+}
+
 .card-logo-box {
   flex-shrink: 0;
   width: 68px;
@@ -296,7 +300,7 @@ html, body {
 }
 
 /* ==========================================================================
-   🎄 CATEGORIA 1: NATAL (3 TEMAS)
+   CATEGORIA 1: NATAL (3 TEMAS)
    1. christmas       -> Cantata Real (Rubi & Ouro)
    2. christmas-snow  -> Noite Feliz (Azul Gelo, Prata & Cristal)
    3. christmas-pine  -> Bosque de Pinheiros (Verde Esmeralda & Champanhe)
@@ -428,7 +432,7 @@ html, body {
 .theme-christmas-pine .progress-bar { background: linear-gradient(90deg, #10B981, #FDE68A, #D97706); }
 
 /* ==========================================================================
-   🏢 CATEGORIA 2: INSTITUCIONAL & CLEAN (3 TEMAS)
+   CATEGORIA 2: INSTITUCIONAL & CLEAN (3 TEMAS)
    4. clean      -> Clean Dark Glass (Padrão Moderno)
    5. inst-light -> Clean Alabaster (Editorial Claro & Azul)
    6. inst-gold  ->Solene Black & Gold (Gala / Culto Solene)
@@ -522,7 +526,7 @@ html, body {
 .theme-inst-gold .progress-bar { background: linear-gradient(90deg, #D4AF37, #FEF08A); }
 
 /* ==========================================================================
-   🕊️ CATEGORIA 3: PÁSCOA (3 TEMAS)
+    CATEGORIA 3: PÁSCOA (3 TEMAS)
    7. easter-resurrection -> Aurora da Ressurreição (Marfim, Luz & Ouro)
    8. easter-royal        -> Cordeiro Real (Púrpura Litúrgico & Dourado)
    9. easter-olive        -> Jardim das Oliveiras (Verde Sálvia & Creme)
@@ -615,7 +619,7 @@ html, body {
 .theme-easter-olive .progress-bar { background: linear-gradient(90deg, #4ADE80, #FEF08A); }
 
 /* ==========================================================================
-   🌸 CATEGORIA 4: DIA DAS MÃES (2 TEMAS)
+    CATEGORIA 4: DIA DAS MÃES (2 TEMAS)
    10. mothers-rose  -> Jardim de Rosas (Rubi Rosé, Blush & Ouro Rosa)
    11. mothers-pearl -> Pérola & Afeto (Creme Perolado & Coral)
    ========================================================================== */
@@ -678,7 +682,7 @@ html, body {
 .theme-mothers-pearl .progress-bar { background: linear-gradient(90deg, #E11D48, #FB7185); }
 
 /* ==========================================================================
-   👔 CATEGORIA 5: DIA DOS PAIS (2 TEMAS)
+    CATEGORIA 5: DIA DOS PAIS (2 TEMAS)
    12. fathers-navy     -> Executivo Navy & Prata (Azul Marinho & Aço)
    13. fathers-espresso -> Clássico Espresso & Âmbar (Couro/Madeira & Bronze)
    ========================================================================== */
@@ -736,7 +740,7 @@ html, body {
 .theme-fathers-espresso .progress-bar { background: linear-gradient(90deg, #D97706, #FDE047); }
 
 /* ==========================================================================
-   ⚽ CATEGORIA 6: FUTEBOL & ESPORTES (2 TEMAS)
+    CATEGORIA 6: FUTEBOL & ESPORTES (2 TEMAS)
    14. soccer-pitch    -> Arena Gramado (Verde Campo, Amarelo Ouro & Placar TV)
    15. soccer-champion -> Noite de Copa (Azul Estádio, Ciano Neon & Prata)
    ========================================================================== */
@@ -806,7 +810,7 @@ html, body {
 .theme-soccer-champion .progress-bar { background: linear-gradient(90deg, #38BDF8, #A855F7); }
 
 /* ==========================================================================
-   ✨ CATEGORIA 7: EXTRAS ESPECIAIS (3 TEMAS SUGERIDOS)
+    CATEGORIA 7: EXTRAS ESPECIAIS (3 TEMAS SUGERIDOS)
    16. new-year    -> Ano Novo / Réveillon (Champanhe, Fogos & Branco)
    17. youth-neon  -> Culto Jovem / Podcast / Louvor (Cyberpunk Violeta & Ciano)
    18. junina-fest -> Festa Junina / Arraial (Terracota, Fogueira & Amarelo)

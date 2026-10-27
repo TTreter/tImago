@@ -1200,10 +1200,10 @@ function startServer(port = PORT) {
     server.listen(port, () => {
       const localIp = getLocalIpAddress();
       console.log('====================================================');
-      console.log('🎬 tImago — SISTEMA DE OVERLAY OBS INICIADO!');
-      console.log(`🖥️  Painel de Controle (PC):   http://localhost:${port}`);
-      console.log(`📱 Painel na Rede (Celular):  http://${localIp}:${port}`);
-      console.log(`🎥 URL para Browser no OBS:   http://localhost:${port}/overlay`);
+      console.log('[tImago] SISTEMA DE OVERLAY OBS INICIADO');
+      console.log(`[PC]       Painel de Controle:   http://localhost:${port}`);
+      console.log(`[REDE]     Painel no Celular:    http://${localIp}:${port}`);
+      console.log(`[OBS]      Browser Source:       http://localhost:${port}/overlay`);
       console.log('====================================================');
 
       syncEngineWithSettings(true);
