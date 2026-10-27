@@ -59,6 +59,12 @@
     'new-year',
     'youth-neon',
     'junina-fest',
+    'october-pink',
+    'november-blue',
+    'september-yellow',
+    'cycling-tour',
+    'city-marathon',
+    'civil-defense',
     'custom'
   ];
 
@@ -85,7 +91,13 @@
     'soccer-champion': `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#38BDF8" stroke-width="2" fill="none"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`,
     'new-year': `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#FDE047" stroke-width="2" fill="none"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6l2.1 2.1M5.6 18.4l2.1-2.1m8.6-8.6l2.1-2.1"/></svg>`,
     'youth-neon': `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#22D3EE" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
-    'junina-fest': `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#FDE047" stroke-width="2" fill="none"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>`
+    'junina-fest': `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#FDE047" stroke-width="2" fill="none"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>`,
+    'october-pink': `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#F9A8D4" stroke-width="2.2" fill="none"><path d="M12 2a5 5 0 0 0-5 5c0 4 5 9 9 14"/><path d="M12 2a5 5 0 0 1 5 5c0 4-5 9-9 14"/></svg>`,
+    'november-blue': `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#7DD3FC" stroke-width="2.2" fill="none"><path d="M12 2a5 5 0 0 0-5 5c0 4 5 9 9 14"/><path d="M12 2a5 5 0 0 1 5 5c0 4-5 9-9 14"/></svg>`,
+    'september-yellow': `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#FDE047" stroke-width="2.2" fill="none"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`,
+    'cycling-tour': `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#86EFAC" stroke-width="2" fill="none"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>`,
+    'city-marathon': `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#FDBA74" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+    'civil-defense': `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#FB923C" stroke-width="2.2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`
   };
 
   function applySettings(settings) {

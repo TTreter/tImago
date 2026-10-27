@@ -82,76 +82,103 @@ const defaultState = {
   },
   lowerThird: {
     active: false,
-    badge: '🎵 LOUVOR AO VIVO',
+    badge: '🏛️ PRONUNCIAMENTO OFICIAL',
     title: '',
     subtitle: '',
     autoHideSeconds: 10
   },
-  activePlaylistId: 'pl-christmas',
+  activePlaylistId: 'pl-inst',
   playlists: [
     {
+      id: 'pl-inst',
+      name: '🏛️ Avisos Institucionais (Prefeitura)',
+      phrases: [
+        {
+          id: 'p-i1',
+          text: 'Acompanhe as ações, editais, obras e serviços públicos no Portal Oficial da Prefeitura e em nossas redes sociais.',
+          author: 'Assessoria de Comunicação (ASCOM)',
+          duration: 10,
+          enabled: true
+        },
+        {
+          id: 'p-i2',
+          text: 'Precisa de atendimento, protocolos ou informações? Utilize a Ouvidoria Municipal e os canais digitais de atendimento ao cidadão.',
+          author: 'Atendimento ao Cidadão',
+          duration: 11,
+          enabled: true
+        },
+        {
+          id: 'p-i3',
+          text: 'Participe ao vivo! Envie sua pergunta, sugestão ou informe o seu bairro no chat da transmissão.',
+          author: 'Participação Popular',
+          duration: 10,
+          enabled: true
+        }
+      ]
+    },
+    {
       id: 'pl-christmas',
-      name: '🎄 Cantata de Natal',
+      name: '🎄 Natal da Família (Prefeitura)',
       phrases: [
         {
-          id: 'p-1',
-          text: 'Sejam todos muito bem-vindos à nossa Cantata de Natal! Que a paz e a esperança desta noite preencham o seu lar.',
-          author: 'Coral & Organização',
+          id: 'p-c1',
+          text: 'Sejam todos muito bem-vindos à programação especial de Natal do nosso município! Uma noite de cultura, luz e união para todas as famílias.',
+          author: 'Prefeitura Municipal',
           duration: 10,
           enabled: true
         },
         {
-          id: 'p-2',
-          text: '"Porque um menino nos nasceu, um filho se nos deu; o governo está sobre os seus ombros; e o seu nome será: Maravilhoso Conselheiro, Deus Forte, Pai da Eternidade, Príncipe da Paz."',
-          author: 'Isaías 9:6',
-          duration: 12,
+          id: 'p-c2',
+          text: 'Prestigie o comércio local e a feira de artesanato na Praça Central durante toda a programação natalina da cidade.',
+          author: 'Secretaria de Cultura e Turismo',
+          duration: 11,
           enabled: true
         },
         {
-          id: 'p-3',
-          text: 'Deixe sua mensagem de Natal no chat! Vamos exibir os recados e felicitações especiais aqui na tela durante a transmissão.',
-          author: 'Participe ao Vivo',
-          duration: 9,
-          enabled: true
-        },
-        {
-          id: 'p-4',
-          text: '"Glória a Deus nas maiores alturas, e paz na terra entre os homens, a quem ele quer bem!"',
-          author: 'Lucas 2:14',
-          duration: 9,
+          id: 'p-c3',
+          text: 'Deixe sua mensagem de Boas Festas no chat dizendo o seu nome e o seu bairro! Vamos exibir a participação dos moradores na tela.',
+          author: 'Comunicação Municipal',
+          duration: 10,
           enabled: true
         }
       ]
     },
     {
-      id: 'pl-worship',
-      name: '⛪ Culto & Avisos Gerais',
+      id: 'pl-health',
+      name: '🎀💙 Saúde (Outubro Rosa / Novembro Azul)',
       phrases: [
         {
-          id: 'p-w1',
-          text: 'Sejam bem-vindos ao nosso culto ao vivo! Compartilhe esta transmissão com sua família e amigos.',
-          author: 'Recepção & Mídia',
-          duration: 10,
+          id: 'p-h1',
+          text: 'Cuidar da saúde é um ato de amor à vida. Procure a Unidade Básica de Saúde (UBS) mais próxima e mantenha seus exames preventivos em dia!',
+          author: 'Secretaria Municipal de Saúde',
+          duration: 11,
           enabled: true
         },
         {
-          id: 'p-w2',
-          text: '"O Senhor te abençoe e te guarde; o Senhor faça resplandecer o seu rosto sobre ti e tenha misericórdia de ti."',
-          author: 'Números 6:24-25',
+          id: 'p-h2',
+          text: 'Outubro Rosa & Novembro Azul: o diagnóstico precoce salva vidas. Informe-se sobre os mutirões de atendimento na rede municipal.',
+          author: 'Prevenção & Saúde Pública',
           duration: 11,
           enabled: true
         }
       ]
     },
     {
-      id: 'pl-easter',
-      name: '🕊️ Especial de Páscoa',
+      id: 'pl-sports',
+      name: '🚴⚽ Passeio Ciclístico & Esportes',
       phrases: [
         {
-          id: 'p-e1',
-          text: '"Ele não está aqui, porque já ressuscitou, como havia dito! Cristo vive para sempre!"',
-          author: 'Mateus 28:6',
+          id: 'p-s1',
+          text: 'Bem-vindos ao Passeio Ciclístico Municipal! Mantenha a hidratação, siga as orientações dos batedores e aproveite o percurso com segurança.',
+          author: 'Secretaria de Esportes e Lazer',
           duration: 11,
+          enabled: true
+        },
+        {
+          id: 'p-s2',
+          text: 'Esporte é saúde, inclusão e qualidade de vida em nosso município! Agradecemos a participação de todas as famílias e atletas.',
+          author: 'Prefeitura Municipal',
+          duration: 10,
           enabled: true
         }
       ]
@@ -159,31 +186,24 @@ const defaultState = {
   ],
   phrases: [
     {
-      id: 'p-1',
-      text: 'Sejam todos muito bem-vindos à nossa Cantata de Natal! Que a paz e a esperança desta noite preencham o seu lar.',
-      author: 'Coral & Organização',
+      id: 'p-i1',
+      text: 'Acompanhe as ações, editais, obras e serviços públicos no Portal Oficial da Prefeitura e em nossas redes sociais.',
+      author: 'Assessoria de Comunicação (ASCOM)',
       duration: 10,
       enabled: true
     },
     {
-      id: 'p-2',
-      text: '"Porque um menino nos nasceu, um filho se nos deu; o governo está sobre os seus ombros; e o seu nome será: Maravilhoso Conselheiro, Deus Forte, Pai da Eternidade, Príncipe da Paz."',
-      author: 'Isaías 9:6',
-      duration: 12,
+      id: 'p-i2',
+      text: 'Precisa de atendimento, protocolos ou informações? Utilize a Ouvidoria Municipal e os canais digitais de atendimento ao cidadão.',
+      author: 'Atendimento ao Cidadão',
+      duration: 11,
       enabled: true
     },
     {
-      id: 'p-3',
-      text: 'Deixe sua mensagem de Natal no chat! Vamos exibir os recados e felicitações especiais aqui na tela durante a transmissão.',
-      author: 'Participe ao Vivo',
-      duration: 9,
-      enabled: true
-    },
-    {
-      id: 'p-4',
-      text: '"Glória a Deus nas maiores alturas, e paz na terra entre os homens, a quem ele quer bem!"',
-      author: 'Lucas 2:14',
-      duration: 9,
+      id: 'p-i3',
+      text: 'Participe ao vivo! Envie sua pergunta, sugestão ou informe o seu bairro no chat da transmissão.',
+      author: 'Participação Popular',
+      duration: 10,
       enabled: true
     }
   ],
@@ -210,19 +230,10 @@ let rotationTimer = null;
  * Garante que a estrutura de playlists exista e esteja sincronizada com state.phrases
  */
 function ensurePlaylistsStructure(st) {
-  if (!Array.isArray(st.playlists) || st.playlists.length === 0) {
-    const initialPhrases = Array.isArray(st.phrases) && st.phrases.length > 0
-      ? st.phrases
-      : JSON.parse(JSON.stringify(defaultState.phrases));
-    st.playlists = [
-      {
-        id: 'pl-christmas',
-        name: '🎄 Cantata de Natal',
-        phrases: initialPhrases
-      },
-      ...JSON.parse(JSON.stringify(defaultState.playlists.slice(1)))
-    ];
-    st.activePlaylistId = 'pl-christmas';
+  const hasLegacyReligiousPlaylist = Array.isArray(st.playlists) && st.playlists.some((p) => p.id === 'pl-worship');
+  if (!Array.isArray(st.playlists) || st.playlists.length === 0 || hasLegacyReligiousPlaylist) {
+    st.playlists = JSON.parse(JSON.stringify(defaultState.playlists));
+    st.activePlaylistId = 'pl-inst';
   }
   let activePl = st.playlists.find((p) => p.id === st.activePlaylistId);
   if (!activePl) {

@@ -1843,6 +1843,30 @@ body.is-reception-mode .main-grid {
 /* ==========================================================================
    PERSONALIZAÇÃO VISUAL AVANÇADA: TEMA CUSTOM, ANIMAÇÃO E LOGO (FASE 4)
    ========================================================================== */
+.swatch-october-pink {
+  background: linear-gradient(135deg, #be185d 0%, #500724 100%);
+  border: 1px solid #f472b6;
+}
+.swatch-november-blue {
+  background: linear-gradient(135deg, #0284c7 0%, #0c4a6e 100%);
+  border: 1px solid #38bdf8;
+}
+.swatch-september-yellow {
+  background: linear-gradient(135deg, #ca8a04 0%, #422006 100%);
+  border: 1px solid #facc15;
+}
+.swatch-cycling-tour {
+  background: linear-gradient(135deg, #16a34a 0%, #064e3b 100%);
+  border: 1px solid #4ade80;
+}
+.swatch-city-marathon {
+  background: linear-gradient(135deg, #ea580c 0%, #1e293b 100%);
+  border: 1px solid #fb923c;
+}
+.swatch-civil-defense {
+  background: linear-gradient(135deg, #1e3a8a 0%, #ea580c 100%);
+  border: 1px solid #f97316;
+}
 .swatch-custom {
   background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #38bdf8 100%);
   border: 1px solid #f472b6;

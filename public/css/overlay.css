@@ -933,6 +933,256 @@ html, body {
 .theme-custom .progress-bar { background: linear-gradient(90deg, var(--custom-border, #38bdf8), var(--custom-author, #fde047)); }
 
 /* ==========================================================================
+   NOVOS TEMAS MUNICIPAIS: CAMPANHAS DE SAÚDE, CICLISMO & DEFESA CIVIL (v1.0.8)
+   ========================================================================== */
+
+/* 20. OUTUBRO ROSA (october-pink) */
+.theme-october-pink .overlay-card {
+  background: linear-gradient(135deg, rgba(131, 24, 67, 0.96) 0%, rgba(80, 7, 36, 0.97) 100%);
+  border-radius: 18px;
+  padding: 30px 38px 26px 40px;
+  border: 2px solid #F472B6;
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.72), 0 0 28px rgba(244, 114, 182, 0.28);
+}
+.theme-october-pink .theme-badge-icon.has-badge {
+  background: linear-gradient(135deg, #DB2777, #831843);
+  border: 2px solid #FBCFE8;
+}
+.theme-october-pink .clean-accent-bar {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 16px;
+  bottom: 16px;
+  width: 5px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, #F9A8D4, #EC4899);
+}
+.theme-october-pink .phrase-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(28px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1.38;
+  color: #FDF2F8;
+}
+.theme-october-pink .author-divider { width: 28px; height: 2px; background: #F472B6; }
+.theme-october-pink .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #FBCFE8;
+}
+.theme-october-pink .progress-wrapper { background: rgba(255, 255, 255, 0.14); }
+.theme-october-pink .progress-bar { background: linear-gradient(90deg, #EC4899, #F9A8D4, #FDF2F8); }
+
+/* 21. NOVEMBRO AZUL (november-blue) */
+.theme-november-blue .overlay-card {
+  background: linear-gradient(135deg, rgba(12, 74, 110, 0.96) 0%, rgba(15, 23, 42, 0.97) 100%);
+  border-radius: 18px;
+  padding: 30px 38px 26px 40px;
+  border: 2px solid #38BDF8;
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.72), 0 0 28px rgba(56, 189, 248, 0.28);
+}
+.theme-november-blue .theme-badge-icon.has-badge {
+  background: linear-gradient(135deg, #0284C7, #0C4A6E);
+  border: 2px solid #BAE6FD;
+}
+.theme-november-blue .clean-accent-bar {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 16px;
+  bottom: 16px;
+  width: 5px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, #7DD3FC, #0284C7);
+}
+.theme-november-blue .phrase-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(28px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1.38;
+  color: #F0F9FF;
+}
+.theme-november-blue .author-divider { width: 28px; height: 2px; background: #38BDF8; }
+.theme-november-blue .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7DD3FC;
+}
+.theme-november-blue .progress-wrapper { background: rgba(255, 255, 255, 0.14); }
+.theme-november-blue .progress-bar { background: linear-gradient(90deg, #0284C7, #38BDF8, #BAE6FD); }
+
+/* 22. SETEMBRO AMARELO & VACINAÇÃO (september-yellow) */
+.theme-september-yellow .overlay-card {
+  background: linear-gradient(135deg, rgba(66, 32, 6, 0.96) 0%, rgba(28, 25, 23, 0.98) 100%);
+  border-radius: 18px;
+  padding: 30px 38px 26px 40px;
+  border: 2px solid #FACC15;
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.72), 0 0 28px rgba(250, 204, 21, 0.25);
+}
+.theme-september-yellow .theme-badge-icon.has-badge {
+  background: linear-gradient(135deg, #CA8A04, #422006);
+  border: 2px solid #FEF08A;
+}
+.theme-september-yellow .clean-accent-bar {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 16px;
+  bottom: 16px;
+  width: 5px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, #FEF08A, #EAB308);
+}
+.theme-september-yellow .phrase-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(28px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1.38;
+  color: #FEFCE8;
+}
+.theme-september-yellow .author-divider { width: 28px; height: 2px; background: #FACC15; }
+.theme-september-yellow .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #FDE047;
+}
+.theme-september-yellow .progress-wrapper { background: rgba(255, 255, 255, 0.14); }
+.theme-september-yellow .progress-bar { background: linear-gradient(90deg, #EAB308, #FDE047, #FEF9C3); }
+
+/* 23. PASSEIO CICLÍSTICO (cycling-tour) */
+.theme-cycling-tour .overlay-card {
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.96) 0%, rgba(15, 23, 42, 0.97) 100%);
+  border-radius: 16px;
+  padding: 30px 38px 26px 42px;
+  border: 2px solid #4ADE80;
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.72), 0 0 28px rgba(74, 222, 128, 0.25);
+}
+.theme-cycling-tour .theme-badge-icon.has-badge {
+  background: linear-gradient(135deg, #16A34A, #064E3B);
+  border: 2px solid #BBF7D0;
+}
+.theme-cycling-tour .clean-accent-bar {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 6px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, #86EFAC, #22C55E);
+}
+.theme-cycling-tour .phrase-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(28px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1.38;
+  color: #F0FDF4;
+}
+.theme-cycling-tour .author-divider { width: 28px; height: 2px; background: #4ADE80; }
+.theme-cycling-tour .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #86EFAC;
+}
+.theme-cycling-tour .progress-wrapper { background: rgba(255, 255, 255, 0.14); }
+.theme-cycling-tour .progress-bar { background: linear-gradient(90deg, #22C55E, #86EFAC, #FACC15); }
+
+/* 24. CORRIDA RÚSTICA & MOVIMENTO (city-marathon) */
+.theme-city-marathon .overlay-card {
+  background: linear-gradient(135deg, rgba(124, 45, 18, 0.96) 0%, rgba(15, 23, 42, 0.97) 100%);
+  border-radius: 16px;
+  padding: 30px 38px 26px 42px;
+  border: 2px solid #FB923C;
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.72), 0 0 28px rgba(251, 146, 60, 0.25);
+}
+.theme-city-marathon .theme-badge-icon.has-badge {
+  background: linear-gradient(135deg, #EA580C, #7C2D12);
+  border: 2px solid #FED7AA;
+}
+.theme-city-marathon .clean-accent-bar {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 6px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, #FDBA74, #F97316);
+}
+.theme-city-marathon .phrase-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(28px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1.38;
+  color: #FFF7ED;
+}
+.theme-city-marathon .author-divider { width: 28px; height: 2px; background: #FB923C; }
+.theme-city-marathon .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #FDBA74;
+}
+.theme-city-marathon .progress-wrapper { background: rgba(255, 255, 255, 0.14); }
+.theme-city-marathon .progress-bar { background: linear-gradient(90deg, #F97316, #FDBA74, #38BDF8); }
+
+/* 25. DEFESA CIVIL & UTILIDADE PÚBLICA (civil-defense) */
+.theme-civil-defense .overlay-card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.97) 0%, rgba(30, 58, 138, 0.96) 100%);
+  border-radius: 16px;
+  padding: 30px 38px 26px 42px;
+  border: 2px solid #F97316;
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.76), 0 0 28px rgba(249, 115, 22, 0.3);
+}
+.theme-civil-defense .theme-badge-icon.has-badge {
+  background: linear-gradient(135deg, #EA580C, #9A3412);
+  border: 2px solid #FFEDD5;
+}
+.theme-civil-defense .clean-accent-bar {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 6px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, #FB923C, #EA580C);
+}
+.theme-civil-defense .phrase-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(28px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1.38;
+  color: #FFFFFF;
+}
+.theme-civil-defense .author-divider { width: 28px; height: 2px; background: #F97316; }
+.theme-civil-defense .phrase-author {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #FDBA74;
+}
+.theme-civil-defense .progress-wrapper { background: rgba(255, 255, 255, 0.14); }
+.theme-civil-defense .progress-bar { background: linear-gradient(90deg, #EA580C, #FB923C, #FACC15); }
+
+/* ==========================================================================
    TARJA DE IDENTIFICAÇÃO RÁPIDA (LOWER THIRD - MÚSICA / PRELETOR - FASE 5)
    ========================================================================== */
 .overlay-lower-third {

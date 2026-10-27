@@ -96,22 +96,22 @@
 
           <form id="form-add-audience" class="quick-form">
             <div class="form-group">
-              <label for="aud-input-text">Mensagem do Ouvinte / Público <span class="req">*</span></label>
+              <label for="aud-input-text">Mensagem do Cidadão / Público <span class="req">*</span></label>
               <textarea
                 id="aud-input-text"
                 rows="2"
-                placeholder="Ex: Um abençoado Natal para toda a igreja e para minha família que está assistindo de longe!"
+                placeholder="Ex: Parabéns à Prefeitura pela organização do evento! Um ótimo Natal para todos os moradores do Bairro Centro!"
                 required
               ></textarea>
             </div>
 
             <div class="form-row">
               <div class="form-group flex-grow">
-                <label for="aud-input-author">Nome do Ouvinte / Autor <span class="opt">(recomendado)</span></label>
+                <label for="aud-input-author">Nome do Cidadão / Bairro <span class="opt">(recomendado)</span></label>
                 <input
                   type="text"
                   id="aud-input-author"
-                  placeholder="Ex: Maria Oliveira (Chat do YouTube)"
+                  placeholder="Ex: Maria Oliveira (Moradora do Bairro São José)"
                 />
               </div>
 
@@ -119,11 +119,13 @@
                 <label for="aud-input-kicker">Etiqueta do Topo <span class="opt">(selo)</span></label>
                 <select id="aud-input-kicker">
                   <option value="">Padrão (Mensagem do Público)</option>
-                  <option value="PEDIDO DE ORAÇÃO">🙏 Pedido de Oração</option>
-                  <option value="RECADO DE NATAL">🎄 Recado de Natal</option>
-                  <option value="PERGUNTA AO VIVO">❓ Pergunta ao Vivo</option>
-                  <option value="ANIVERSARIANTE">🎂 Aniversariante</option>
-                  <option value="TESTEMUNHO">✨ Testemunho</option>
+                  <option value="COMENTÁRIO DO CIDADÃO">💬 Comentário do Cidadão</option>
+                  <option value="PERGUNTA DA POPULAÇÃO">❓ Pergunta da População</option>
+                  <option value="BAIRRO / COMUNIDADE">📍 Bairro / Comunidade</option>
+                  <option value="ELOGIO / SUGESTÃO">👏 Elogio / Sugestão</option>
+                  <option value="UTILIDADE PÚBLICA">📢 Utilidade Pública</option>
+                  <option value="MENSAGEM DE NATAL">🎄 Mensagem de Natal</option>
+                  <option value="HOMENAGEM">🎉 Homenagem / Aniversário</option>
                   <option value="__NONE__">🚫 Ocultar Etiqueta</option>
                 </select>
               </div>
@@ -197,7 +199,7 @@
                 <span id="carousel-status-pill" class="badge-carousel-state">Em Rotação</span>
               </div>
               <p class="card-subtitle">
-                Versículos e avisos fixos que alternam em loop contínuo quando a fila do público está vazia.
+                Avisos institucionais, utilidade pública e informações do evento que alternam em loop contínuo quando a fila do público está vazia.
               </p>
             </div>
             <div class="header-right-actions">
@@ -231,21 +233,21 @@
           <!-- Formulário colapsável para adicionar nova frase fixa ao sistema -->
           <form id="form-add-phrase" class="quick-form sys-add-form is-collapsed">
             <div class="form-group">
-              <label for="input-text">Nova Frase Fixa / Versículo / Anúncio do Sistema <span class="req">*</span></label>
+              <label for="input-text">Nova Frase Fixa / Comunicado Oficial / Aviso do Evento <span class="req">*</span></label>
               <textarea
                 id="input-text"
                 rows="2"
-                placeholder="Ex: Sejam bem-vindos à nossa Cantata de Natal!"
+                placeholder="Ex: Acompanhe a programação oficial e serviços públicos no portal da Prefeitura Municipal."
               ></textarea>
             </div>
 
             <div class="form-row">
               <div class="form-group flex-grow">
-                <label for="input-author">Autor / Referência <span class="opt">(opcional)</span></label>
+                <label for="input-author">Secretaria / Fonte / Autor <span class="opt">(opcional)</span></label>
                 <input
                   type="text"
                   id="input-author"
-                  placeholder="Ex: Isaías 9:6, Coral & Organização..."
+                  placeholder="Ex: Prefeitura Municipal • Secretaria de Saúde / ASCOM"
                 />
               </div>
 
@@ -254,7 +256,7 @@
                 <input
                   type="text"
                   id="input-kicker"
-                  placeholder="Ex: AVISO, VERSÍCULO, MÚSICA..."
+                  placeholder="Ex: UTILIDADE PÚBLICA, SAÚDE, ESPORTE..."
                 />
               </div>
 
@@ -307,17 +309,17 @@
           </div>
         </section>
 
-        <!-- CARD EXTRA (FASE 5): TARJA DE IDENTIFICAÇÃO RÁPIDA (LOWER THIRD - MÚSICA / PRELETOR) -->
+        <!-- CARD EXTRA (FASE 5): TARJA DE IDENTIFICAÇÃO RÁPIDA (LOWER THIRD - CERIMONIAL / AUTORIDADES) -->
         <section class="panel-card lower-third-card">
           <div class="card-header">
             <div class="card-header-left">
               <div class="title-with-badge">
-                <span class="section-icon system-icon">🎙️</span>
-                <h2>Tarja de Identificação (Lower Third — Música / Preletor)</h2>
+                <span class="section-icon system-icon">🏛️</span>
+                <h2>Tarja de Identificação (Lower Third — Autoridades / Palestrantes / Atrações)</h2>
                 <span id="lt-status-pill" class="badge-carousel-state is-off">Oculta</span>
               </div>
               <p class="card-subtitle">
-                Dispare rapidamente uma tarja elegante para identificar a música atual, cantor, preletor ou convidado sem alterar o carrossel.
+                Dispare rapidamente uma tarja oficial para identificar o Prefeito(a), Secretários, Palestrantes ou Atrações Culturais sem alterar o carrossel.
               </p>
             </div>
           </div>
@@ -327,21 +329,23 @@
               <div class="form-group kicker-group">
                 <label for="lt-input-badge">Categoria / Selo</label>
                 <select id="lt-input-badge">
-                  <option value="🎵 LOUVOR AO VIVO">🎵 Louvor ao Vivo</option>
-                  <option value="🎙️ PRELETOR / MENSAGEM">🎙️ Preletor / Mensagem</option>
-                  <option value="🙌 CONVIDADO ESPECIAL">🙌 Convidado Especial</option>
-                  <option value="📖 LEITURA BÍBLICA">📖 Leitura Bíblica</option>
-                  <option value="📌 DESTAQUE DA LIVE">📌 Destaque da Live</option>
+                  <option value="🏛️ PRONUNCIAMENTO OFICIAL">🏛️ Pronunciamento Oficial</option>
+                  <option value="🎙️ SECRETÁRIO(A) MUNICIPAL">🎙️ Secretário(a) Municipal</option>
+                  <option value="📊 AUDIÊNCIA PÚBLICA">📊 Audiência Pública / Técnico</option>
+                  <option value="🎤 PALESTRANTE / CONVIDADO">🎤 Palestrante / Convidado</option>
+                  <option value="🎶 ATRAÇÃO CULTURAL">🎶 Atração Cultural / Palco</option>
+                  <option value="🚴 EVENTO ESPORTIVO">🚴 Evento Esportivo</option>
+                  <option value="📌 INFORMATIVO MUNICIPAL">📌 Informativo Municipal</option>
                   <option value="">Sem Etiqueta</option>
                 </select>
               </div>
 
               <div class="form-group flex-grow">
-                <label for="lt-input-title">Título Principal (Nome da Música ou Preletor) <span class="req">*</span></label>
+                <label for="lt-input-title">Nome / Título Principal (Autoridade, Palestrante ou Atração) <span class="req">*</span></label>
                 <input
                   type="text"
                   id="lt-input-title"
-                  placeholder="Ex: Noite Feliz — Cantata de Natal (ou Pr. João Silva)"
+                  placeholder="Ex: Prefeito(a) Municipal / Secretário(a) de Saúde / Banda Municipal"
                   required
                 />
               </div>
@@ -349,11 +353,11 @@
 
             <div class="form-row">
               <div class="form-group flex-grow">
-                <label for="lt-input-subtitle">Subtítulo / Intérprete / Cargo <span class="opt">(opcional)</span></label>
+                <label for="lt-input-subtitle">Cargo / Secretaria / Tema da Pauta <span class="opt">(opcional)</span></label>
                 <input
                   type="text"
                   id="lt-input-subtitle"
-                  placeholder="Ex: Coral Principal & Orquestra • Regência: Maestro Carlos"
+                  placeholder="Ex: Coletiva Oficial • Secretaria Municipal de Comunicação (ASCOM)"
                 />
               </div>
 
@@ -459,28 +463,120 @@
           <div id="tab-style" class="tab-pane active">
             <div class="form-group">
               <div class="theme-header-row">
-                <label>Galeria de Temas (19 estilos)</label>
+                <label>Galeria de Temas (25 estilos)</label>
                 <span id="active-theme-name-pill" class="slider-value-pill">Cantata Real</span>
               </div>
 
               <!-- Filtros de Categoria de Tema -->
               <div class="theme-cat-pills" id="theme-cat-filters">
                 <button type="button" class="theme-cat-btn active" data-cat="all">Todos</button>
+                <button type="button" class="theme-cat-btn" data-cat="inst">🏛️ Inst. (4)</button>
+                <button type="button" class="theme-cat-btn" data-cat="health">🎗️ Campanhas (3)</button>
+                <button type="button" class="theme-cat-btn" data-cat="soccer">🚴⚽ Esportes (4)</button>
                 <button type="button" class="theme-cat-btn" data-cat="christmas">🎄 Natal (3)</button>
-                <button type="button" class="theme-cat-btn" data-cat="inst">🏢 Inst. (3)</button>
                 <button type="button" class="theme-cat-btn" data-cat="easter">🕊️ Páscoa (3)</button>
                 <button type="button" class="theme-cat-btn" data-cat="mothers">🌸 Mães (2)</button>
                 <button type="button" class="theme-cat-btn" data-cat="fathers">👔 Pais (2)</button>
-                <button type="button" class="theme-cat-btn" data-cat="soccer">⚽ Futebol (2)</button>
                 <button type="button" class="theme-cat-btn" data-cat="extra">✨ Extras (4)</button>
               </div>
 
               <div class="theme-selector-grid theme-gallery-scroll">
+                <!-- 🏛️ INSTITUCIONAL & PREFEITURA (4) -->
+                <button type="button" class="theme-option-btn" data-theme="clean" data-cat="inst">
+                  <div class="theme-swatch swatch-clean">🏛️</div>
+                  <div class="theme-info">
+                    <strong>Clean Dark Pro</strong>
+                    <small>Prefeitura • Glass Moderno</small>
+                  </div>
+                </button>
+
+                <button type="button" class="theme-option-btn" data-theme="inst-light" data-cat="inst">
+                  <div class="theme-swatch swatch-inst-light">📋</div>
+                  <div class="theme-info">
+                    <strong>Clean Alabaster</strong>
+                    <small>Institucional • Claro & Azul</small>
+                  </div>
+                </button>
+
+                <button type="button" class="theme-option-btn" data-theme="inst-gold" data-cat="inst">
+                  <div class="theme-swatch swatch-inst-gold">👑</div>
+                  <div class="theme-info">
+                    <strong>Solene Black & Gold</strong>
+                    <small>Cerimonial • Sessão Solene</small>
+                  </div>
+                </button>
+
+                <button type="button" class="theme-option-btn" data-theme="civil-defense" data-cat="inst">
+                  <div class="theme-swatch swatch-civil-defense">🚨</div>
+                  <div class="theme-info">
+                    <strong>Defesa Civil & Alerta</strong>
+                    <small>Utilidade Pública • Laranja</small>
+                  </div>
+                </button>
+
+                <!-- 🎗️ CAMPANHAS DE SAÚDE & CONSCIENTIZAÇÃO (3) -->
+                <button type="button" class="theme-option-btn" data-theme="october-pink" data-cat="health">
+                  <div class="theme-swatch swatch-october-pink">🎀</div>
+                  <div class="theme-info">
+                    <strong>Outubro Rosa</strong>
+                    <small>Saúde da Mulher • Prevenção</small>
+                  </div>
+                </button>
+
+                <button type="button" class="theme-option-btn" data-theme="november-blue" data-cat="health">
+                  <div class="theme-swatch swatch-november-blue">💙</div>
+                  <div class="theme-info">
+                    <strong>Novembro Azul</strong>
+                    <small>Saúde do Homem • Cuidado</small>
+                  </div>
+                </button>
+
+                <button type="button" class="theme-option-btn" data-theme="september-yellow" data-cat="health">
+                  <div class="theme-swatch swatch-september-yellow">💛</div>
+                  <div class="theme-info">
+                    <strong>Setembro Amarelo</strong>
+                    <small>Saúde & Vida • Vacinação</small>
+                  </div>
+                </button>
+
+                <!-- 🚴⚽ ESPORTES, CICLISMO & LAZER (4) -->
+                <button type="button" class="theme-option-btn" data-theme="cycling-tour" data-cat="soccer">
+                  <div class="theme-swatch swatch-cycling-tour">🚴</div>
+                  <div class="theme-info">
+                    <strong>Passeio Ciclístico</strong>
+                    <small>Pedal Municipal • Verde</small>
+                  </div>
+                </button>
+
+                <button type="button" class="theme-option-btn" data-theme="city-marathon" data-cat="soccer">
+                  <div class="theme-swatch swatch-city-marathon">🏃</div>
+                  <div class="theme-info">
+                    <strong>Corrida & Movimento</strong>
+                    <small>Esporte & Lazer • Energia</small>
+                  </div>
+                </button>
+
+                <button type="button" class="theme-option-btn" data-theme="soccer-pitch" data-cat="soccer">
+                  <div class="theme-swatch swatch-soccer-pitch">⚽</div>
+                  <div class="theme-info">
+                    <strong>Arena Gramado</strong>
+                    <small>Futebol • Campeonato</small>
+                  </div>
+                </button>
+
+                <button type="button" class="theme-option-btn" data-theme="soccer-champion" data-cat="soccer">
+                  <div class="theme-swatch swatch-soccer-champion">🏆</div>
+                  <div class="theme-info">
+                    <strong>Noite de Copa</strong>
+                    <small>Torneio • Azul Champions</small>
+                  </div>
+                </button>
+
                 <!-- 🎄 NATAL (3) -->
                 <button type="button" class="theme-option-btn active" data-theme="christmas" data-cat="christmas">
                   <div class="theme-swatch swatch-christmas">🎄</div>
                   <div class="theme-info">
-                    <strong>Cantata Real</strong>
+                    <strong>Natal Luz Municipal</strong>
                     <small>Natal • Rubi & Ouro</small>
                   </div>
                 </button>
@@ -501,44 +597,19 @@
                   </div>
                 </button>
 
-                <!-- 🏢 INSTITUCIONAL & CLEAN (3) -->
-                <button type="button" class="theme-option-btn" data-theme="clean" data-cat="inst">
-                  <div class="theme-swatch swatch-clean">✨</div>
-                  <div class="theme-info">
-                    <strong>Clean Dark Pro</strong>
-                    <small>Institucional • Glass</small>
-                  </div>
-                </button>
-
-                <button type="button" class="theme-option-btn" data-theme="inst-light" data-cat="inst">
-                  <div class="theme-swatch swatch-inst-light">🏛️</div>
-                  <div class="theme-info">
-                    <strong>Clean Alabaster</strong>
-                    <small>Institucional • Claro & Azul</small>
-                  </div>
-                </button>
-
-                <button type="button" class="theme-option-btn" data-theme="inst-gold" data-cat="inst">
-                  <div class="theme-swatch swatch-inst-gold">👑</div>
-                  <div class="theme-info">
-                    <strong>Solene Black & Gold</strong>
-                    <small>Institucional • Gala & Culto</small>
-                  </div>
-                </button>
-
                 <!-- 🕊️ PÁSCOA (3) -->
                 <button type="button" class="theme-option-btn" data-theme="easter-resurrection" data-cat="easter">
                   <div class="theme-swatch swatch-easter-res">🌅</div>
                   <div class="theme-info">
-                    <strong>Aurora da Vida</strong>
+                    <strong>Aurora de Páscoa</strong>
                     <small>Páscoa • Luz & Ouro</small>
                   </div>
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="easter-royal" data-cat="easter">
-                  <div class="theme-swatch swatch-easter-royal">✝️</div>
+                  <div class="theme-swatch swatch-easter-royal">✨</div>
                   <div class="theme-info">
-                    <strong>Cordeiro Real</strong>
+                    <strong>Páscoa Imperial</strong>
                     <small>Páscoa • Púrpura & Ouro</small>
                   </div>
                 </button>
@@ -546,7 +617,7 @@
                 <button type="button" class="theme-option-btn" data-theme="easter-olive" data-cat="easter">
                   <div class="theme-swatch swatch-easter-olive">🌿</div>
                   <div class="theme-info">
-                    <strong>Monte das Oliveiras</strong>
+                    <strong>Outono & Paz</strong>
                     <small>Páscoa • Verde Sálvia</small>
                   </div>
                 </button>
@@ -585,28 +656,11 @@
                   </div>
                 </button>
 
-                <!-- ⚽ FUTEBOL (2) -->
-                <button type="button" class="theme-option-btn" data-theme="soccer-pitch" data-cat="soccer">
-                  <div class="theme-swatch swatch-soccer-pitch">⚽</div>
-                  <div class="theme-info">
-                    <strong>Arena Gramado</strong>
-                    <small>Futebol • Campo & Ouro</small>
-                  </div>
-                </button>
-
-                <button type="button" class="theme-option-btn" data-theme="soccer-champion" data-cat="soccer">
-                  <div class="theme-swatch swatch-soccer-champion">🏆</div>
-                  <div class="theme-info">
-                    <strong>Noite de Copa</strong>
-                    <small>Futebol • Azul Champions</small>
-                  </div>
-                </button>
-
-                <!-- ✨ EXTRAS SUGERIDOS (3) -->
+                <!-- ✨ EXTRAS & FESTIVIDADES MUNICIPAIS (4) -->
                 <button type="button" class="theme-option-btn" data-theme="new-year" data-cat="extra">
                   <div class="theme-swatch swatch-new-year">🎆</div>
                   <div class="theme-info">
-                    <strong>Réveillon & Luz</strong>
+                    <strong>Réveillon na Praça</strong>
                     <small>Ano Novo • Champanhe</small>
                   </div>
                 </button>
@@ -614,15 +668,15 @@
                 <button type="button" class="theme-option-btn" data-theme="youth-neon" data-cat="extra">
                   <div class="theme-swatch swatch-youth-neon">⚡</div>
                   <div class="theme-info">
-                    <strong>Culto Jovem / Pod</strong>
-                    <small>Louvor • Cyber Neon</small>
+                    <strong>Festival & Podcast</strong>
+                    <small>Cultura • Cyber Neon</small>
                   </div>
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="junina-fest" data-cat="extra">
                   <div class="theme-swatch swatch-junina">🔥</div>
                   <div class="theme-info">
-                    <strong>Arraial & Fogueira</strong>
+                    <strong>Arraial Municipal</strong>
                     <small>Festa Junina • Terracota</small>
                   </div>
                 </button>
@@ -999,7 +1053,7 @@
           <input
             type="text"
             id="playlist-modal-name"
-            placeholder="Ex: 🎄 Cantata de Natal, 🕊️ Vigília de Ano Novo..."
+            placeholder="Ex: 🏛️ Audiência Pública, 🚴 Passeio Ciclístico, 🎀 Outubro Rosa..."
             required
           />
         </div>
