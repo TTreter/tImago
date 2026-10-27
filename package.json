@@ -31,11 +31,26 @@
     ],
     "win": {
       "target": [
-        "portable"
+        "portable",
+        "nsis"
       ],
       "icon": "public/img/icon.png",
-      "signAndEditExecutable": false,
+      "signAndEditExecutable": false
+    },
+    "portable": {
+      "splashImage": "public/img/splash.bmp",
+      "unpackDirName": "tImago-App",
+      "useZip": true,
       "artifactName": "tImago-Portable-${version}.exe"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "tImago",
+      "artifactName": "tImago-Setup-${version}.exe"
     }
   }
 }

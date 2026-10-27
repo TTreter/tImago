@@ -37,12 +37,14 @@ const {
 
 let mainWindow = null;
 let splashWindow = null;
+let splashStartTime = 0;
 let tray = null;
 let isQuitting = false;
 const PORT = process.env.PORT || 3000;
 
 function createSplashWindow() {
   try {
+    splashStartTime = Date.now();
     splashWindow = new BrowserWindow({
       width: 480,
       height: 290,
@@ -249,13 +251,19 @@ async function startApplication() {
     hasShownMainWindow = true;
 
     updateSplash(100, 'Pronto! Abrindo Painel...');
+
+    // Garante um tempo de exibição agradável (1.8s) para que a barra progrida de forma visível e fluida
+    const elapsed = splashStartTime > 0 ? (Date.now() - splashStartTime) : 2000;
+    const minSplashDuration = 1800; // 1.8 segundos
+    const remainingDelay = Math.max(300, minSplashDuration - elapsed);
+
     setTimeout(() => {
       closeSplash();
       if (!shouldStartHidden && mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.show();
         mainWindow.focus();
       }
-    }, 280);
+    }, remainingDelay);
   };
 
   mainWindow.once('ready-to-show', revealMainWindow);
