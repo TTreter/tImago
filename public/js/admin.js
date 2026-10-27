@@ -1753,6 +1753,10 @@
   // Interações de controle
   if (btnToggleSbAir) {
     btnToggleSbAir.addEventListener('click', () => {
+      const nextVis = !Boolean(currentScoreboard?.visible);
+      if (currentScoreboard) currentScoreboard.visible = nextVis;
+      btnToggleSbAir.classList.toggle('is-on', nextVis);
+      if (sbAirLabel) sbAirLabel.textContent = nextVis ? 'PLACAR NO AR (VISÍVEL)' : 'PLACAR OCULTO';
       socket.emit('scoreboard:toggle-visible');
     });
   }
@@ -1779,6 +1783,14 @@
 
   if (btnSbSwitchSides) {
     btnSbSwitchSides.addEventListener('click', () => {
+      if (currentScoreboard) {
+        const tempA = currentScoreboard.teamA;
+        currentScoreboard.teamA = currentScoreboard.teamB;
+        currentScoreboard.teamB = tempA;
+        if (currentScoreboard.servingTeam === 'teamA') currentScoreboard.servingTeam = 'teamB';
+        else if (currentScoreboard.servingTeam === 'teamB') currentScoreboard.servingTeam = 'teamA';
+        renderScoreboardControls(currentScoreboard);
+      }
       socket.emit('scoreboard:switch-sides');
     });
   }
@@ -1786,11 +1798,21 @@
   // Ações de Gols/Pontos Mandante
   if (btnIncScoreA) {
     btnIncScoreA.addEventListener('click', () => {
+      if (!currentScoreboard) currentScoreboard = { teamA: {}, teamB: {}, timer: {} };
+      if (!currentScoreboard.teamA) currentScoreboard.teamA = {};
+      const next = (Number(currentScoreboard.teamA.score) || 0) + 1;
+      currentScoreboard.teamA.score = next;
+      if (sbDisplayScoreA) sbDisplayScoreA.textContent = next;
       socket.emit('scoreboard:score-change', { team: 'teamA', delta: 1, triggerCelebration: true });
     });
   }
   if (btnDecScoreA) {
     btnDecScoreA.addEventListener('click', () => {
+      if (!currentScoreboard) currentScoreboard = { teamA: {}, teamB: {}, timer: {} };
+      if (!currentScoreboard.teamA) currentScoreboard.teamA = {};
+      const next = Math.max(0, (Number(currentScoreboard.teamA.score) || 0) - 1);
+      currentScoreboard.teamA.score = next;
+      if (sbDisplayScoreA) sbDisplayScoreA.textContent = next;
       socket.emit('scoreboard:score-change', { team: 'teamA', delta: -1 });
     });
   }
@@ -1804,11 +1826,21 @@
   // Ações de Gols/Pontos Visitante
   if (btnIncScoreB) {
     btnIncScoreB.addEventListener('click', () => {
+      if (!currentScoreboard) currentScoreboard = { teamA: {}, teamB: {}, timer: {} };
+      if (!currentScoreboard.teamB) currentScoreboard.teamB = {};
+      const next = (Number(currentScoreboard.teamB.score) || 0) + 1;
+      currentScoreboard.teamB.score = next;
+      if (sbDisplayScoreB) sbDisplayScoreB.textContent = next;
       socket.emit('scoreboard:score-change', { team: 'teamB', delta: 1, triggerCelebration: true });
     });
   }
   if (btnDecScoreB) {
     btnDecScoreB.addEventListener('click', () => {
+      if (!currentScoreboard) currentScoreboard = { teamA: {}, teamB: {}, timer: {} };
+      if (!currentScoreboard.teamB) currentScoreboard.teamB = {};
+      const next = Math.max(0, (Number(currentScoreboard.teamB.score) || 0) - 1);
+      currentScoreboard.teamB.score = next;
+      if (sbDisplayScoreB) sbDisplayScoreB.textContent = next;
       socket.emit('scoreboard:score-change', { team: 'teamB', delta: -1 });
     });
   }
@@ -1821,56 +1853,80 @@
 
   // Cartões Mandante
   if (btnIncYellowA) btnIncYellowA.addEventListener('click', () => {
-    const cur = Number(currentScoreboard?.teamA?.yellowCards) || 0;
-    socket.emit('scoreboard:update', { teamA: { yellowCards: cur + 1 } });
+    const cur = (Number(currentScoreboard?.teamA?.yellowCards) || 0) + 1;
+    if (currentScoreboard?.teamA) currentScoreboard.teamA.yellowCards = cur;
+    if (sbCountYellowA) sbCountYellowA.textContent = cur;
+    socket.emit('scoreboard:update', { teamA: { yellowCards: cur } });
   });
   if (btnDecYellowA) btnDecYellowA.addEventListener('click', () => {
-    const cur = Number(currentScoreboard?.teamA?.yellowCards) || 0;
-    socket.emit('scoreboard:update', { teamA: { yellowCards: Math.max(0, cur - 1) } });
+    const cur = Math.max(0, (Number(currentScoreboard?.teamA?.yellowCards) || 0) - 1);
+    if (currentScoreboard?.teamA) currentScoreboard.teamA.yellowCards = cur;
+    if (sbCountYellowA) sbCountYellowA.textContent = cur;
+    socket.emit('scoreboard:update', { teamA: { yellowCards: cur } });
   });
   if (btnIncRedA) btnIncRedA.addEventListener('click', () => {
-    const cur = Number(currentScoreboard?.teamA?.redCards) || 0;
-    socket.emit('scoreboard:update', { teamA: { redCards: cur + 1 } });
+    const cur = (Number(currentScoreboard?.teamA?.redCards) || 0) + 1;
+    if (currentScoreboard?.teamA) currentScoreboard.teamA.redCards = cur;
+    if (sbCountRedA) sbCountRedA.textContent = cur;
+    socket.emit('scoreboard:update', { teamA: { redCards: cur } });
   });
   if (btnDecRedA) btnDecRedA.addEventListener('click', () => {
-    const cur = Number(currentScoreboard?.teamA?.redCards) || 0;
-    socket.emit('scoreboard:update', { teamA: { redCards: Math.max(0, cur - 1) } });
+    const cur = Math.max(0, (Number(currentScoreboard?.teamA?.redCards) || 0) - 1);
+    if (currentScoreboard?.teamA) currentScoreboard.teamA.redCards = cur;
+    if (sbCountRedA) sbCountRedA.textContent = cur;
+    socket.emit('scoreboard:update', { teamA: { redCards: cur } });
   });
 
   // Cartões Visitante
   if (btnIncYellowB) btnIncYellowB.addEventListener('click', () => {
-    const cur = Number(currentScoreboard?.teamB?.yellowCards) || 0;
-    socket.emit('scoreboard:update', { teamB: { yellowCards: cur + 1 } });
+    const cur = (Number(currentScoreboard?.teamB?.yellowCards) || 0) + 1;
+    if (currentScoreboard?.teamB) currentScoreboard.teamB.yellowCards = cur;
+    if (sbCountYellowB) sbCountYellowB.textContent = cur;
+    socket.emit('scoreboard:update', { teamB: { yellowCards: cur } });
   });
   if (btnDecYellowB) btnDecYellowB.addEventListener('click', () => {
-    const cur = Number(currentScoreboard?.teamB?.yellowCards) || 0;
-    socket.emit('scoreboard:update', { teamB: { yellowCards: Math.max(0, cur - 1) } });
+    const cur = Math.max(0, (Number(currentScoreboard?.teamB?.yellowCards) || 0) - 1);
+    if (currentScoreboard?.teamB) currentScoreboard.teamB.yellowCards = cur;
+    if (sbCountYellowB) sbCountYellowB.textContent = cur;
+    socket.emit('scoreboard:update', { teamB: { yellowCards: cur } });
   });
   if (btnIncRedB) btnIncRedB.addEventListener('click', () => {
-    const cur = Number(currentScoreboard?.teamB?.redCards) || 0;
-    socket.emit('scoreboard:update', { teamB: { redCards: cur + 1 } });
+    const cur = (Number(currentScoreboard?.teamB?.redCards) || 0) + 1;
+    if (currentScoreboard?.teamB) currentScoreboard.teamB.redCards = cur;
+    if (sbCountRedB) sbCountRedB.textContent = cur;
+    socket.emit('scoreboard:update', { teamB: { redCards: cur } });
   });
   if (btnDecRedB) btnDecRedB.addEventListener('click', () => {
-    const cur = Number(currentScoreboard?.teamB?.redCards) || 0;
-    socket.emit('scoreboard:update', { teamB: { redCards: Math.max(0, cur - 1) } });
+    const cur = Math.max(0, (Number(currentScoreboard?.teamB?.redCards) || 0) - 1);
+    if (currentScoreboard?.teamB) currentScoreboard.teamB.redCards = cur;
+    if (sbCountRedB) sbCountRedB.textContent = cur;
+    socket.emit('scoreboard:update', { teamB: { redCards: cur } });
   });
 
   // Sets Vôlei
   if (btnIncSetsA) btnIncSetsA.addEventListener('click', () => {
-    const cur = Number(currentScoreboard?.teamA?.setsWon) || 0;
-    socket.emit('scoreboard:update', { teamA: { setsWon: cur + 1 } });
+    const cur = (Number(currentScoreboard?.teamA?.setsWon) || 0) + 1;
+    if (currentScoreboard?.teamA) currentScoreboard.teamA.setsWon = cur;
+    if (sbCountSetsA) sbCountSetsA.textContent = cur;
+    socket.emit('scoreboard:update', { teamA: { setsWon: cur } });
   });
   if (btnDecSetsA) btnDecSetsA.addEventListener('click', () => {
-    const cur = Number(currentScoreboard?.teamA?.setsWon) || 0;
-    socket.emit('scoreboard:update', { teamA: { setsWon: Math.max(0, cur - 1) } });
+    const cur = Math.max(0, (Number(currentScoreboard?.teamA?.setsWon) || 0) - 1);
+    if (currentScoreboard?.teamA) currentScoreboard.teamA.setsWon = cur;
+    if (sbCountSetsA) sbCountSetsA.textContent = cur;
+    socket.emit('scoreboard:update', { teamA: { setsWon: cur } });
   });
   if (btnIncSetsB) btnIncSetsB.addEventListener('click', () => {
-    const cur = Number(currentScoreboard?.teamB?.setsWon) || 0;
-    socket.emit('scoreboard:update', { teamB: { setsWon: cur + 1 } });
+    const cur = (Number(currentScoreboard?.teamB?.setsWon) || 0) + 1;
+    if (currentScoreboard?.teamB) currentScoreboard.teamB.setsWon = cur;
+    if (sbCountSetsB) sbCountSetsB.textContent = cur;
+    socket.emit('scoreboard:update', { teamB: { setsWon: cur } });
   });
   if (btnDecSetsB) btnDecSetsB.addEventListener('click', () => {
-    const cur = Number(currentScoreboard?.teamB?.setsWon) || 0;
-    socket.emit('scoreboard:update', { teamB: { setsWon: Math.max(0, cur - 1) } });
+    const cur = Math.max(0, (Number(currentScoreboard?.teamB?.setsWon) || 0) - 1);
+    if (currentScoreboard?.teamB) currentScoreboard.teamB.setsWon = cur;
+    if (sbCountSetsB) sbCountSetsB.textContent = cur;
+    socket.emit('scoreboard:update', { teamB: { setsWon: cur } });
   });
 
   // Saque Vôlei
@@ -1969,6 +2025,14 @@
   if (btnSbToggleTimer) {
     btnSbToggleTimer.addEventListener('click', () => {
       const isRunning = Boolean(currentScoreboard?.timer?.running);
+      const nextRunning = !isRunning;
+      if (currentScoreboard?.timer) currentScoreboard.timer.running = nextRunning;
+      btnSbToggleTimer.classList.toggle('is-running', nextRunning);
+      if (labelBtnTimer) labelBtnTimer.textContent = nextRunning ? 'Pausar Relógio' : 'Iniciar Tempo';
+      if (sbTimerStateLabel) {
+        sbTimerStateLabel.textContent = nextRunning ? 'EM ANDAMENTO' : 'PAUSADO';
+        sbTimerStateLabel.classList.toggle('is-running', nextRunning);
+      }
       socket.emit('scoreboard:timer-control', { action: isRunning ? 'pause' : 'start' });
     });
   }
@@ -1976,6 +2040,8 @@
   if (btnSbPlus1m) {
     btnSbPlus1m.addEventListener('click', () => {
       const sec = (currentScoreboard?.timer?.seconds || 0) + 60;
+      if (currentScoreboard?.timer) currentScoreboard.timer.seconds = sec;
+      if (sbTimerDigits) sbTimerDigits.textContent = formatTime(sec);
       socket.emit('scoreboard:timer-control', { action: 'set', seconds: sec });
     });
   }
@@ -1983,12 +2049,27 @@
   if (btnSbMinus1m) {
     btnSbMinus1m.addEventListener('click', () => {
       const sec = Math.max(0, (currentScoreboard?.timer?.seconds || 0) - 60);
+      if (currentScoreboard?.timer) currentScoreboard.timer.seconds = sec;
+      if (sbTimerDigits) sbTimerDigits.textContent = formatTime(sec);
       socket.emit('scoreboard:timer-control', { action: 'set', seconds: sec });
     });
   }
 
   if (btnSbResetTimer) {
     btnSbResetTimer.addEventListener('click', () => {
+      if (currentScoreboard?.timer) {
+        currentScoreboard.timer.seconds = 0;
+        currentScoreboard.timer.running = false;
+        currentScoreboard.timer.extraMinutes = 0;
+      }
+      if (sbTimerDigits) sbTimerDigits.textContent = '00:00';
+      if (sbTimerStateLabel) {
+        sbTimerStateLabel.textContent = 'PAUSADO';
+        sbTimerStateLabel.classList.remove('is-running');
+      }
+      if (btnSbToggleTimer) btnSbToggleTimer.classList.remove('is-running');
+      if (labelBtnTimer) labelBtnTimer.textContent = 'Iniciar Tempo';
+      extraPills.forEach(p => p.classList.toggle('active', Number(p.dataset.extra) === 0));
       socket.emit('scoreboard:timer-control', { action: 'reset' });
     });
   }
@@ -2006,6 +2087,8 @@
   extraPills.forEach((pill) => {
     pill.addEventListener('click', () => {
       const extra = Number(pill.dataset.extra) || 0;
+      if (currentScoreboard?.timer) currentScoreboard.timer.extraMinutes = extra;
+      extraPills.forEach(p => p.classList.toggle('active', Number(p.dataset.extra) === extra));
       socket.emit('scoreboard:timer-control', { action: 'set', extraMinutes: extra });
     });
   });
@@ -2073,34 +2156,53 @@
     if (!isTyping) {
       if (e.code === 'Numpad7') {
         e.preventDefault();
-        socket.emit('scoreboard:score-change', { team: 'teamA', delta: 1, triggerCelebration: true });
+        btnIncScoreA?.click();
       } else if (e.code === 'Numpad4') {
         e.preventDefault();
-        socket.emit('scoreboard:score-change', { team: 'teamA', delta: -1 });
+        btnDecScoreA?.click();
       } else if (e.code === 'Numpad9') {
         e.preventDefault();
-        socket.emit('scoreboard:score-change', { team: 'teamB', delta: 1, triggerCelebration: true });
+        btnIncScoreB?.click();
       } else if (e.code === 'Numpad6') {
         e.preventDefault();
-        socket.emit('scoreboard:score-change', { team: 'teamB', delta: -1 });
+        btnDecScoreB?.click();
       } else if (e.code === 'Numpad8') {
         e.preventDefault();
-        const isRunning = Boolean(currentScoreboard?.timer?.running);
-        socket.emit('scoreboard:timer-control', { action: isRunning ? 'pause' : 'start' });
+        btnSbToggleTimer?.click();
       } else if (e.code === 'Numpad5') {
         e.preventDefault();
-        const nameA = currentScoreboard?.teamA?.name || 'Mandante';
-        socket.emit('scoreboard:trigger-celebration', { text: 'GOL!', subtext: nameA, type: 'goal' });
+        btnTriggerGoalA?.click();
       } else if (e.code === 'Numpad0') {
         e.preventDefault();
-        socket.emit('scoreboard:switch-sides');
+        btnSbSwitchSides?.click();
       }
     }
   });
 
   // ==========================================================================
-  // SINCRONIZAÇÃO SOCKET.IO
+  // SINCRONIZAÇÃO SOCKET.IO & RESILIÊNCIA DE CONEXÃO
   // ==========================================================================
+  socket.on('connect', () => {
+    console.log('[tImago] Conexão Socket.IO estabelecida com sucesso');
+    const notice = document.getElementById('offline-notice-banner');
+    if (notice) notice.remove();
+  });
+
+  socket.on('disconnect', () => {
+    console.warn('[tImago] Conexão com o servidor local perdida. Reconectando...');
+    if (!document.getElementById('offline-notice-banner')) {
+      const banner = document.createElement('div');
+      banner.id = 'offline-notice-banner';
+      banner.style.cssText = 'position:fixed;bottom:20px;right:20px;background:rgba(239,68,68,0.92);backdrop-filter:blur(8px);color:#fff;padding:10px 18px;border-radius:10px;font-weight:700;font-size:13px;z-index:999999;box-shadow:0 8px 30px rgba(0,0,0,0.6);display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,0.2);';
+      banner.innerHTML = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#fff;animation:airPulse 1s infinite;"></span> Reconectando ao tImago...';
+      document.body.appendChild(banner);
+    }
+  });
+
+  socket.on('connect_error', () => {
+    console.warn('[tImago] Erro ao conectar ao servidor local');
+  });
+
   socket.on('state:sync', (payload) => {
     if (!payload) return;
     currentState = payload.state;

@@ -2884,6 +2884,31 @@ body.is-compact-lists .phrase-item-text {
   display: flex;
   align-items: center;
   justify-content: center;
+  user-select: none;
+}
+
+/* Feedback Tátil e Estados Ativos em Botões de Operação */
+.btn:active,
+.btn-step:active,
+.btn-action-goal:active,
+.btn-timer-start:active,
+.btn-extra-pill:active,
+.btn-sb-air:active,
+.btn-mini:active,
+.btn-icon:active {
+  transform: scale(0.93) !important;
+  filter: brightness(0.9) !important;
+  transition: transform 0.06s ease, filter 0.06s ease !important;
+}
+
+.btn-step-inc:active {
+  background: #16a34a !important;
+  color: #ffffff !important;
+}
+
+.btn-step-dec:active {
+  background: #dc2626 !important;
+  color: #ffffff !important;
 }
 
 .btn-step-inc {
