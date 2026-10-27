@@ -66,10 +66,12 @@ const defaultState = {
     audienceHoldMode: true,
     audienceBatchPlaying: false,
     showKicker: true,
-    defaultKickerText: 'MENSAGEM DO PÚBLICO',
+    defaultKickerText: 'MENSAGEM DO CIDADÃO',
     animationStyle: 'slide-up',
     showLogo: false,
     logoDataUrl: '',
+    logoPosition: 'left',
+    logoSizePx: 56,
     customThemeColors: {
       bg1: '#1e1b4b',
       bg2: '#0f172a',
@@ -78,11 +80,16 @@ const defaultState = {
       author: '#fde047'
     },
     displayMode: 'card',
-    tickerSpeedSeconds: 32
+    tickerSpeedSeconds: 32,
+    startWithWindows: false,
+    startMinimized: false,
+    closeBehavior: 'tray',
+    organizationName: 'Prefeitura Municipal',
+    compactLists: false
   },
   lowerThird: {
     active: false,
-    badge: '🏛️ PRONUNCIAMENTO OFICIAL',
+    badge: 'PRONUNCIAMENTO OFICIAL',
     title: '',
     subtitle: '',
     autoHideSeconds: 10
@@ -91,7 +98,7 @@ const defaultState = {
   playlists: [
     {
       id: 'pl-inst',
-      name: '🏛️ Avisos Institucionais (Prefeitura)',
+      name: 'Avisos Institucionais (Prefeitura)',
       phrases: [
         {
           id: 'p-i1',
@@ -118,7 +125,7 @@ const defaultState = {
     },
     {
       id: 'pl-christmas',
-      name: '🎄 Natal da Família (Prefeitura)',
+      name: 'Natal da Família (Prefeitura)',
       phrases: [
         {
           id: 'p-c1',
@@ -145,7 +152,7 @@ const defaultState = {
     },
     {
       id: 'pl-health',
-      name: '🎀💙 Saúde (Outubro Rosa / Novembro Azul)',
+      name: 'Saúde (Outubro Rosa / Novembro Azul)',
       phrases: [
         {
           id: 'p-h1',
@@ -165,7 +172,7 @@ const defaultState = {
     },
     {
       id: 'pl-sports',
-      name: '🚴⚽ Passeio Ciclístico & Esportes',
+      name: 'Passeio Ciclístico & Esportes',
       phrases: [
         {
           id: 'p-s1',
@@ -227,6 +234,82 @@ let runtime = {
 let rotationTimer = null;
 
 /**
+ * Remove emojis de uma string para garantir sobriedade institucional
+ */
+function stripEmojis(str) {
+  if (typeof str !== 'string') return str;
+  return str
+    .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1FA00}-\u{1FAFF}\u{FE0F}]/gu, '')
+    .trim();
+}
+
+/**
+ * Sanitiza valores textuais do estado removendo emojis legados
+ */
+function sanitizeStateStrings(st) {
+  if (!st) return st;
+  if (st.settings && st.settings.defaultKickerText) {
+    st.settings.defaultKickerText = stripEmojis(st.settings.defaultKickerText);
+  }
+  if (st.lowerThird && st.lowerThird.badge) {
+    st.lowerThird.badge = stripEmojis(st.lowerThird.badge);
+  }
+  if (Array.isArray(st.playlists)) {
+    st.playlists.forEach((pl) => {
+      if (pl.name) pl.name = stripEmojis(pl.name);
+    });
+  }
+  return st;
+}
+
+/**
+ * Callbacks para notificar o processo Electron ou plugins sobre mudancas de settings
+ */
+const settingsChangeCallbacks = [];
+
+function onSettingsChange(cb) {
+  if (typeof cb === 'function') settingsChangeCallbacks.push(cb);
+}
+
+function notifySettingsChanged(newSettings) {
+  settingsChangeCallbacks.forEach((cb) => {
+    try {
+      cb(newSettings);
+    } catch (e) {
+      console.error('Erro no callback onSettingsChange:', e.message);
+    }
+  });
+}
+
+function getSettings() {
+  return state ? state.settings : defaultState.settings;
+}
+
+function getState() {
+  return state;
+}
+
+function toggleOverlayVisibility() {
+  if (!state || !state.settings) return false;
+  state.settings.visible = !state.settings.visible;
+  saveState();
+  if (!state.settings.visible) {
+    markCurrentAudienceAsPlayedIfAny();
+    clearRotationTimer();
+    runtime.currentPhraseId = null;
+    runtime.currentPhrase = null;
+    runtime.phase = 'idle';
+    runtime.phaseStartedAt = Date.now();
+    runtime.phaseDurationMs = 0;
+  } else {
+    advanceNextInPriority();
+  }
+  broadcastState();
+  notifySettingsChanged(state.settings);
+  return state.settings.visible;
+}
+
+/**
  * Garante que a estrutura de playlists exista e esteja sincronizada com state.phrases
  */
 function ensurePlaylistsStructure(st) {
@@ -262,17 +345,17 @@ function loadState() {
       const loaded = {
         settings: { ...defaultState.settings, ...(parsed.settings || {}) },
         lowerThird: { ...defaultState.lowerThird, ...(parsed.lowerThird || {}), active: false },
-        activePlaylistId: parsed.activePlaylistId || 'pl-christmas',
+        activePlaylistId: parsed.activePlaylistId || 'pl-inst',
         playlists: Array.isArray(parsed.playlists) ? parsed.playlists : [],
         phrases: Array.isArray(parsed.phrases) ? parsed.phrases : defaultState.phrases,
         audienceQueue: Array.isArray(parsed.audienceQueue) ? parsed.audienceQueue : []
       };
-      return ensurePlaylistsStructure(loaded);
+      return ensurePlaylistsStructure(sanitizeStateStrings(loaded));
     }
   } catch (err) {
     console.error('Erro ao carregar state.json:', err.message);
   }
-  return ensurePlaylistsStructure(JSON.parse(JSON.stringify(defaultState)));
+  return ensurePlaylistsStructure(sanitizeStateStrings(JSON.parse(JSON.stringify(defaultState))));
 }
 
 /**
@@ -592,6 +675,7 @@ io.on('connection', (socket) => {
       ...partialSettings
     };
     saveState();
+    notifySettingsChanged(state.settings);
 
     if (!state.settings.visible) {
       markCurrentAudienceAsPlayedIfAny();
@@ -980,9 +1064,10 @@ io.on('connection', (socket) => {
       state.audienceQueue = importedData.audienceQueue;
     }
 
-    state = ensurePlaylistsStructure(state);
+    state = ensurePlaylistsStructure(sanitizeStateStrings(state));
     runtime.queueIndex = -1;
     saveState();
+    notifySettingsChanged(state.settings);
     syncEngineWithSettings(true);
   });
 
@@ -1031,6 +1116,32 @@ io.on('connection', (socket) => {
       saveState();
       broadcastState();
     }
+  });
+
+  socket.on('settings:resetDefaults', () => {
+    state.settings = {
+      ...state.settings,
+      theme: 'christmas',
+      fontSizePercent: 100,
+      overlayScalePercent: 100,
+      cardMaxWidthPx: 1020,
+      resolutionWidth: 1920,
+      resolutionHeight: 1080,
+      position: 'bottom-left',
+      animationStyle: 'slide-up',
+      intervalSeconds: 4,
+      defaultDurationSeconds: 10,
+      showProgress: true,
+      showKicker: true,
+      displayMode: 'card',
+      tickerSpeedSeconds: 32,
+      logoPosition: 'left',
+      logoSizePx: 56,
+      compactLists: false
+    };
+    saveState();
+    broadcastState();
+    notifySettingsChanged(state.settings);
   });
 });
 
@@ -1123,4 +1234,12 @@ if (require.main === module) {
   startServer(PORT);
 }
 
-module.exports = { startServer, stopServer, isOverlayVisible };
+module.exports = {
+  startServer,
+  stopServer,
+  isOverlayVisible,
+  getSettings,
+  getState,
+  onSettingsChange,
+  toggleOverlayVisibility
+};

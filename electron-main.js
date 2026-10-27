@@ -7,12 +7,12 @@
  * 1. Definir o diretório seguro de dados do usuário (%APPDATA%/tImago) antes de iniciar o servidor.
  * 2. Iniciar o servidor Express + Socket.IO em segundo plano sem abrir terminal.
  * 3. Criar a janela nativa do Painel de Controle do tImago.
- * 4. Ao fechar a janela principal (clicar no X), encerrar imediatamente o servidor
- *    e ocultar qualquer card que esteja visível no OBS Studio.
+ * 4. Integrar com a Bandeja do Sistema (System Tray) e Iniciar com o Windows.
+ * 5. Gerenciar o comportamento configurável ao fechar a janela no botão X.
  * ============================================================================
  */
 
-const { app, BrowserWindow, shell, dialog } = require('electron');
+const { app, BrowserWindow, shell, dialog, Tray, Menu, nativeImage } = require('electron');
 const path = require('path');
 
 // Garante que apenas uma instância do aplicativo tImago rode por vez
@@ -25,19 +25,131 @@ if (!gotTheLock) {
 // Configura a pasta de persistência em AppData/Roaming/tImago antes de importar o server.js
 process.env.TIMAGO_DATA_DIR = path.join(app.getPath('userData'), 'data');
 
-const { startServer, stopServer, isOverlayVisible } = require('./server');
+const {
+  startServer,
+  stopServer,
+  isOverlayVisible,
+  getSettings,
+  onSettingsChange,
+  toggleOverlayVisibility
+} = require('./server');
 
 let mainWindow = null;
+let tray = null;
+let isQuitting = false;
 const PORT = process.env.PORT || 3000;
+
+function applyWindowsLoginItem(startWithWindows) {
+  try {
+    app.setLoginItemSettings({
+      openAtLogin: Boolean(startWithWindows),
+      openAsHidden: true,
+      path: process.execPath,
+      args: ['--autostart']
+    });
+  } catch (err) {
+    console.warn('Erro ao configurar loginItemSettings:', err.message);
+  }
+}
+
+function updateTrayMenu() {
+  if (!tray) return;
+
+  const visible = isOverlayVisible();
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Abrir Painel de Controle',
+      click: () => {
+        if (mainWindow) {
+          mainWindow.show();
+          if (mainWindow.isMinimized()) mainWindow.restore();
+          mainWindow.focus();
+        }
+      }
+    },
+    { type: 'separator' },
+    {
+      label: `Transmissão: ${visible ? 'NO AR (Visível)' : 'OCULTO'}`,
+      enabled: false
+    },
+    {
+      label: visible ? 'Ocultar Overlay no OBS' : 'Colocar Overlay NO AR',
+      click: () => {
+        toggleOverlayVisibility();
+        updateTrayMenu();
+      }
+    },
+    {
+      label: 'Abrir Overlay no Navegador',
+      click: () => {
+        shell.openExternal(`http://localhost:${PORT}/overlay`);
+      }
+    },
+    { type: 'separator' },
+    {
+      label: 'Encerrar tImago',
+      click: () => {
+        isQuitting = true;
+        stopServer();
+        app.quit();
+      }
+    }
+  ]);
+
+  tray.setContextMenu(contextMenu);
+  tray.setToolTip(`tImago — ${visible ? 'NO AR' : 'Oculto'}`);
+}
+
+function createTray() {
+  if (tray) return;
+
+  try {
+    const iconPath = path.join(__dirname, 'public', 'img', 'icon.png');
+    const icon = nativeImage.createFromPath(iconPath);
+    tray = new Tray(icon.resize({ width: 16, height: 16 }));
+
+    updateTrayMenu();
+
+    tray.on('click', () => {
+      if (mainWindow) {
+        if (mainWindow.isVisible()) {
+          mainWindow.focus();
+        } else {
+          mainWindow.show();
+          mainWindow.focus();
+        }
+      }
+    });
+
+    tray.on('double-click', () => {
+      if (mainWindow) {
+        mainWindow.show();
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.focus();
+      }
+    });
+  } catch (err) {
+    console.warn('Erro ao inicializar Tray:', err.message);
+  }
+}
 
 async function createMainWindow() {
   await startServer(PORT);
+
+  const initialSettings = getSettings();
+  applyWindowsLoginItem(initialSettings.startWithWindows);
+
+  createTray();
+
+  const isAutostart = process.argv.includes('--autostart');
+  const shouldStartHidden = Boolean(initialSettings.startMinimized) || isAutostart;
 
   mainWindow = new BrowserWindow({
     width: 1460,
     height: 920,
     minWidth: 1024,
     minHeight: 700,
+    show: !shouldStartHidden,
     title: 'tImago — Controle de Overlay OBS',
     backgroundColor: '#090d16',
     autoHideMenuBar: true,
@@ -54,15 +166,32 @@ async function createMainWindow() {
   // Carrega o Painel de Controle local
   mainWindow.loadURL(`http://localhost:${PORT}`);
 
-  // Abre links externos (ex: botão "Abrir" /overlay em nova aba) no navegador padrão do sistema
+  // Abre links externos no navegador padrão do sistema
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
   });
 
-  // Trava de Segurança ao Vivo (Fase 6): pergunta antes de fechar se o Overlay estiver NO AR
+  // Reage a alterações de configurações salvas pelo painel
+  onSettingsChange((newSettings) => {
+    applyWindowsLoginItem(newSettings.startWithWindows);
+    updateTrayMenu();
+  });
+
+  // Gerenciamento de Fechamento da Janela (Botão X)
   mainWindow.on('close', (e) => {
-    if (isOverlayVisible()) {
+    if (isQuitting) return;
+
+    const currentSettings = getSettings();
+    const behavior = currentSettings.closeBehavior || 'tray';
+
+    if (behavior === 'tray') {
+      e.preventDefault();
+      mainWindow.hide();
+      return;
+    }
+
+    if (behavior === 'ask' && isOverlayVisible()) {
       const choice = dialog.showMessageBoxSync(mainWindow, {
         type: 'warning',
         buttons: ['Cancelar (Manter Aberto)', 'Sim, Encerrar Transmissão e Fechar'],
@@ -74,8 +203,12 @@ async function createMainWindow() {
       });
       if (choice === 0) {
         e.preventDefault();
+        return;
       }
     }
+
+    isQuitting = true;
+    stopServer();
   });
 
   mainWindow.on('closed', () => {
@@ -85,6 +218,7 @@ async function createMainWindow() {
 
 app.on('second-instance', () => {
   if (mainWindow) {
+    if (!mainWindow.isVisible()) mainWindow.show();
     if (mainWindow.isMinimized()) mainWindow.restore();
     mainWindow.focus();
   }
@@ -92,12 +226,14 @@ app.on('second-instance', () => {
 
 app.whenReady().then(createMainWindow);
 
-// Quando o usuário fecha a janela do tImago, encerra o servidor (desligando o overlay no OBS) e fecha o app
 app.on('window-all-closed', () => {
-  stopServer();
-  app.quit();
+  if (isQuitting) {
+    stopServer();
+    app.quit();
+  }
 });
 
 app.on('before-quit', () => {
+  isQuitting = true;
   stopServer();
 });
