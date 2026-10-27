@@ -1493,30 +1493,72 @@
     });
   }
 
+  /**
+   * Redimensiona e comprime imagens via Canvas antes do envio para o servidor,
+   * garantindo que o payload de rede e o state.json permaneçam ultraleves (< 25 KB).
+   */
+  function compressLogoImage(file, maxDim = 140) {
+    return new Promise((resolve, reject) => {
+      if (!file) return reject(new Error('Nenhum arquivo fornecido'));
+      if (file.type === 'image/svg+xml') {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(String(e.target?.result || ''));
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w >= h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = () => resolve(String(e.target?.result || ''));
+        img.src = String(e.target?.result || '');
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   if (btnUploadLogo && inputLogoFile) {
     btnUploadLogo.addEventListener('click', () => {
       inputLogoFile.value = '';
       inputLogoFile.click();
     });
 
-    inputLogoFile.addEventListener('change', (e) => {
+    inputLogoFile.addEventListener('change', async (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      if (file.size > 2 * 1024 * 1024) {
-        window.alert('Por favor, escolha uma imagem leve (até 2MB) em PNG, SVG ou WebP.');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const dataUrl = String(ev.target?.result || '');
+      try {
+        const dataUrl = await compressLogoImage(file, 140);
         if (dataUrl.startsWith('data:image/')) {
           socket.emit('settings:update', {
             logoDataUrl: dataUrl,
             showLogo: true
           });
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        window.alert('Erro ao processar imagem do brasão. Escolha um arquivo PNG, JPG ou SVG.');
+      }
     });
   }
 
@@ -2161,22 +2203,23 @@
     syncTeamBInfo();
   });
 
-  // Upload de Escudos Time A e Time B
+  // Upload de Escudos Time A e Time B com compressão automática
   if (btnUploadLogoA && sbFileLogoA) {
     btnUploadLogoA.addEventListener('click', () => sbFileLogoA.click());
-    sbFileLogoA.addEventListener('change', (e) => {
+    sbFileLogoA.addEventListener('change', async (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
+      try {
+        const compressed = await compressLogoImage(file, 140);
         if (!currentScoreboard.teamA) currentScoreboard.teamA = {};
-        currentScoreboard.teamA.logo = reader.result;
-        socket.emit('scoreboard:update', { teamA: { logo: reader.result } });
+        currentScoreboard.teamA.logo = compressed;
+        socket.emit('scoreboard:update', { teamA: { logo: compressed } });
         if (btnRemoveLogoA) btnRemoveLogoA.classList.remove('is-hidden');
         if (sbLogoPreviewNameA) sbLogoPreviewNameA.textContent = 'Escudo ativo';
         updateScoreboardMiniPreview();
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        window.alert('Erro ao carregar escudo do Time A. Escolha um arquivo PNG, JPG ou SVG.');
+      }
     });
   }
   if (btnRemoveLogoA) {
@@ -2192,19 +2235,20 @@
 
   if (btnUploadLogoB && sbFileLogoB) {
     btnUploadLogoB.addEventListener('click', () => sbFileLogoB.click());
-    sbFileLogoB.addEventListener('change', (e) => {
+    sbFileLogoB.addEventListener('change', async (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
+      try {
+        const compressed = await compressLogoImage(file, 140);
         if (!currentScoreboard.teamB) currentScoreboard.teamB = {};
-        currentScoreboard.teamB.logo = reader.result;
-        socket.emit('scoreboard:update', { teamB: { logo: reader.result } });
+        currentScoreboard.teamB.logo = compressed;
+        socket.emit('scoreboard:update', { teamB: { logo: compressed } });
         if (btnRemoveLogoB) btnRemoveLogoB.classList.remove('is-hidden');
         if (sbLogoPreviewNameB) sbLogoPreviewNameB.textContent = 'Escudo ativo';
         updateScoreboardMiniPreview();
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        window.alert('Erro ao carregar escudo do Time B. Escolha um arquivo PNG, JPG ou SVG.');
+      }
     });
   }
   if (btnRemoveLogoB) {

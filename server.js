@@ -414,10 +414,17 @@ function loadState() {
   return ensurePlaylistsStructure(sanitizeStateStrings(JSON.parse(JSON.stringify(defaultState))));
 }
 
-/**
- * Salva o estado atual em disco de forma síncrona e segura, sincronizando a playlist ativa
- */
-function saveState() {
+let saveStateDebounceTimer = null;
+let isSavingState = false;
+let hasPendingSaveState = false;
+
+async function executeSaveState() {
+  if (isSavingState) {
+    hasPendingSaveState = true;
+    return;
+  }
+  isSavingState = true;
+  hasPendingSaveState = false;
   try {
     if (Array.isArray(state.playlists)) {
       const activePl = state.playlists.find((p) => p.id === state.activePlaylistId);
@@ -426,12 +433,51 @@ function saveState() {
       }
     }
     if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+      await fs.promises.mkdir(DATA_DIR, { recursive: true });
     }
-    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf-8');
+    const tempFile = STATE_FILE + '.tmp';
+    const jsonStr = JSON.stringify(state, null, 2);
+    await fs.promises.writeFile(tempFile, jsonStr, 'utf-8');
+    await fs.promises.rename(tempFile, STATE_FILE);
   } catch (err) {
-    console.error('Erro ao salvar state.json:', err.message);
+    console.error('Erro ao salvar state.json de forma atômica:', err.message);
+  } finally {
+    isSavingState = false;
+    if (hasPendingSaveState) {
+      executeSaveState();
+    }
   }
+}
+
+/**
+ * Salva o estado atual em disco com debounce de 150ms e escrita atômica segura.
+ * Passar immediate=true força gravação síncrona imediata (ex: no encerramento da aplicação).
+ */
+function saveState(immediate = false) {
+  if (saveStateDebounceTimer) {
+    clearTimeout(saveStateDebounceTimer);
+    saveStateDebounceTimer = null;
+  }
+
+  if (immediate) {
+    try {
+      if (Array.isArray(state.playlists)) {
+        const activePl = state.playlists.find((p) => p.id === state.activePlaylistId);
+        if (activePl) {
+          activePl.phrases = state.phrases;
+        }
+      }
+      if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      }
+      fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf-8');
+    } catch (e) {
+      console.error('Erro ao salvar state síncrono:', e.message);
+    }
+    return;
+  }
+
+  saveStateDebounceTimer = setTimeout(executeSaveState, 150);
 }
 
 /**
@@ -1361,7 +1407,15 @@ io.on('connection', (socket) => {
   });
 });
 
+let cachedLocalIp = null;
+let lastIpCheckAt = 0;
+
 function getLocalIpAddress() {
+  const now = Date.now();
+  if (cachedLocalIp && now - lastIpCheckAt < 60000) {
+    return cachedLocalIp;
+  }
+
   const interfaces = os.networkInterfaces();
   const candidates = [];
 
@@ -1395,7 +1449,9 @@ function getLocalIpAddress() {
   }
 
   candidates.sort((a, b) => b.score - a.score);
-  return candidates.length > 0 ? candidates[0].address : 'localhost';
+  cachedLocalIp = candidates.length > 0 ? candidates[0].address : 'localhost';
+  lastIpCheckAt = now;
+  return cachedLocalIp;
 }
 
 let scoreboardTicker = null;
@@ -1489,6 +1545,7 @@ function startServer(preferredPort = PORT) {
  * Encerra o servidor HTTP e todas as conexões ativas (incluindo o Overlay no OBS)
  */
 function stopServer() {
+  saveState(true);
   clearRotationTimer();
   stopScoreboardTicker();
   if (global.lowerThirdTimer) {
