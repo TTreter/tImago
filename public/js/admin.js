@@ -63,6 +63,22 @@
   const btnEnableAllPhrases = document.getElementById('btn-enable-all-phrases');
   const btnDisableAllPhrases = document.getElementById('btn-disable-all-phrases');
 
+  // Playlists (Eventos) e Backup JSON (Fase 2)
+  const selectPlaylist = document.getElementById('select-playlist');
+  const btnCreatePlaylist = document.getElementById('btn-create-playlist');
+  const btnRenamePlaylist = document.getElementById('btn-rename-playlist');
+  const btnDeletePlaylist = document.getElementById('btn-delete-playlist');
+  const playlistModal = document.getElementById('playlist-modal');
+  const playlistModalTitle = document.getElementById('playlist-modal-title');
+  const playlistModalMode = document.getElementById('playlist-modal-mode');
+  const playlistModalName = document.getElementById('playlist-modal-name');
+  const formPlaylistModal = document.getElementById('form-playlist-modal');
+  const btnClosePlaylistModal = document.getElementById('btn-close-playlist-modal');
+  const btnCancelPlaylistModal = document.getElementById('btn-cancel-playlist-modal');
+  const btnExportBackup = document.getElementById('btn-export-backup');
+  const btnImportBackup = document.getElementById('btn-import-backup');
+  const inputImportJson = document.getElementById('input-import-json');
+
   const phrasesListEl = document.getElementById('phrases-list');
   const phrasesCounterEl = document.getElementById('phrases-counter');
 
@@ -1012,6 +1028,137 @@
   }
 
   // ==========================================================================
+  // MÚLTIPLAS PLAYLISTS (EVENTOS) & BACKUP JSON (FASE 2)
+  // ==========================================================================
+  function renderPlaylistsSelector(playlists, activePlaylistId) {
+    if (!selectPlaylist) return;
+    const list = Array.isArray(playlists) ? playlists : [];
+    selectPlaylist.innerHTML = list
+      .map((pl) => {
+        const count = Array.isArray(pl.phrases) ? pl.phrases.length : 0;
+        const selected = pl.id === activePlaylistId ? 'selected' : '';
+        return `<option value="${escapeHtml(pl.id)}" ${selected}>${escapeHtml(pl.name)} (${count} frases)</option>`;
+      })
+      .join('');
+
+    if (btnDeletePlaylist) {
+      btnDeletePlaylist.disabled = list.length <= 1;
+    }
+  }
+
+  if (selectPlaylist) {
+    selectPlaylist.addEventListener('change', () => {
+      const selectedId = selectPlaylist.value;
+      if (selectedId) {
+        socket.emit('playlist:select', selectedId);
+      }
+    });
+  }
+
+  function closePlaylistModal() {
+    if (playlistModal) playlistModal.classList.add('is-hidden');
+  }
+
+  if (btnClosePlaylistModal) btnClosePlaylistModal.addEventListener('click', closePlaylistModal);
+  if (btnCancelPlaylistModal) btnCancelPlaylistModal.addEventListener('click', closePlaylistModal);
+
+  if (btnCreatePlaylist) {
+    btnCreatePlaylist.addEventListener('click', () => {
+      if (!playlistModal) return;
+      if (playlistModalTitle) playlistModalTitle.textContent = 'Nova Playlist de Evento';
+      if (playlistModalMode) playlistModalMode.value = 'create';
+      if (playlistModalName) playlistModalName.value = '';
+      playlistModal.classList.remove('is-hidden');
+      if (playlistModalName) playlistModalName.focus();
+    });
+  }
+
+  if (btnRenamePlaylist) {
+    btnRenamePlaylist.addEventListener('click', () => {
+      if (!playlistModal || !currentState) return;
+      const activePl = (currentState.playlists || []).find((p) => p.id === currentState.activePlaylistId);
+      if (!activePl) return;
+      if (playlistModalTitle) playlistModalTitle.textContent = 'Renomear Playlist';
+      if (playlistModalMode) playlistModalMode.value = 'rename';
+      if (playlistModalName) playlistModalName.value = activePl.name || '';
+      playlistModal.classList.remove('is-hidden');
+      if (playlistModalName) playlistModalName.focus();
+    });
+  }
+
+  if (formPlaylistModal) {
+    formPlaylistModal.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = playlistModalName ? playlistModalName.value.trim() : '';
+      const mode = playlistModalMode ? playlistModalMode.value : 'create';
+      if (!name) return;
+
+      if (mode === 'rename' && currentState?.activePlaylistId) {
+        socket.emit('playlist:rename', { id: currentState.activePlaylistId, name });
+      } else {
+        socket.emit('playlist:create', { name });
+      }
+      closePlaylistModal();
+    });
+  }
+
+  if (btnDeletePlaylist) {
+    btnDeletePlaylist.addEventListener('click', () => {
+      if (!currentState || !Array.isArray(currentState.playlists) || currentState.playlists.length <= 1) return;
+      const activePl = currentState.playlists.find((p) => p.id === currentState.activePlaylistId);
+      if (!activePl) return;
+      const confirmed = window.confirm(`Deseja realmente excluir a playlist "${activePl.name}" e todas as suas frases?`);
+      if (confirmed) {
+        socket.emit('playlist:delete', activePl.id);
+      }
+    });
+  }
+
+  // Exportar e Importar Backup (.json)
+  if (btnExportBackup) {
+    btnExportBackup.addEventListener('click', () => {
+      if (!currentState) return;
+      const backupPayload = {
+        exportedAt: new Date().toISOString(),
+        app: 'tImago',
+        ...currentState
+      };
+      const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const dateStr = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = `tImago-backup-${dateStr}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  if (btnImportBackup && inputImportJson) {
+    btnImportBackup.addEventListener('click', () => {
+      inputImportJson.value = '';
+      inputImportJson.click();
+    });
+
+    inputImportJson.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(String(ev.target?.result || '{}'));
+          socket.emit('state:import', parsed);
+        } catch (err) {
+          window.alert('Arquivo JSON inválido. Verifique o arquivo selecionado.');
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+    });
+  }
+
+  // ==========================================================================
   // SINCRONIZAÇÃO SOCKET.IO
   // ==========================================================================
   socket.on('state:sync', (payload) => {
@@ -1028,6 +1175,7 @@
     };
 
     renderMasterControls(currentState.settings);
+    renderPlaylistsSelector(currentState.playlists || [], currentState.activePlaylistId);
     renderAudienceQueue(currentState.audienceQueue || [], currentRuntime, currentState.settings);
     renderPhrasesList(currentState.phrases || [], currentRuntime, currentState.settings);
     updateLiveMonitorTick();

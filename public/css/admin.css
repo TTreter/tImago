@@ -1647,7 +1647,8 @@ input:checked + .slider:before {
   cursor: pointer;
 }
 
-#form-edit-phrase {
+#form-edit-phrase,
+#form-playlist-modal {
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -1658,4 +1659,69 @@ input:checked + .slider:before {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 6px;
+}
+
+/* ==========================================================================
+   PLAYLIST SELECTOR BAR & BACKUP CONTROLS (FASE 2)
+   ========================================================================== */
+.backup-actions-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-input);
+  padding: 5px 8px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.playlist-selector-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(56, 189, 248, 0.06);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: var(--radius-md);
+}
+
+.playlist-select-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 260px;
+}
+
+.playlist-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #7dd3fc;
+  white-space: nowrap;
+}
+
+.playlist-select {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: var(--radius-sm);
+  color: #f8fafc;
+  padding: 7px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+.playlist-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.playlist-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }

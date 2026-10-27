@@ -40,6 +40,18 @@
           </a>
         </div>
 
+        <div class="backup-actions-box">
+          <button type="button" id="btn-export-backup" class="btn btn-sm btn-ghost" title="Exportar backup completo (.json) de todas as playlists, configurações e fila">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Exportar JSON</span>
+          </button>
+          <button type="button" id="btn-import-backup" class="btn btn-sm btn-ghost" title="Restaurar/Importar backup (.json)">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <span>Importar JSON</span>
+          </button>
+          <input type="file" id="input-import-json" accept=".json,application/json" class="is-hidden" />
+        </div>
+
         <button id="btn-toggle-visible" class="btn-master-air is-on">
           <span class="air-dot"></span>
           <span id="master-air-label">NO AR (VISÍVEL)</span>
@@ -186,6 +198,25 @@
               <button type="button" id="btn-toggle-sys-form" class="btn btn-sm btn-secondary">
                 <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>Nova Frase Fixa</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Barra de Seleção e Gestão de Playlists (Eventos) -->
+          <div class="playlist-selector-bar">
+            <div class="playlist-select-group">
+              <label for="select-playlist" class="playlist-label">📂 Playlist / Evento:</label>
+              <select id="select-playlist" class="playlist-select"></select>
+            </div>
+            <div class="playlist-actions-group">
+              <button type="button" id="btn-create-playlist" class="btn btn-sm btn-secondary" title="Criar nova lista de frases para um evento específico">
+                <span>+ Nova Playlist</span>
+              </button>
+              <button type="button" id="btn-rename-playlist" class="btn btn-sm btn-ghost" title="Renomear a playlist selecionada">
+                <span>✏️ Renomear</span>
+              </button>
+              <button type="button" id="btn-delete-playlist" class="btn btn-sm btn-ghost" title="Excluir a playlist selecionada">
+                <span>🗑️ Excluir</span>
               </button>
             </div>
           </div>
@@ -760,6 +791,32 @@
         <div class="modal-footer">
           <button type="button" id="btn-cancel-edit" class="btn btn-ghost">Cancelar</button>
           <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE CRIAÇÃO / RENOMEAÇÃO DE PLAYLIST (EVENTO) -->
+  <div id="playlist-modal" class="modal-backdrop is-hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="playlist-modal-title">Nova Playlist de Evento</h3>
+        <button type="button" id="btn-close-playlist-modal" class="btn-icon">✕</button>
+      </div>
+      <form id="form-playlist-modal">
+        <input type="hidden" id="playlist-modal-mode" value="create">
+        <div class="form-group">
+          <label for="playlist-modal-name">Nome da Playlist / Evento <span class="req">*</span></label>
+          <input
+            type="text"
+            id="playlist-modal-name"
+            placeholder="Ex: 🎄 Cantata de Natal, 🕊️ Vigília de Ano Novo..."
+            required
+          />
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btn-cancel-playlist-modal" class="btn btn-ghost">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Playlist</button>
         </div>
       </form>
     </div>

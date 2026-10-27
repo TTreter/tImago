@@ -68,6 +68,76 @@ const defaultState = {
     showKicker: true,
     defaultKickerText: 'MENSAGEM DO PÚBLICO'
   },
+  activePlaylistId: 'pl-christmas',
+  playlists: [
+    {
+      id: 'pl-christmas',
+      name: '🎄 Cantata de Natal',
+      phrases: [
+        {
+          id: 'p-1',
+          text: 'Sejam todos muito bem-vindos à nossa Cantata de Natal! Que a paz e a esperança desta noite preencham o seu lar.',
+          author: 'Coral & Organização',
+          duration: 10,
+          enabled: true
+        },
+        {
+          id: 'p-2',
+          text: '"Porque um menino nos nasceu, um filho se nos deu; o governo está sobre os seus ombros; e o seu nome será: Maravilhoso Conselheiro, Deus Forte, Pai da Eternidade, Príncipe da Paz."',
+          author: 'Isaías 9:6',
+          duration: 12,
+          enabled: true
+        },
+        {
+          id: 'p-3',
+          text: 'Deixe sua mensagem de Natal no chat! Vamos exibir os recados e felicitações especiais aqui na tela durante a transmissão.',
+          author: 'Participe ao Vivo',
+          duration: 9,
+          enabled: true
+        },
+        {
+          id: 'p-4',
+          text: '"Glória a Deus nas maiores alturas, e paz na terra entre os homens, a quem ele quer bem!"',
+          author: 'Lucas 2:14',
+          duration: 9,
+          enabled: true
+        }
+      ]
+    },
+    {
+      id: 'pl-worship',
+      name: '⛪ Culto & Avisos Gerais',
+      phrases: [
+        {
+          id: 'p-w1',
+          text: 'Sejam bem-vindos ao nosso culto ao vivo! Compartilhe esta transmissão com sua família e amigos.',
+          author: 'Recepção & Mídia',
+          duration: 10,
+          enabled: true
+        },
+        {
+          id: 'p-w2',
+          text: '"O Senhor te abençoe e te guarde; o Senhor faça resplandecer o seu rosto sobre ti e tenha misericórdia de ti."',
+          author: 'Números 6:24-25',
+          duration: 11,
+          enabled: true
+        }
+      ]
+    },
+    {
+      id: 'pl-easter',
+      name: '🕊️ Especial de Páscoa',
+      phrases: [
+        {
+          id: 'p-e1',
+          text: '"Ele não está aqui, porque já ressuscitou, como havia dito! Cristo vive para sempre!"',
+          author: 'Mateus 28:6',
+          duration: 11,
+          enabled: true
+        }
+      ]
+    }
+  ],
   phrases: [
     {
       id: 'p-1',
@@ -118,6 +188,33 @@ let runtime = {
 let rotationTimer = null;
 
 /**
+ * Garante que a estrutura de playlists exista e esteja sincronizada com state.phrases
+ */
+function ensurePlaylistsStructure(st) {
+  if (!Array.isArray(st.playlists) || st.playlists.length === 0) {
+    const initialPhrases = Array.isArray(st.phrases) && st.phrases.length > 0
+      ? st.phrases
+      : JSON.parse(JSON.stringify(defaultState.phrases));
+    st.playlists = [
+      {
+        id: 'pl-christmas',
+        name: '🎄 Cantata de Natal',
+        phrases: initialPhrases
+      },
+      ...JSON.parse(JSON.stringify(defaultState.playlists.slice(1)))
+    ];
+    st.activePlaylistId = 'pl-christmas';
+  }
+  let activePl = st.playlists.find((p) => p.id === st.activePlaylistId);
+  if (!activePl) {
+    activePl = st.playlists[0];
+    st.activePlaylistId = activePl.id;
+  }
+  st.phrases = Array.isArray(activePl.phrases) ? activePl.phrases : [];
+  return st;
+}
+
+/**
  * Carrega o estado persistido no disco (ou copia o seed inicial na primeira execução)
  */
 function loadState() {
@@ -132,23 +229,32 @@ function loadState() {
     if (fs.existsSync(STATE_FILE)) {
       const raw = fs.readFileSync(STATE_FILE, 'utf-8');
       const parsed = JSON.parse(raw);
-      return {
+      const loaded = {
         settings: { ...defaultState.settings, ...(parsed.settings || {}) },
+        activePlaylistId: parsed.activePlaylistId || 'pl-christmas',
+        playlists: Array.isArray(parsed.playlists) ? parsed.playlists : [],
         phrases: Array.isArray(parsed.phrases) ? parsed.phrases : defaultState.phrases,
         audienceQueue: Array.isArray(parsed.audienceQueue) ? parsed.audienceQueue : []
       };
+      return ensurePlaylistsStructure(loaded);
     }
   } catch (err) {
     console.error('Erro ao carregar state.json:', err.message);
   }
-  return JSON.parse(JSON.stringify(defaultState));
+  return ensurePlaylistsStructure(JSON.parse(JSON.stringify(defaultState)));
 }
 
 /**
- * Salva o estado atual em disco de forma síncrona e segura
+ * Salva o estado atual em disco de forma síncrona e segura, sincronizando a playlist ativa
  */
 function saveState() {
   try {
+    if (Array.isArray(state.playlists)) {
+      const activePl = state.playlists.find((p) => p.id === state.activePlaylistId);
+      if (activePl) {
+        activePl.phrases = state.phrases;
+      }
+    }
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
@@ -736,6 +842,113 @@ io.on('connection', (socket) => {
     state.phrases[targetIdx] = temp;
     saveState();
     broadcastState();
+  });
+
+  // --- Eventos de Múltiplas Playlists (Eventos) & Backup JSON ---
+  socket.on('playlist:select', (playlistId) => {
+    if (!Array.isArray(state.playlists)) return;
+    const targetPl = state.playlists.find((p) => p.id === playlistId);
+    if (!targetPl) return;
+
+    state.activePlaylistId = targetPl.id;
+    state.phrases = Array.isArray(targetPl.phrases) ? targetPl.phrases : [];
+    runtime.queueIndex = -1;
+    saveState();
+
+    const isShowingSystem = runtime.phase === 'showing' && runtime.currentPhrase?.source === 'system';
+    if (state.settings.visible && state.settings.autoRotate && (isShowingSystem || runtime.phase === 'idle')) {
+      advanceNextInPriority();
+    } else {
+      broadcastState();
+    }
+  });
+
+  socket.on('playlist:create', ({ name }) => {
+    const cleanName = String(name || '').trim();
+    if (!cleanName) return;
+
+    const newPl = {
+      id: 'pl-' + Date.now() + '-' + Math.random().toString(36).substring(2, 5),
+      name: cleanName,
+      phrases: []
+    };
+
+    if (!Array.isArray(state.playlists)) state.playlists = [];
+    state.playlists.push(newPl);
+    state.activePlaylistId = newPl.id;
+    state.phrases = newPl.phrases;
+    runtime.queueIndex = -1;
+    saveState();
+
+    const isShowingSystem = runtime.phase === 'showing' && runtime.currentPhrase?.source === 'system';
+    if (state.settings.visible && state.settings.autoRotate && isShowingSystem) {
+      advanceNextInPriority();
+    } else {
+      broadcastState();
+    }
+  });
+
+  socket.on('playlist:rename', ({ id, name }) => {
+    const cleanName = String(name || '').trim();
+    if (!cleanName || !Array.isArray(state.playlists)) return;
+    const targetPl = state.playlists.find((p) => p.id === id);
+    if (!targetPl) return;
+
+    targetPl.name = cleanName;
+    saveState();
+    broadcastState();
+  });
+
+  socket.on('playlist:delete', (id) => {
+    if (!Array.isArray(state.playlists) || state.playlists.length <= 1) return;
+    const idx = state.playlists.findIndex((p) => p.id === id);
+    if (idx === -1) return;
+
+    state.playlists.splice(idx, 1);
+    if (state.activePlaylistId === id) {
+      const fallback = state.playlists[0];
+      state.activePlaylistId = fallback.id;
+      state.phrases = fallback.phrases;
+      runtime.queueIndex = -1;
+    }
+    saveState();
+
+    const isShowingSystem = runtime.phase === 'showing' && runtime.currentPhrase?.source === 'system';
+    if (state.settings.visible && state.settings.autoRotate && (isShowingSystem || runtime.phase === 'idle')) {
+      advanceNextInPriority();
+    } else {
+      broadcastState();
+    }
+  });
+
+  socket.on('state:import', (importedData) => {
+    if (!importedData || typeof importedData !== 'object') return;
+
+    if (importedData.settings && typeof importedData.settings === 'object') {
+      state.settings = {
+        ...defaultState.settings,
+        ...state.settings,
+        ...importedData.settings
+      };
+    }
+
+    if (Array.isArray(importedData.playlists) && importedData.playlists.length > 0) {
+      state.playlists = importedData.playlists;
+      if (importedData.activePlaylistId) {
+        state.activePlaylistId = importedData.activePlaylistId;
+      }
+    } else if (Array.isArray(importedData.phrases)) {
+      state.phrases = importedData.phrases;
+    }
+
+    if (Array.isArray(importedData.audienceQueue)) {
+      state.audienceQueue = importedData.audienceQueue;
+    }
+
+    state = ensurePlaylistsStructure(state);
+    runtime.queueIndex = -1;
+    saveState();
+    syncEngineWithSettings(true);
   });
 });
 
