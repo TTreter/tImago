@@ -14,52 +14,43 @@
   <div class="app-shell">
 
     <!-- ====================================================================
-         TOPBAR: IDENTIDADE VISUAL tImago, STATUS AO VIVO & LINK OBS
+         TOPBAR: IDENTIDADE, NAVEGAÇÃO PRINCIPAL (AO VIVO vs CONFIGURAÇÕES) & STATUS NO AR
          ==================================================================== -->
     <header class="topbar">
       <div class="brand">
         <img src="/img/logo.svg" alt="tImago Broadcast Overlay" class="brand-logo" />
         <div class="brand-divider"></div>
         <div class="brand-meta">
-          <span class="brand-tag">ESTÚDIO AO VIVO</span>
-          <p class="brand-subtitle">Controle de Overlays para OBS Studio</p>
+          <span class="brand-tag">PAINEL INSTITUCIONAL</span>
+          <p id="topbar-org-name" class="brand-subtitle">Prefeitura Municipal • ASCOM</p>
         </div>
       </div>
 
+      <!-- NAVEGAÇÃO ENTRE TELAS: OPERAÇÃO AO VIVO vs PÁGINA DE CONFIGURAÇÕES -->
+      <nav class="topbar-nav" role="tablist">
+        <button type="button" id="nav-btn-live" class="nav-tab-btn active" data-view="live" title="Painel de Operação Ao Vivo (Atalho: Alt + O)">
+          <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+          <span>Operação Ao Vivo</span>
+        </button>
+        <button type="button" id="nav-btn-settings" class="nav-tab-btn" data-view="settings" title="Página Completa de Configurações (Atalho: Alt + S)">
+          <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <span>Configurações</span>
+        </button>
+      </nav>
+
+      <!-- AÇÕES RÁPIDAS DA BARRA SUPERIOR -->
       <div class="topbar-actions">
-        <div class="obs-url-box">
-          <span class="obs-url-label">OBS:</span>
-          <code id="obs-url-display">http://localhost:3000/overlay</code>
-          <button id="btn-copy-url" class="btn btn-sm btn-secondary" title="Copiar link para colar no Browser Source do OBS">
-            <svg class="icon-svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            <span>Copiar</span>
-          </button>
-          <a href="/overlay" target="_blank" class="btn btn-sm btn-ghost" title="Abrir Overlay em nova aba">
-            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-            <span>Abrir</span>
-          </a>
-        </div>
+        <button type="button" id="btn-open-mobile-qr" class="btn btn-sm btn-secondary" title="Abrir controle remoto no celular ou tablet via QR Code na rede Wi-Fi">
+          <svg class="icon-svg" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+          <span id="label-mobile-qr">Acesso Mobile</span>
+        </button>
 
-        <div class="backup-actions-box">
-          <button type="button" id="btn-open-mobile-qr" class="btn btn-sm btn-secondary" title="Abrir controle remoto no celular ou tablet via QR Code na rede Wi-Fi">
-            <svg class="icon-svg" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-            <span id="label-mobile-qr">Celular / QR</span>
-          </button>
-          <button type="button" id="btn-toggle-reception-mode" class="btn btn-sm btn-ghost" title="Alternar Modo Recepção Simplificado (focado apenas na Fila do Público para celular/voluntários)">
-            <span>🙋 Modo Recepção</span>
-          </button>
-          <button type="button" id="btn-export-backup" class="btn btn-sm btn-ghost" title="Exportar backup completo (.json) de todas as playlists, configurações e fila">
-            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            <span>Exportar</span>
-          </button>
-          <button type="button" id="btn-import-backup" class="btn btn-sm btn-ghost" title="Restaurar/Importar backup (.json)">
-            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-            <span>Importar</span>
-          </button>
-          <input type="file" id="input-import-json" accept=".json,application/json" class="is-hidden" />
-        </div>
+        <button type="button" id="btn-toggle-reception-mode" class="btn btn-sm btn-ghost" title="Alternar Modo Recepção Simplificado (focado apenas na triagem da Fila do Cidadão)">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span id="label-reception-mode">Modo Recepção</span>
+        </button>
 
-        <button id="btn-toggle-visible" class="btn-master-air is-on" title="Alternar visibilidade do Overlay no OBS (Atalho: Alt+A)">
+        <button id="btn-toggle-visible" class="btn-master-air is-on" title="Alternar visibilidade do Overlay no OBS (Atalho: Alt + A)">
           <span class="air-dot"></span>
           <span id="master-air-label">NO AR (VISÍVEL)</span>
         </button>
@@ -67,14 +58,14 @@
     </header>
 
     <!-- ====================================================================
-         GRID PRINCIPAL: ESQUERDA (FILA DO PÚBLICO + CARROSSEL) | DIREITA (PREVIEW + ABAS)
+         VISÃO 1: OPERAÇÃO AO VIVO (DESPOLUÍDA & FOCADA NA TRANSMISSÃO)
          ==================================================================== -->
-    <main class="main-grid">
+    <main id="view-live" class="main-grid view-panel active">
 
-      <!-- COLUNA ESQUERDA: FILA DO PÚBLICO + CARROSSEL DO SISTEMA -->
+      <!-- COLUNA PRINCIPAL ESQUERDA: CONTEÚDO (FILA, PAUTAS E TARJA LOWER THIRD) -->
       <div class="col-main">
 
-        <!-- CARD 1: FILA DE RECADOS DO PÚBLICO / OUVINTES (PAUSA O CARROSSEL, NÃO REPETE) -->
+        <!-- CARD 1: FILA DE PARTICIPAÇÃO DO CIDADÃO (PRIORIDADE / NÃO REPETE) -->
         <section class="panel-card highlight-card audience-card">
           <div class="card-header">
             <div class="card-header-left">
@@ -82,11 +73,11 @@
                 <span class="section-icon audience-icon">
                   <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                 </span>
-                <h2>Fila do Público / Ouvintes</h2>
-                <span class="badge-priority">⚡ Prioridade • Não Repete</span>
+                <h2>Participação do Cidadão (Fila Ao Vivo)</h2>
+                <span class="badge-priority">Prioridade • Não Repete</span>
               </div>
               <p class="card-subtitle">
-                Pausa automaticamente o carrossel enquanto houver mensagens de ouvintes não exibidas.
+                Mensagens enviadas pela população durante a live. Pausa automaticamente o carrossel enquanto houver itens aguardando.
               </p>
             </div>
             <div class="header-right-actions">
@@ -96,11 +87,11 @@
 
           <form id="form-add-audience" class="quick-form">
             <div class="form-group">
-              <label for="aud-input-text">Mensagem do Cidadão / Público <span class="req">*</span></label>
+              <label for="aud-input-text">Mensagem do Cidadão / População <span class="req">*</span></label>
               <textarea
                 id="aud-input-text"
                 rows="2"
-                placeholder="Ex: Parabéns à Prefeitura pela organização do evento! Um ótimo Natal para todos os moradores do Bairro Centro!"
+                placeholder="Ex: Parabéns à Prefeitura e aos servidores pelo trabalho nas obras do Bairro Centro! Um abraço para todos."
                 required
               ></textarea>
             </div>
@@ -111,22 +102,22 @@
                 <input
                   type="text"
                   id="aud-input-author"
-                  placeholder="Ex: Maria Oliveira (Moradora do Bairro São José)"
+                  placeholder="Ex: Maria Oliveira (Bairro São José)"
                 />
               </div>
 
               <div class="form-group kicker-group">
-                <label for="aud-input-kicker">Etiqueta do Topo <span class="opt">(selo)</span></label>
+                <label for="aud-input-kicker">Etiqueta do Topo <span class="opt">(categoria)</span></label>
                 <select id="aud-input-kicker">
-                  <option value="">Padrão (Mensagem do Público)</option>
-                  <option value="COMENTÁRIO DO CIDADÃO">💬 Comentário do Cidadão</option>
-                  <option value="PERGUNTA DA POPULAÇÃO">❓ Pergunta da População</option>
-                  <option value="BAIRRO / COMUNIDADE">📍 Bairro / Comunidade</option>
-                  <option value="ELOGIO / SUGESTÃO">👏 Elogio / Sugestão</option>
-                  <option value="UTILIDADE PÚBLICA">📢 Utilidade Pública</option>
-                  <option value="MENSAGEM DE NATAL">🎄 Mensagem de Natal</option>
-                  <option value="HOMENAGEM">🎉 Homenagem / Aniversário</option>
-                  <option value="__NONE__">🚫 Ocultar Etiqueta</option>
+                  <option value="">Padrão (Mensagem do Cidadão)</option>
+                  <option value="COMENTÁRIO DO CIDADÃO">Comentário do Cidadão</option>
+                  <option value="PERGUNTA DA POPULAÇÃO">Pergunta da População</option>
+                  <option value="BAIRRO / COMUNIDADE">Bairro / Comunidade</option>
+                  <option value="ELOGIO / SUGESTÃO">Elogio / Sugestão</option>
+                  <option value="UTILIDADE PÚBLICA">Utilidade Pública</option>
+                  <option value="MENSAGEM ESPECIAL">Mensagem Especial</option>
+                  <option value="HOMENAGEM">Homenagem / Destaque</option>
+                  <option value="__NONE__">Ocultar Etiqueta</option>
                 </select>
               </div>
 
@@ -145,40 +136,41 @@
             <div class="form-actions">
               <button type="submit" class="btn btn-accent">
                 <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>Guardar na Fila do Público</span>
+                <span>Inserir na Fila</span>
               </button>
-              <button type="button" id="btn-aud-show-now" class="btn btn-secondary" title="Ignora a espera e exibe esta mensagem imediatamente na tela">
+              <button type="button" id="btn-aud-show-now" class="btn btn-secondary" title="Ignora a fila e exibe imediatamente no OBS">
                 <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                <span>Cortar e Exibir Agora!</span>
+                <span>Cortar e Exibir Agora</span>
               </button>
             </div>
           </form>
 
-          <!-- BARRA DE CONTROLE DE DISPARO DA FILA DO PÚBLICO (ACUMULAR E SOLTAR QUANDO QUISER) -->
+          <!-- BARRA DE CONTROLE EM LOTE DA FILA -->
           <div class="audience-batch-bar">
             <div class="batch-bar-left">
               <button type="button" id="btn-start-audience-batch" class="btn btn-start-batch" disabled>
                 <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                 <span id="label-start-audience-batch">Iniciar Exibição da Fila (0)</span>
               </button>
-              <button type="button" id="btn-pause-audience-batch" class="btn btn-sm btn-ghost is-hidden" title="Pausar a fila do público e voltar para o carrossel">
-                ⏸ Pausar Fila
+              <button type="button" id="btn-pause-audience-batch" class="btn btn-sm btn-ghost is-hidden" title="Pausar a fila e voltar para os avisos do carrossel">
+                <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                <span>Pausar Fila</span>
               </button>
             </div>
 
-            <label class="hold-mode-toggle" title="Quando marcado, você pode ir cadastrando várias mensagens (ex: 7 recados) sem interromper a transmissão e só soltar quando clicar no botão verde 'Iniciar Exibição da Fila'">
+            <label class="hold-mode-toggle" title="Quando marcado, acumula as mensagens sem interromper a transmissão até você autorizar o início">
               <input type="checkbox" id="toggle-audience-hold-mode" checked />
-              <span>Aguardar meu comando para iniciar a fila</span>
+              <span>Aguardar comando para liberar exibição</span>
             </label>
           </div>
 
-          <!-- Lista da Fila do Público (Aguardando + Histórico de Exibidas) -->
+          <!-- LISTA DA FILA -->
           <div class="audience-queue-section">
             <div class="audience-queue-header">
-              <span class="sub-label">Fila de Exibição do Público</span>
-              <button type="button" id="btn-clear-played-audience" class="btn-reset-link" title="Limpar da lista os recados que já foram exibidos">
+              <span class="sub-label">Fila de Exibição</span>
+              <button type="button" id="btn-clear-played-audience" class="btn-reset-link" title="Limpar da lista as mensagens que já foram exibidas">
                 <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                <span>Limpar Já Exibidas</span>
+                <span>Limpar Exibidas</span>
               </button>
             </div>
             <div id="audience-list" class="phrases-list">
@@ -187,7 +179,7 @@
           </div>
         </section>
 
-        <!-- CARD 2: CARROSSEL DO SISTEMA (FRASES FIXAS QUE REPETEM EM LOOP) -->
+        <!-- CARD 2: PAUTA DE AVISOS INSTITUCIONAIS & PLAYLISTS (CARROSSEL EM LOOP) -->
         <section class="panel-card">
           <div class="card-header">
             <div class="card-header-left">
@@ -195,59 +187,65 @@
                 <span class="section-icon system-icon">
                   <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                 </span>
-                <h2>Carrossel do Sistema (Frases Fixas)</h2>
+                <h2>Pauta de Avisos & Institucional (Carrossel)</h2>
                 <span id="carousel-status-pill" class="badge-carousel-state">Em Rotação</span>
               </div>
               <p class="card-subtitle">
-                Avisos institucionais, utilidade pública e informações do evento que alternam em loop contínuo quando a fila do público está vazia.
+                Avisos oficiais, utilidade pública e campanhas que alternam em rotação contínua quando a fila do cidadão está vazia.
               </p>
             </div>
             <div class="header-right-actions">
               <span id="phrases-counter" class="counter-pill">0 ativas</span>
               <button type="button" id="btn-toggle-sys-form" class="btn btn-sm btn-secondary">
                 <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>Nova Frase Fixa</span>
+                <span>Novo Aviso</span>
               </button>
             </div>
           </div>
 
-          <!-- Barra de Seleção e Gestão de Playlists (Eventos) -->
+          <!-- SELETOR E GESTÃO DE PLAYLISTS DE EVENTOS -->
           <div class="playlist-selector-bar">
             <div class="playlist-select-group">
-              <label for="select-playlist" class="playlist-label">📂 Playlist / Evento:</label>
+              <label for="select-playlist" class="playlist-label">
+                <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                <span>Pauta / Evento:</span>
+              </label>
               <select id="select-playlist" class="playlist-select"></select>
             </div>
             <div class="playlist-actions-group">
-              <button type="button" id="btn-create-playlist" class="btn btn-sm btn-secondary" title="Criar nova lista de frases para um evento específico">
-                <span>+ Nova Playlist</span>
+              <button type="button" id="btn-create-playlist" class="btn btn-sm btn-secondary" title="Criar nova playlist para um evento ou solenidade">
+                <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Nova Pauta</span>
               </button>
-              <button type="button" id="btn-rename-playlist" class="btn btn-sm btn-ghost" title="Renomear a playlist selecionada">
-                <span>✏️ Renomear</span>
+              <button type="button" id="btn-rename-playlist" class="btn btn-sm btn-ghost" title="Renomear a pauta selecionada">
+                <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                <span>Renomear</span>
               </button>
-              <button type="button" id="btn-delete-playlist" class="btn btn-sm btn-ghost" title="Excluir a playlist selecionada">
-                <span>🗑️ Excluir</span>
+              <button type="button" id="btn-delete-playlist" class="btn btn-sm btn-ghost" title="Excluir a pauta selecionada">
+                <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <span>Excluir</span>
               </button>
             </div>
           </div>
 
-          <!-- Formulário colapsável para adicionar nova frase fixa ao sistema -->
+          <!-- FORMULÁRIO COLAPSÁVEL DE NOVO AVISO -->
           <form id="form-add-phrase" class="quick-form sys-add-form is-collapsed">
             <div class="form-group">
-              <label for="input-text">Nova Frase Fixa / Comunicado Oficial / Aviso do Evento <span class="req">*</span></label>
+              <label for="input-text">Texto do Comunicado Oficial / Aviso da Pauta <span class="req">*</span></label>
               <textarea
                 id="input-text"
                 rows="2"
-                placeholder="Ex: Acompanhe a programação oficial e serviços públicos no portal da Prefeitura Municipal."
+                placeholder="Ex: Acompanhe as ações, editais, obras e serviços públicos no Portal Oficial da Prefeitura e em nossas redes sociais."
               ></textarea>
             </div>
 
             <div class="form-row">
               <div class="form-group flex-grow">
-                <label for="input-author">Secretaria / Fonte / Autor <span class="opt">(opcional)</span></label>
+                <label for="input-author">Secretaria / Fonte / Órgão <span class="opt">(opcional)</span></label>
                 <input
                   type="text"
                   id="input-author"
-                  placeholder="Ex: Prefeitura Municipal • Secretaria de Saúde / ASCOM"
+                  placeholder="Ex: Secretaria de Comunicação (ASCOM) • Prefeitura Municipal"
                 />
               </div>
 
@@ -256,7 +254,7 @@
                 <input
                   type="text"
                   id="input-kicker"
-                  placeholder="Ex: UTILIDADE PÚBLICA, SAÚDE, ESPORTE..."
+                  placeholder="Ex: INFORMATIVO, SAÚDE, EDUCAÇÃO..."
                 />
               </div>
 
@@ -275,7 +273,7 @@
             <div class="form-actions">
               <button type="submit" class="btn btn-primary">
                 <svg class="icon-svg" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                <span>Salvar no Carrossel</span>
+                <span>Salvar na Pauta</span>
               </button>
               <button type="button" id="btn-add-and-show" class="btn btn-secondary">
                 <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
@@ -284,22 +282,24 @@
             </div>
           </form>
 
-          <!-- Barra de Pesquisa e Ações em Massa do Carrossel -->
+          <!-- BUSCA E AÇÕES EM LOTE DA PAUTA -->
           <div class="carousel-toolbar">
             <div class="search-input-wrapper">
               <svg class="icon-svg icon-xs search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               <input
                 type="text"
                 id="input-search-phrases"
-                placeholder="Filtrar frases do carrossel por texto ou autor..."
+                placeholder="Filtrar avisos da pauta por palavra-chave ou secretaria..."
               />
             </div>
             <div class="bulk-actions-group">
-              <button type="button" id="btn-enable-all-phrases" class="btn-reset-link" title="Ativar todas as frases no carrossel">
-                ✓ Ativar Todas
+              <button type="button" id="btn-enable-all-phrases" class="btn-reset-link" title="Ativar todos os avisos">
+                <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Ativar Todos</span>
               </button>
-              <button type="button" id="btn-disable-all-phrases" class="btn-reset-link" title="Desativar todas as frases do carrossel">
-                ✕ Desativar Todas
+              <button type="button" id="btn-disable-all-phrases" class="btn-reset-link" title="Desativar todos os avisos">
+                <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <span>Desativar Todos</span>
               </button>
             </div>
           </div>
@@ -309,17 +309,19 @@
           </div>
         </section>
 
-        <!-- CARD EXTRA (FASE 5): TARJA DE IDENTIFICAÇÃO RÁPIDA (LOWER THIRD - CERIMONIAL / AUTORIDADES) -->
+        <!-- CARD 3: TARJA DE IDENTIFICAÇÃO (LOWER THIRD - AUTORIDADES / CERIMONIAL) -->
         <section class="panel-card lower-third-card">
           <div class="card-header">
             <div class="card-header-left">
               <div class="title-with-badge">
-                <span class="section-icon system-icon">🏛️</span>
-                <h2>Tarja de Identificação (Lower Third — Autoridades / Palestrantes / Atrações)</h2>
+                <span class="section-icon system-icon">
+                  <svg class="icon-svg" viewBox="0 0 24 24"><line x1="3" y1="22" x2="21" y2="22"></line><line x1="6" y1="18" x2="6" y2="11"></line><line x1="10" y1="18" x2="10" y2="11"></line><line x1="14" y1="18" x2="14" y2="11"></line><line x1="18" y1="18" x2="18" y2="11"></line><polygon points="12 2 20 7 4 7 12 2"></polygon></svg>
+                </span>
+                <h2>Tarja de Identificação (Lower Third — Autoridades / Entrevistados)</h2>
                 <span id="lt-status-pill" class="badge-carousel-state is-off">Oculta</span>
               </div>
               <p class="card-subtitle">
-                Dispare rapidamente uma tarja oficial para identificar o Prefeito(a), Secretários, Palestrantes ou Atrações Culturais sem alterar o carrossel.
+                Identificação em destaque para Prefeito(a), Secretários, Palestrantes ou Entrevistados, sem interferir no carrossel.
               </p>
             </div>
           </div>
@@ -327,25 +329,25 @@
           <form id="form-lower-third" class="quick-form">
             <div class="form-row">
               <div class="form-group kicker-group">
-                <label for="lt-input-badge">Categoria / Selo</label>
+                <label for="lt-input-badge">Selo Institucional</label>
                 <select id="lt-input-badge">
-                  <option value="🏛️ PRONUNCIAMENTO OFICIAL">🏛️ Pronunciamento Oficial</option>
-                  <option value="🎙️ SECRETÁRIO(A) MUNICIPAL">🎙️ Secretário(a) Municipal</option>
-                  <option value="📊 AUDIÊNCIA PÚBLICA">📊 Audiência Pública / Técnico</option>
-                  <option value="🎤 PALESTRANTE / CONVIDADO">🎤 Palestrante / Convidado</option>
-                  <option value="🎶 ATRAÇÃO CULTURAL">🎶 Atração Cultural / Palco</option>
-                  <option value="🚴 EVENTO ESPORTIVO">🚴 Evento Esportivo</option>
-                  <option value="📌 INFORMATIVO MUNICIPAL">📌 Informativo Municipal</option>
+                  <option value="PRONUNCIAMENTO OFICIAL">Pronunciamento Oficial</option>
+                  <option value="SECRETÁRIO(A) MUNICIPAL">Secretário(a) Municipal</option>
+                  <option value="AUDIÊNCIA PÚBLICA">Audiência Pública</option>
+                  <option value="PALESTRANTE / CONVIDADO">Palestrante / Convidado</option>
+                  <option value="ATRAÇÃO CULTURAL">Atração Cultural</option>
+                  <option value="EVENTO ESPORTIVO">Evento Esportivo</option>
+                  <option value="INFORMATIVO MUNICIPAL">Informativo Municipal</option>
                   <option value="">Sem Etiqueta</option>
                 </select>
               </div>
 
               <div class="form-group flex-grow">
-                <label for="lt-input-title">Nome / Título Principal (Autoridade, Palestrante ou Atração) <span class="req">*</span></label>
+                <label for="lt-input-title">Nome / Autoridade / Entrevistado <span class="req">*</span></label>
                 <input
                   type="text"
                   id="lt-input-title"
-                  placeholder="Ex: Prefeito(a) Municipal / Secretário(a) de Saúde / Banda Municipal"
+                  placeholder="Ex: Nome da Autoridade ou Convidado"
                   required
                 />
               </div>
@@ -353,16 +355,16 @@
 
             <div class="form-row">
               <div class="form-group flex-grow">
-                <label for="lt-input-subtitle">Cargo / Secretaria / Tema da Pauta <span class="opt">(opcional)</span></label>
+                <label for="lt-input-subtitle">Cargo / Secretaria / Assunto <span class="opt">(opcional)</span></label>
                 <input
                   type="text"
                   id="lt-input-subtitle"
-                  placeholder="Ex: Coletiva Oficial • Secretaria Municipal de Comunicação (ASCOM)"
+                  placeholder="Ex: Prefeito(a) Municipal • Prefeitura Municipal"
                 />
               </div>
 
               <div class="form-group duration-group">
-                <label for="lt-input-autohide" title="0 = permanece na tela até você clicar em Ocultar">Auto-Ocultar (seg)</label>
+                <label for="lt-input-autohide" title="0 = permanece no ar até você clicar em Ocultar">Auto-Ocultar (seg)</label>
                 <input
                   type="number"
                   id="lt-input-autohide"
@@ -379,7 +381,8 @@
                 <span>Exibir Tarja no OBS</span>
               </button>
               <button type="button" id="btn-hide-lower-third" class="btn btn-ghost" disabled>
-                <span>⏹ Ocultar Tarja</span>
+                <svg class="icon-svg" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"></rect></svg>
+                <span>Ocultar Tarja</span>
               </button>
             </div>
           </form>
@@ -387,10 +390,10 @@
 
       </div>
 
-      <!-- COLUNA DIREITA FIXA (STICKY): PREVIEW + MONITOR INTEGRADO + ABAS DE CONFIGURAÇÃO -->
+      <!-- COLUNA LATERAL DIREITA: PREVIEW OBS + MONITOR DE SAÍDA + BARRA RÁPIDA DE CENA -->
       <aside class="col-sidebar">
 
-        <!-- CARD 3: PRÉ-VISUALIZAÇÃO EM TEMPO REAL + MONITOR DE SAÍDA INTEGRADO -->
+        <!-- PREVIEW EM TEMPO REAL COM MONITOR INTEGRADO -->
         <section class="panel-card preview-card">
           <div class="card-header preview-card-header">
             <div class="title-with-badge">
@@ -398,33 +401,39 @@
               <span id="preview-res-badge" class="res-pill-badge">1920×1080</span>
             </div>
 
-            <!-- Seletor de Fundo do Preview para testar contraste -->
-            <div class="preview-bg-switcher" title="Alternar fundo de simulação (no OBS será sempre 100% transparente)">
-              <button type="button" class="bg-switch-btn active" data-bg="grid" title="Fundo Quadriculado (Transparência)">🏁</button>
-              <button type="button" class="bg-switch-btn" data-bg="dark" title="Simular Palco Escuro">🌑</button>
-              <button type="button" class="bg-switch-btn" data-bg="warm" title="Simular Luzes Quentes de Natal">🎄</button>
+            <!-- SELETOR DE FUNDO DO PREVIEW -->
+            <div class="preview-bg-switcher" title="Alternar fundo de simulação (no OBS Browser Source será 100% transparente)">
+              <button type="button" class="bg-switch-btn active" data-bg="grid" title="Fundo Quadriculado de Transparência">
+                <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              </button>
+              <button type="button" class="bg-switch-btn" data-bg="dark" title="Simular Fundo Escuro de Palco">
+                <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+              </button>
+              <button type="button" class="bg-switch-btn" data-bg="warm" title="Simular Iluminação de Auditório">
+                <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+              </button>
             </div>
           </div>
 
           <div class="preview-viewport-wrapper" id="preview-wrapper">
             <div id="preview-backdrop" class="preview-checkerboard bg-mode-grid">
-              <iframe id="overlay-preview-iframe" src="/overlay" title="Preview do Overlay"></iframe>
+              <iframe id="overlay-preview-iframe" src="/overlay" title="Preview do Overlay em Tempo Real"></iframe>
             </div>
           </div>
 
-          <!-- MONITOR DE SAÍDA INTEGRADO (Substitui o card solto e nunca empurra o layout) -->
+          <!-- MONITOR DE SAÍDA INTEGRADO -->
           <div id="live-floating-popup" class="live-monitor-dock">
             <div class="live-dock-top">
               <div class="live-dock-status">
-                <span id="live-phase-badge" class="phase-badge phase-showing">CARROSSEL NO AR</span>
+                <span id="live-phase-badge" class="phase-badge phase-showing">NO AR AGORA</span>
                 <span id="live-countdown" class="live-countdown">--s</span>
               </div>
               <div class="live-dock-actions">
-                <button id="btn-next-phrase" class="btn-dock-action" title="Pular para a próxima frase agora">
+                <button id="btn-next-phrase" class="btn-dock-action" title="Pular para a próxima frase da rotação agora (Atalho: Alt + N)">
                   <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
                   <span>Próxima</span>
                 </button>
-                <button id="btn-clear-current" class="btn-dock-action subtle" title="Recolher o card atual (entrar em intervalo)">
+                <button id="btn-clear-current" class="btn-dock-action subtle" title="Recolher card imediatamente para intervalo (Atalho: Alt + C)">
                   <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"></rect></svg>
                   <span>Recolher</span>
                 </button>
@@ -436,54 +445,205 @@
             </div>
 
             <div class="live-current-content">
-              <p id="live-current-text" class="live-current-text" title="">Carregando estado da transmissão...</p>
+              <p id="live-current-text" class="live-current-text" title="">Sincronizando com a transmissão...</p>
               <span id="live-current-author" class="live-current-author"></span>
             </div>
           </div>
         </section>
 
-        <!-- CARD 4: CENTRAL DE CONFIGURAÇÕES EM ABAS (ZERO POLUIÇÃO VISUAL) -->
-        <section class="panel-card settings-tabs-card">
-          <div class="tabs-nav" role="tablist">
-            <button type="button" class="tab-btn active" data-tab="tab-style">
-              <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path></svg>
-              <span>Tema & Tamanho</span>
-            </button>
-            <button type="button" class="tab-btn" data-tab="tab-screen">
-              <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-              <span>Posição & Tela</span>
-            </button>
-            <button type="button" class="tab-btn" data-tab="tab-timing">
-              <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              <span>Tempos</span>
+        <!-- BARRA RÁPIDA DE CENA (ACESSO ÁGIL AO VIVO) -->
+        <section class="panel-card quick-scene-card">
+          <div class="card-header quick-scene-header">
+            <div class="title-with-badge">
+              <span class="section-icon system-icon">
+                <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              </span>
+              <h3>Troca Rápida de Cena</h3>
+            </div>
+            <button type="button" id="btn-jump-to-settings" class="btn-reset-link" title="Abrir página completa com todos os ajustes visuais">
+              <span>Mais Ajustes</span>
+              <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
           </div>
 
-          <!-- ABA 1: TEMA VISUAL & DIMENSÕES DA LETRA/CARD -->
-          <div id="tab-style" class="tab-pane active">
+          <div class="quick-scene-controls">
             <div class="form-group">
-              <div class="theme-header-row">
-                <label>Galeria de Temas (25 estilos)</label>
-                <span id="active-theme-name-pill" class="slider-value-pill">Cantata Real</span>
+              <label for="quick-theme-select">Tema Visual da Transmissão</label>
+              <select id="quick-theme-select" class="form-control-sm">
+                <!-- Preenchido dinamicamente via JS -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="quick-display-mode">Modo de Exibição no Palco</label>
+              <select id="quick-display-mode" class="form-control-sm">
+                <option value="card">Card Flutuante Individual</option>
+                <option value="ticker">Faixa Ticker de Rodapé (Letreiro)</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+      </aside>
+
+    </main>
+
+    <!-- ====================================================================
+         VISÃO 2: PÁGINA DEDICADA DE CONFIGURAÇÕES (ESTRUTURADA EM 5 SEÇÕES)
+         ==================================================================== -->
+    <main id="view-settings" class="settings-page-wrapper view-panel">
+
+      <div class="settings-page-header">
+        <div class="settings-title-group">
+          <h1>Configurações do Sistema & Transmissão</h1>
+          <p>Personalize identidade institucional, palco OBS, sistema Windows, automação e backups técnicos.</p>
+        </div>
+        <div class="settings-header-actions">
+          <button type="button" id="btn-back-to-live" class="btn btn-secondary" title="Retornar ao painel de operação ao vivo">
+            <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
+            <span>Voltar ao Painel Ao Vivo</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-sections-container">
+
+        <!-- SEÇÃO 1: SISTEMA DESKTOP WINDOWS & BANDEJA -->
+        <section class="settings-section-card">
+          <div class="section-card-header">
+            <div class="section-card-icon">
+              <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            </div>
+            <div>
+              <h2>Sistema Windows & Aplicativo Desktop</h2>
+              <p>Comportamento de inicialização automática e controle de encerramento do tImago.</p>
+            </div>
+          </div>
+
+          <div class="section-card-body">
+            <div class="setting-item-toggle">
+              <div>
+                <strong>Iniciar Automaticamente com o Windows</strong>
+                <small>Executa o tImago em segundo plano ao ligar o computador do estúdio</small>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-start-with-windows" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item-toggle">
+              <div>
+                <strong>Iniciar Minimizado na Bandeja do Sistema (System Tray)</strong>
+                <small>Inicia silenciosamente ao lado do relógio do Windows sem abrir janela na frente do operador</small>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-start-minimized" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="form-group setting-select-block">
+              <label for="setting-close-behavior">Ação ao Clicar no Botão Fechar da Janela (X)</label>
+              <select id="setting-close-behavior">
+                <option value="tray">Minimizar para a Bandeja do Sistema (Manter servidor e overlay ativos em segundo plano)</option>
+                <option value="quit">Encerrar o aplicativo e desligar o overlay imediatamente</option>
+                <option value="ask">Perguntar antes de fechar apenas quando a transmissão estiver NO AR</option>
+              </select>
+              <small class="field-help">A opção recomendada mantém o overlay funcionando no OBS sem pop-ups chatos toda vez que fechar a janela.</small>
+            </div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO 2: IDENTIDADE INSTITUCIONAL, BRASÃO & TEMAS VISUAIS -->
+        <section class="settings-section-card">
+          <div class="section-card-header">
+            <div class="section-card-icon">
+              <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path></svg>
+            </div>
+            <div>
+              <h2>Identidade Visual, Brasão & Temas</h2>
+              <p>Personalize o nome da instituição, brasão oficial, paletas de cores e proporções visuais.</p>
+            </div>
+          </div>
+
+          <div class="section-card-body">
+            <div class="form-group">
+              <label for="setting-organization-name">Nome da Instituição / Órgão Público no Cabeçalho</label>
+              <input
+                type="text"
+                id="setting-organization-name"
+                placeholder="Ex: Prefeitura Municipal • Secretaria de Comunicação (ASCOM)"
+                value="Prefeitura Municipal"
+              />
+            </div>
+
+            <!-- GESTÃO DO BRASÃO / LOGO -->
+            <div class="sub-panel-card">
+              <div class="logo-upload-row">
+                <div class="logo-upload-left">
+                  <label class="switch" title="Exibir brasão oficial ao lado da frase no card">
+                    <input type="checkbox" id="toggle-show-logo" />
+                    <span class="slider"></span>
+                  </label>
+                  <div>
+                    <strong class="logo-title">Brasão Oficial / Logomarca no Card</strong>
+                    <small class="logo-subtitle">Exibe o brasão da Prefeitura em PNG/SVG transparente junto à mensagem</small>
+                  </div>
+                </div>
+                <div class="logo-upload-actions">
+                  <button type="button" id="btn-upload-logo" class="btn btn-sm btn-secondary">
+                    <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <span>Enviar Imagem</span>
+                  </button>
+                  <button type="button" id="btn-remove-logo" class="btn btn-sm btn-ghost is-hidden" title="Remover imagem atual">
+                    <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    <span>Remover</span>
+                  </button>
+                  <input type="file" id="input-logo-file" accept="image/*" class="is-hidden" />
+                </div>
               </div>
 
-              <!-- Filtros de Categoria de Tema -->
+              <div class="form-row" style="margin-top: 14px;">
+                <div class="form-group flex-grow">
+                  <label for="setting-logo-position">Posição do Brasão no Card</label>
+                  <select id="setting-logo-position">
+                    <option value="left">Esquerda do Texto</option>
+                    <option value="right">Direita do Texto</option>
+                  </select>
+                </div>
+                <div class="form-group" style="width: 140px;">
+                  <label for="setting-logo-size">Tamanho (px)</label>
+                  <input type="number" id="setting-logo-size" min="36" max="140" step="4" value="56" />
+                </div>
+              </div>
+            </div>
+
+            <!-- GALERIA DOS 25 TEMAS VISUAIS -->
+            <div class="form-group" style="margin-top: 20px;">
+              <div class="theme-header-row">
+                <label>Galeria de Temas Visuais (25 Opções Institucionais)</label>
+                <span id="active-theme-name-pill" class="slider-value-pill">Natal Luz Municipal</span>
+              </div>
+
+              <!-- FILTROS DE CATEGORIA -->
               <div class="theme-cat-pills" id="theme-cat-filters">
                 <button type="button" class="theme-cat-btn active" data-cat="all">Todos</button>
-                <button type="button" class="theme-cat-btn" data-cat="inst">🏛️ Inst. (4)</button>
-                <button type="button" class="theme-cat-btn" data-cat="health">🎗️ Campanhas (3)</button>
-                <button type="button" class="theme-cat-btn" data-cat="soccer">🚴⚽ Esportes (4)</button>
-                <button type="button" class="theme-cat-btn" data-cat="christmas">🎄 Natal (3)</button>
-                <button type="button" class="theme-cat-btn" data-cat="easter">🕊️ Páscoa (3)</button>
-                <button type="button" class="theme-cat-btn" data-cat="mothers">🌸 Mães (2)</button>
-                <button type="button" class="theme-cat-btn" data-cat="fathers">👔 Pais (2)</button>
-                <button type="button" class="theme-cat-btn" data-cat="extra">✨ Extras (4)</button>
+                <button type="button" class="theme-cat-btn" data-cat="inst">Institucional (4)</button>
+                <button type="button" class="theme-cat-btn" data-cat="health">Campanhas (3)</button>
+                <button type="button" class="theme-cat-btn" data-cat="soccer">Esportes (4)</button>
+                <button type="button" class="theme-cat-btn" data-cat="christmas">Natal (3)</button>
+                <button type="button" class="theme-cat-btn" data-cat="easter">Páscoa (3)</button>
+                <button type="button" class="theme-cat-btn" data-cat="mothers">Mães (2)</button>
+                <button type="button" class="theme-cat-btn" data-cat="fathers">Pais (2)</button>
+                <button type="button" class="theme-cat-btn" data-cat="extra">Extras (4)</button>
               </div>
 
+              <!-- GRADE DE TEMAS -->
               <div class="theme-selector-grid theme-gallery-scroll">
-                <!-- 🏛️ INSTITUCIONAL & PREFEITURA (4) -->
+                <!-- INSTITUCIONAL & PREFEITURA -->
                 <button type="button" class="theme-option-btn" data-theme="clean" data-cat="inst">
-                  <div class="theme-swatch swatch-clean">🏛️</div>
+                  <div class="theme-swatch swatch-clean"><span class="swatch-indicator">PRO</span></div>
                   <div class="theme-info">
                     <strong>Clean Dark Pro</strong>
                     <small>Prefeitura • Glass Moderno</small>
@@ -491,7 +651,7 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="inst-light" data-cat="inst">
-                  <div class="theme-swatch swatch-inst-light">📋</div>
+                  <div class="theme-swatch swatch-inst-light"><span class="swatch-indicator">PUB</span></div>
                   <div class="theme-info">
                     <strong>Clean Alabaster</strong>
                     <small>Institucional • Claro & Azul</small>
@@ -499,7 +659,7 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="inst-gold" data-cat="inst">
-                  <div class="theme-swatch swatch-inst-gold">👑</div>
+                  <div class="theme-swatch swatch-inst-gold"><span class="swatch-indicator">SOL</span></div>
                   <div class="theme-info">
                     <strong>Solene Black & Gold</strong>
                     <small>Cerimonial • Sessão Solene</small>
@@ -507,16 +667,16 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="civil-defense" data-cat="inst">
-                  <div class="theme-swatch swatch-civil-defense">🚨</div>
+                  <div class="theme-swatch swatch-civil-defense"><span class="swatch-indicator">DEF</span></div>
                   <div class="theme-info">
                     <strong>Defesa Civil & Alerta</strong>
                     <small>Utilidade Pública • Laranja</small>
                   </div>
                 </button>
 
-                <!-- 🎗️ CAMPANHAS DE SAÚDE & CONSCIENTIZAÇÃO (3) -->
+                <!-- CAMPANHAS DE SAÚDE -->
                 <button type="button" class="theme-option-btn" data-theme="october-pink" data-cat="health">
-                  <div class="theme-swatch swatch-october-pink">🎀</div>
+                  <div class="theme-swatch swatch-october-pink"><span class="swatch-indicator">OUT</span></div>
                   <div class="theme-info">
                     <strong>Outubro Rosa</strong>
                     <small>Saúde da Mulher • Prevenção</small>
@@ -524,7 +684,7 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="november-blue" data-cat="health">
-                  <div class="theme-swatch swatch-november-blue">💙</div>
+                  <div class="theme-swatch swatch-november-blue"><span class="swatch-indicator">NOV</span></div>
                   <div class="theme-info">
                     <strong>Novembro Azul</strong>
                     <small>Saúde do Homem • Cuidado</small>
@@ -532,16 +692,16 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="september-yellow" data-cat="health">
-                  <div class="theme-swatch swatch-september-yellow">💛</div>
+                  <div class="theme-swatch swatch-september-yellow"><span class="swatch-indicator">SET</span></div>
                   <div class="theme-info">
                     <strong>Setembro Amarelo</strong>
                     <small>Saúde & Vida • Vacinação</small>
                   </div>
                 </button>
 
-                <!-- 🚴⚽ ESPORTES, CICLISMO & LAZER (4) -->
+                <!-- ESPORTES & PASSEIOS -->
                 <button type="button" class="theme-option-btn" data-theme="cycling-tour" data-cat="soccer">
-                  <div class="theme-swatch swatch-cycling-tour">🚴</div>
+                  <div class="theme-swatch swatch-cycling-tour"><span class="swatch-indicator">PED</span></div>
                   <div class="theme-info">
                     <strong>Passeio Ciclístico</strong>
                     <small>Pedal Municipal • Verde</small>
@@ -549,7 +709,7 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="city-marathon" data-cat="soccer">
-                  <div class="theme-swatch swatch-city-marathon">🏃</div>
+                  <div class="theme-swatch swatch-city-marathon"><span class="swatch-indicator">COR</span></div>
                   <div class="theme-info">
                     <strong>Corrida & Movimento</strong>
                     <small>Esporte & Lazer • Energia</small>
@@ -557,7 +717,7 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="soccer-pitch" data-cat="soccer">
-                  <div class="theme-swatch swatch-soccer-pitch">⚽</div>
+                  <div class="theme-swatch swatch-soccer-pitch"><span class="swatch-indicator">FUT</span></div>
                   <div class="theme-info">
                     <strong>Arena Gramado</strong>
                     <small>Futebol • Campeonato</small>
@@ -565,16 +725,16 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="soccer-champion" data-cat="soccer">
-                  <div class="theme-swatch swatch-soccer-champion">🏆</div>
+                  <div class="theme-swatch swatch-soccer-champion"><span class="swatch-indicator">COP</span></div>
                   <div class="theme-info">
                     <strong>Noite de Copa</strong>
                     <small>Torneio • Azul Champions</small>
                   </div>
                 </button>
 
-                <!-- 🎄 NATAL (3) -->
+                <!-- NATAL MUNICIPAL -->
                 <button type="button" class="theme-option-btn active" data-theme="christmas" data-cat="christmas">
-                  <div class="theme-swatch swatch-christmas">🎄</div>
+                  <div class="theme-swatch swatch-christmas"><span class="swatch-indicator">NAT</span></div>
                   <div class="theme-info">
                     <strong>Natal Luz Municipal</strong>
                     <small>Natal • Rubi & Ouro</small>
@@ -582,7 +742,7 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="christmas-snow" data-cat="christmas">
-                  <div class="theme-swatch swatch-christmas-snow">❄️</div>
+                  <div class="theme-swatch swatch-christmas-snow"><span class="swatch-indicator">GEL</span></div>
                   <div class="theme-info">
                     <strong>Noite Feliz</strong>
                     <small>Natal • Azul Gelo & Prata</small>
@@ -590,16 +750,16 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="christmas-pine" data-cat="christmas">
-                  <div class="theme-swatch swatch-christmas-pine">🌲</div>
+                  <div class="theme-swatch swatch-christmas-pine"><span class="swatch-indicator">PIN</span></div>
                   <div class="theme-info">
                     <strong>Bosque Real</strong>
                     <small>Natal • Pinheiro & Ouro</small>
                   </div>
                 </button>
 
-                <!-- 🕊️ PÁSCOA (3) -->
+                <!-- PÁSCOA -->
                 <button type="button" class="theme-option-btn" data-theme="easter-resurrection" data-cat="easter">
-                  <div class="theme-swatch swatch-easter-res">🌅</div>
+                  <div class="theme-swatch swatch-easter-res"><span class="swatch-indicator">PAS</span></div>
                   <div class="theme-info">
                     <strong>Aurora de Páscoa</strong>
                     <small>Páscoa • Luz & Ouro</small>
@@ -607,7 +767,7 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="easter-royal" data-cat="easter">
-                  <div class="theme-swatch swatch-easter-royal">✨</div>
+                  <div class="theme-swatch swatch-easter-royal"><span class="swatch-indicator">IMP</span></div>
                   <div class="theme-info">
                     <strong>Páscoa Imperial</strong>
                     <small>Páscoa • Púrpura & Ouro</small>
@@ -615,16 +775,16 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="easter-olive" data-cat="easter">
-                  <div class="theme-swatch swatch-easter-olive">🌿</div>
+                  <div class="theme-swatch swatch-easter-olive"><span class="swatch-indicator">SAL</span></div>
                   <div class="theme-info">
                     <strong>Outono & Paz</strong>
                     <small>Páscoa • Verde Sálvia</small>
                   </div>
                 </button>
 
-                <!-- 🌸 DIA DAS MÃES (2) -->
+                <!-- MÃES -->
                 <button type="button" class="theme-option-btn" data-theme="mothers-rose" data-cat="mothers">
-                  <div class="theme-swatch swatch-mothers-rose">🌹</div>
+                  <div class="theme-swatch swatch-mothers-rose"><span class="swatch-indicator">MAE</span></div>
                   <div class="theme-info">
                     <strong>Jardim de Rosas</strong>
                     <small>Mães • Rubi Rosé & Blush</small>
@@ -632,16 +792,16 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="mothers-pearl" data-cat="mothers">
-                  <div class="theme-swatch swatch-mothers-pearl">🌸</div>
+                  <div class="theme-swatch swatch-mothers-pearl"><span class="swatch-indicator">PER</span></div>
                   <div class="theme-info">
                     <strong>Pérola & Afeto</strong>
                     <small>Mães • Creme & Coral</small>
                   </div>
                 </button>
 
-                <!-- 👔 DIA DOS PAIS (2) -->
+                <!-- PAIS -->
                 <button type="button" class="theme-option-btn" data-theme="fathers-navy" data-cat="fathers">
-                  <div class="theme-swatch swatch-fathers-navy">👔</div>
+                  <div class="theme-swatch swatch-fathers-navy"><span class="swatch-indicator">PAI</span></div>
                   <div class="theme-info">
                     <strong>Executivo Navy</strong>
                     <small>Pais • Azul Marinho & Aço</small>
@@ -649,16 +809,16 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="fathers-espresso" data-cat="fathers">
-                  <div class="theme-swatch swatch-fathers-espresso">🛡️</div>
+                  <div class="theme-swatch swatch-fathers-espresso"><span class="swatch-indicator">ESP</span></div>
                   <div class="theme-info">
                     <strong>Clássico Espresso</strong>
                     <small>Pais • Tabaco & Âmbar</small>
                   </div>
                 </button>
 
-                <!-- ✨ EXTRAS & FESTIVIDADES MUNICIPAIS (4) -->
+                <!-- EXTRAS & FESTIVIDADES -->
                 <button type="button" class="theme-option-btn" data-theme="new-year" data-cat="extra">
-                  <div class="theme-swatch swatch-new-year">🎆</div>
+                  <div class="theme-swatch swatch-new-year"><span class="swatch-indicator">REV</span></div>
                   <div class="theme-info">
                     <strong>Réveillon na Praça</strong>
                     <small>Ano Novo • Champanhe</small>
@@ -666,7 +826,7 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="youth-neon" data-cat="extra">
-                  <div class="theme-swatch swatch-youth-neon">⚡</div>
+                  <div class="theme-swatch swatch-youth-neon"><span class="swatch-indicator">CYB</span></div>
                   <div class="theme-info">
                     <strong>Festival & Podcast</strong>
                     <small>Cultura • Cyber Neon</small>
@@ -674,7 +834,7 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="junina-fest" data-cat="extra">
-                  <div class="theme-swatch swatch-junina">🔥</div>
+                  <div class="theme-swatch swatch-junina"><span class="swatch-indicator">FES</span></div>
                   <div class="theme-info">
                     <strong>Arraial Municipal</strong>
                     <small>Festa Junina • Terracota</small>
@@ -682,18 +842,18 @@
                 </button>
 
                 <button type="button" class="theme-option-btn" data-theme="custom" data-cat="extra">
-                  <div class="theme-swatch swatch-custom">🎨</div>
+                  <div class="theme-swatch swatch-custom"><span class="swatch-indicator">COR</span></div>
                   <div class="theme-info">
-                    <strong>Meu Tema Custom</strong>
-                    <small>Personalizado • Suas Cores</small>
+                    <strong>Tema Personalizado</strong>
+                    <small>Personalizado • Cores Próprias</small>
                   </div>
                 </button>
               </div>
 
-              <!-- Painel de Cores do 19º Tema (Visível ao escolher "Meu Tema Custom") -->
+              <!-- EDITOR DE CORES DO TEMA CUSTOM -->
               <div id="custom-theme-colors-box" class="custom-theme-colors-box is-hidden">
                 <div class="sizing-header">
-                  <strong>🎨 Cores do Meu Tema Personalizado</strong>
+                  <strong>Paleta do Tema Personalizado</strong>
                 </div>
                 <div class="color-pickers-grid">
                   <label class="color-picker-item">
@@ -713,147 +873,148 @@
                     <input type="color" id="color-custom-text" value="#f8fafc" />
                   </label>
                   <label class="color-picker-item">
-                    <span>Autor</span>
+                    <span>Autor / Fonte</span>
                     <input type="color" id="color-custom-author" value="#fde047" />
                   </label>
                 </div>
               </div>
             </div>
 
-            <div class="sizing-controls-box">
+            <!-- PROPORÇÕES DE TEXTO E CARD -->
+            <div class="sizing-controls-box" style="margin-top: 20px;">
               <div class="sizing-header">
-                <strong>Tamanho da Letra & Overlay</strong>
-                <button type="button" id="btn-reset-sizes" class="btn-reset-link" title="Restaurar para o tamanho padrão (100%)">
-                  ↺ Padrão (100%)
+                <strong>Dimensões & Tipografia</strong>
+                <button type="button" id="btn-reset-sizes" class="btn-reset-link" title="Restaurar proporções padrão (100%)">
+                  <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                  <span>Redefinir Padrões (100%)</span>
                 </button>
               </div>
 
-              <!-- Slider 1: Tamanho da Letra -->
               <div class="slider-control">
                 <div class="slider-label-row">
-                  <label for="setting-font-size">Tamanho da Letra (Texto & Autor)</label>
+                  <label for="setting-font-size">Tamanho da Fonte (Texto & Autor)</label>
                   <span id="label-font-size" class="slider-value-pill">100%</span>
                 </div>
-                <input
-                  type="range"
-                  id="setting-font-size"
-                  class="range-slider"
-                  min="65"
-                  max="175"
-                  step="5"
-                  value="100"
-                />
+                <input type="range" id="setting-font-size" class="range-slider" min="65" max="175" step="5" value="100" />
               </div>
 
-              <!-- Slider 2: Escala Geral do Card (Overlay) -->
               <div class="slider-control">
                 <div class="slider-label-row">
-                  <label for="setting-overlay-scale">Escala Geral do Card</label>
+                  <label for="setting-overlay-scale">Escala Geral do Card (Zoom)</label>
                   <span id="label-overlay-scale" class="slider-value-pill">100%</span>
                 </div>
-                <input
-                  type="range"
-                  id="setting-overlay-scale"
-                  class="range-slider"
-                  min="65"
-                  max="145"
-                  step="5"
-                  value="100"
-                />
+                <input type="range" id="setting-overlay-scale" class="range-slider" min="65" max="145" step="5" value="100" />
               </div>
 
-              <!-- Slider 3: Largura Máxima do Card -->
               <div class="slider-control">
                 <div class="slider-label-row">
                   <label for="setting-card-width">Largura Máxima do Card</label>
                   <span id="label-card-width" class="slider-value-pill">1020px</span>
                 </div>
-                <input
-                  type="range"
-                  id="setting-card-width"
-                  class="range-slider"
-                  min="520"
-                  max="1680"
-                  step="20"
-                  value="1020"
-                />
+                <input type="range" id="setting-card-width" class="range-slider" min="520" max="1680" step="20" value="1020" />
               </div>
-            </div>
 
-            <!-- Animação de Entrada e Logo Personalizado no Card (Fase 4) -->
-            <div class="sizing-controls-box">
-              <div class="form-group">
-                <label for="setting-animation-style">Estilo de Animação de Entrada / Saída</label>
+              <div class="form-group" style="margin-top: 14px;">
+                <label for="setting-animation-style">Estilo de Animação de Entrada e Saída</label>
                 <select id="setting-animation-style">
-                  <option value="slide-up">⬆️ Elevação Suave (Vertical Padrão)</option>
-                  <option value="slide-left">➡️ Deslizar da Esquerda</option>
-                  <option value="slide-right">⬅️ Deslizar da Direita</option>
-                  <option value="zoom">🔍 Expansão Central (Zoom)</option>
-                  <option value="fade">✨ Dissolver Suave (Fade)</option>
+                  <option value="slide-up">Elevação Suave (Vertical Padrão)</option>
+                  <option value="slide-left">Deslizar da Esquerda</option>
+                  <option value="slide-right">Deslizar da Direita</option>
+                  <option value="zoom">Expansão Central (Zoom)</option>
+                  <option value="fade">Dissolver Suave (Fade)</option>
                 </select>
-              </div>
-
-              <div class="logo-upload-row">
-                <div class="logo-upload-left">
-                  <label class="switch" title="Exibir ou ocultar o logo ao lado do texto no card">
-                    <input type="checkbox" id="toggle-show-logo" />
-                    <span class="slider"></span>
-                  </label>
-                  <div>
-                    <strong class="logo-title">Logo / Ícone no Card</strong>
-                    <small class="logo-subtitle">Exibe sua marca (PNG/SVG) ao lado da frase</small>
-                  </div>
-                </div>
-                <div class="logo-upload-actions">
-                  <button type="button" id="btn-upload-logo" class="btn btn-sm btn-secondary">
-                    <span>🖼️ Enviar Logo</span>
-                  </button>
-                  <button type="button" id="btn-remove-logo" class="btn btn-sm btn-ghost is-hidden" title="Remover logo enviado">
-                    <span>🗑️</span>
-                  </button>
-                  <input type="file" id="input-logo-file" accept="image/*" class="is-hidden" />
-                </div>
               </div>
             </div>
           </div>
+        </section>
 
-          <!-- ABA 2: MAPA VISUAL DE POSIÇÃO & RESOLUÇÃO DO OBS -->
-          <div id="tab-screen" class="tab-pane">
-            <div class="form-group">
-              <label>Ancoragem do Card na Tela (Clique no Quadrante)</label>
+        <!-- SEÇÃO 3: PALCO OBS, POSIÇÃO & MODOS DE EXIBIÇÃO -->
+        <section class="settings-section-card">
+          <div class="section-card-header">
+            <div class="section-card-icon">
+              <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+            </div>
+            <div>
+              <h2>Palco OBS, Posição & Modos de Exibição</h2>
+              <p>URL da fonte de navegador, mapa de ancoragem na tela e resoluções de transmissão.</p>
+            </div>
+          </div>
+
+          <div class="section-card-body">
+            <!-- URL DO OBS BROWSER SOURCE -->
+            <div class="obs-url-box settings-obs-box">
+              <div class="obs-url-info">
+                <span class="obs-url-label">Link para Fonte de Navegador do OBS:</span>
+                <code id="obs-url-display">http://localhost:3000/overlay</code>
+              </div>
+              <div class="obs-url-btns">
+                <button type="button" id="btn-copy-url" class="btn btn-sm btn-secondary" title="Copiar link para o OBS">
+                  <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  <span>Copiar URL</span>
+                </button>
+                <a href="/overlay" target="_blank" class="btn btn-sm btn-ghost" title="Abrir Overlay em nova aba">
+                  <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  <span>Abrir em Nova Aba</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- MODO DE EXIBIÇÃO -->
+            <div class="form-group" style="margin-top: 18px;">
+              <label for="setting-display-mode">Modo de Exibição Principal no OBS</label>
+              <select id="setting-display-mode">
+                <option value="card">Card Flutuante Individual (Padrão para frases e recados)</option>
+                <option value="ticker">Faixa Ticker Deslizante de Rodapé (Letreiro Contínuo de Notícias)</option>
+              </select>
+            </div>
+
+            <div id="ticker-speed-box" class="form-row is-hidden">
+              <div class="form-group flex-grow">
+                <label for="setting-ticker-speed">Velocidade do Letreiro Ticker (segundos por volta completa)</label>
+                <small class="field-help">Menor valor = velocidade mais rápida | Maior valor = leitura mais pausada</small>
+              </div>
+              <div class="form-group" style="width: 110px;">
+                <input type="number" id="setting-ticker-speed" min="8" max="180" value="32" />
+              </div>
+            </div>
+
+            <!-- MAPA DE ANCORAGEM (6 POSIÇÕES) -->
+            <div class="form-group" style="margin-top: 18px;">
+              <label>Ancoragem do Card no Palco (Clique para Definir a Posição)</label>
               <div class="screen-map-box">
                 <div class="position-grid">
                   <button type="button" class="pos-btn" data-pos="top-left">
                     <span class="pos-dot"></span>
-                    <span>Sup. Esq.</span>
+                    <span>Superior Esquerdo</span>
                   </button>
                   <button type="button" class="pos-btn" data-pos="top-center">
                     <span class="pos-dot"></span>
-                    <span>Sup. Centro</span>
+                    <span>Superior Centro</span>
                   </button>
                   <button type="button" class="pos-btn" data-pos="top-right">
                     <span class="pos-dot"></span>
-                    <span>Sup. Dir.</span>
+                    <span>Superior Direito</span>
                   </button>
                   <button type="button" class="pos-btn active" data-pos="bottom-left">
                     <span class="pos-dot"></span>
-                    <span>Inf. Esq.</span>
+                    <span>Inferior Esquerdo</span>
                   </button>
                   <button type="button" class="pos-btn" data-pos="bottom-center">
                     <span class="pos-dot"></span>
-                    <span>Inf. Centro</span>
+                    <span>Inferior Centro</span>
                   </button>
                   <button type="button" class="pos-btn" data-pos="bottom-right">
                     <span class="pos-dot"></span>
-                    <span>Inf. Dir.</span>
+                    <span>Inferior Direito</span>
                   </button>
                 </div>
               </div>
             </div>
 
-            <div class="sizing-controls-box">
+            <!-- RESOLUÇÃO DO PALCO -->
+            <div class="sizing-controls-box" style="margin-top: 18px;">
               <div class="sizing-header">
-                <strong>Resolução do Palco (OBS Browser Source)</strong>
+                <strong>Resolução do Palco OBS (Largura × Altura)</strong>
               </div>
 
               <div class="res-presets-grid">
@@ -890,136 +1051,201 @@
               </div>
             </div>
           </div>
+        </section>
 
-          <!-- ABA 3: AUTOMAÇÃO & TEMPOS -->
-          <div id="tab-timing" class="tab-pane">
-            <div class="settings-stack">
-              <div class="form-group">
-                <label for="setting-display-mode">Modo de Exibição Principal no OBS (Fase 5)</label>
-                <select id="setting-display-mode">
-                  <option value="card">🗂️ Card Flutuante Individual (Padrão)</option>
-                  <option value="ticker">📰 Faixa Ticker Deslizante de Rodapé (Letreiro Contínuo)</option>
-                </select>
-              </div>
-
-              <div id="ticker-speed-box" class="form-row is-hidden">
-                <div class="form-group flex-grow">
-                  <label for="setting-ticker-speed">Velocidade do Letreiro Ticker (seg por volta)</label>
-                  <small class="field-help">Menor valor = mais rápido | Maior valor = mais lento</small>
-                </div>
-                <div class="form-group" style="width: 90px;">
-                  <input type="number" id="setting-ticker-speed" min="8" max="180" value="32">
-                </div>
-              </div>
-
-              <hr class="divider" />
-
-              <div class="setting-item-toggle">
-                <div>
-                  <strong>Rotação Automática (Carrossel)</strong>
-                  <small>Alterna sozinho entre as frases fixas do sistema quando não há fila do público</small>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" id="toggle-auto-rotate" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-
-              <div class="setting-item-toggle">
-                <div>
-                  <strong>Mostrar Barra de Progresso</strong>
-                  <small>Linha animada na base do card mostrando o tempo restante de exibição</small>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" id="toggle-show-progress" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-
-              <div class="setting-item-toggle">
-                <div>
-                  <strong>Mostrar Etiqueta no Topo do Card</strong>
-                  <small>Exibe o selo identificador acima da frase (ex: Mensagem do Público)</small>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" id="toggle-show-kicker" checked>
-                  <span class="slider"></span>
-                </label>
-              </div>
-
-              <div class="form-group">
-                <label for="setting-default-kicker">Texto Padrão da Etiqueta da Fila do Público</label>
-                <input
-                  type="text"
-                  id="setting-default-kicker"
-                  placeholder="Ex: MENSAGEM DO PÚBLICO"
-                  value="MENSAGEM DO PÚBLICO"
-                />
-              </div>
-
-              <hr class="divider" />
-
-              <div class="form-row">
-                <div class="form-group flex-grow">
-                  <label for="setting-interval">Intervalo entre frases (seg)</label>
-                  <small class="field-help">Tempo oculto entre uma frase e a próxima (0 = troca direta)</small>
-                </div>
-                <div class="form-group" style="width: 90px;">
-                  <input type="number" id="setting-interval" min="0" max="120" value="4">
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group flex-grow">
-                  <label for="setting-default-duration">Tempo padrão de novas frases (seg)</label>
-                  <small class="field-help">Valor preenchido automaticamente nos formulários</small>
-                </div>
-                <div class="form-group" style="width: 90px;">
-                  <input type="number" id="setting-default-duration" min="2" max="120" value="10">
-                </div>
-              </div>
-
-              <hr class="divider" />
-
-              <!-- Guia Visual de Atalhos de Teclado (Fase 6) -->
-              <div class="shortcuts-guide-box">
-                <strong>⌨️ Atalhos Rápidos de Teclado (Estúdio Ao Vivo)</strong>
-                <div class="shortcuts-grid">
-                  <div class="shortcut-item"><kbd>Alt + A</kbd> <span>NO AR / OCULTO</span></div>
-                  <div class="shortcut-item"><kbd>Alt + N</kbd> <span>Próxima Frase</span></div>
-                  <div class="shortcut-item"><kbd>Alt + C</kbd> <span>Recolher Card</span></div>
-                  <div class="shortcut-item"><kbd>Alt + I</kbd> <span>Iniciar Fila do Público</span></div>
-                  <div class="shortcut-item"><kbd>Alt + L</kbd> <span>Ocultar Tarja Lower Third</span></div>
-                  <div class="shortcut-item"><kbd>Ctrl + Enter</kbd> <span>Enviar Frase do Campo</span></div>
-                </div>
-              </div>
+        <!-- SEÇÃO 4: AUTOMAÇÃO, TEMPORIZAÇÃO & ETIQUETAS -->
+        <section class="settings-section-card">
+          <div class="section-card-header">
+            <div class="section-card-icon">
+              <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div>
+              <h2>Automação, Temporização & Etiquetas</h2>
+              <p>Controles de rotação automática, durações de tela e comportamento das mensagens.</p>
             </div>
           </div>
 
+          <div class="section-card-body">
+            <div class="setting-item-toggle">
+              <div>
+                <strong>Rotação Automática do Carrossel</strong>
+                <small>Alterna sozinho entre as mensagens da pauta quando a fila do cidadão não estiver em exibição</small>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-auto-rotate" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item-toggle">
+              <div>
+                <strong>Exibir Barra Animada de Progresso</strong>
+                <small>Linha luminosa na base do card indicando o tempo restante da frase no ar</small>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-show-progress" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item-toggle">
+              <div>
+                <strong>Exibir Etiqueta no Topo do Card</strong>
+                <small>Selo institucional exibido acima do texto (ex: Mensagem do Cidadão, Informativo)</small>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-show-kicker" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item-toggle">
+              <div>
+                <strong>Modo Compacto nas Listas de Frases</strong>
+                <small>Reduz o espaçamento vertical dos itens para visualizar mais recados sem rolagem</small>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-compact-lists" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="form-group" style="margin-top: 14px;">
+              <label for="setting-default-kicker">Texto Padrão da Etiqueta da Fila do Cidadão</label>
+              <input
+                type="text"
+                id="setting-default-kicker"
+                placeholder="Ex: MENSAGEM DO CIDADÃO"
+                value="MENSAGEM DO CIDADÃO"
+              />
+            </div>
+
+            <div class="form-row" style="margin-top: 14px;">
+              <div class="form-group flex-grow">
+                <label for="setting-interval">Intervalo entre Frases (seg)</label>
+                <small class="field-help">Tempo oculto entre uma frase e a próxima (0 = troca contínua)</small>
+              </div>
+              <div class="form-group" style="width: 100px;">
+                <input type="number" id="setting-interval" min="0" max="120" value="4" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-grow">
+                <label for="setting-default-duration">Tempo Padrão de Novas Frases (seg)</label>
+                <small class="field-help">Duração pré-preenchida ao criar mensagens</small>
+              </div>
+              <div class="form-group" style="width: 100px;">
+                <input type="number" id="setting-default-duration" min="2" max="120" value="10" />
+              </div>
+            </div>
+          </div>
         </section>
 
-      </aside>
+        <!-- SEÇÃO 5: REDE LOCAL, BACKUP JSON & DIAGNÓSTICO -->
+        <section class="settings-section-card">
+          <div class="section-card-header">
+            <div class="section-card-icon">
+              <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+            </div>
+            <div>
+              <h2>Rede Local, Backup & Manutenção</h2>
+              <p>Exportação e restauração de dados, diagnóstico da rede local e atalhos rápidos de teclado.</p>
+            </div>
+          </div>
 
+          <div class="section-card-body">
+            <!-- DIAGNÓSTICO DE REDE LOCAL -->
+            <div class="sub-panel-card">
+              <strong>Diagnóstico de Rede Local (Para Celular e Tablet)</strong>
+              <p class="field-help">Dispositivos conectados na mesma rede Wi-Fi podem acessar o painel pelos links abaixo:</p>
+              <div class="network-links-grid">
+                <div class="network-link-item">
+                  <span class="network-link-tag">Modo Recepção (Celular da Equipe):</span>
+                  <code id="diag-url-reception">http://localhost:3000/?mode=recepcao</code>
+                </div>
+                <div class="network-link-item">
+                  <span class="network-link-tag">Painel Completo de Estúdio:</span>
+                  <code id="diag-url-full">http://localhost:3000</code>
+                </div>
+              </div>
+            </div>
+
+            <!-- BACKUP E RESTAURAÇÃO -->
+            <div class="backup-actions-grid" style="margin-top: 18px;">
+              <div class="backup-action-card">
+                <strong>Exportar Backup Geral (.json)</strong>
+                <small>Salva todas as playlists, frases, recados e configurações em um arquivo portátil</small>
+                <button type="button" id="btn-export-backup" class="btn btn-secondary btn-sm" style="margin-top: 10px;">
+                  <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>Baixar Arquivo JSON</span>
+                </button>
+              </div>
+
+              <div class="backup-action-card">
+                <strong>Restaurar / Importar Backup (.json)</strong>
+                <small>Restaura todo o banco de dados a partir de um arquivo previamente exportado</small>
+                <button type="button" id="btn-import-backup" class="btn btn-ghost btn-sm" style="margin-top: 10px;">
+                  <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  <span>Selecionar Arquivo JSON</span>
+                </button>
+                <input type="file" id="input-import-json" accept=".json,application/json" class="is-hidden" />
+              </div>
+            </div>
+
+            <!-- RESTAURAÇÃO DE PADRÕES -->
+            <div class="maintenance-danger-zone" style="margin-top: 18px;">
+              <div>
+                <strong>Restaurar Configurações Visuais de Fábrica</strong>
+                <small>Redefine temas, proporções e resoluções para o padrão 1080p sem apagar suas playlists</small>
+              </div>
+              <button type="button" id="btn-reset-defaults" class="btn btn-danger btn-sm">
+                <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                <span>Restaurar Padrões</span>
+              </button>
+            </div>
+
+            <!-- GUIA DE ATALHOS DE TECLADO -->
+            <div class="shortcuts-guide-box" style="margin-top: 20px;">
+              <strong>Atalhos Rápidos de Teclado (Estúdio Ao Vivo)</strong>
+              <div class="shortcuts-grid">
+                <div class="shortcut-item"><kbd>Alt + A</kbd> <span>Alternar NO AR / OCULTO</span></div>
+                <div class="shortcut-item"><kbd>Alt + O</kbd> <span>Abrir Operação Ao Vivo</span></div>
+                <div class="shortcut-item"><kbd>Alt + S</kbd> <span>Abrir Configurações</span></div>
+                <div class="shortcut-item"><kbd>Alt + N</kbd> <span>Próxima Frase</span></div>
+                <div class="shortcut-item"><kbd>Alt + C</kbd> <span>Recolher Card do Ar</span></div>
+                <div class="shortcut-item"><kbd>Alt + I</kbd> <span>Iniciar Fila do Cidadão</span></div>
+                <div class="shortcut-item"><kbd>Alt + L</kbd> <span>Ocultar Tarja Lower Third</span></div>
+                <div class="shortcut-item"><kbd>Ctrl + Enter</kbd> <span>Enviar Formulário</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
     </main>
+
   </div>
 
   <!-- MODAL DE EDIÇÃO RÁPIDA DE FRASE (PÚBLICO OU CARROSSEL) -->
   <div id="edit-modal" class="modal-backdrop is-hidden">
     <div class="modal-box">
       <div class="modal-header">
-        <h3 id="edit-modal-title">Editar Frase</h3>
-        <button type="button" id="btn-close-modal" class="btn-icon">✕</button>
+        <h3 id="edit-modal-title">Editar Mensagem</h3>
+        <button type="button" id="btn-close-modal" class="btn-icon" title="Fechar">
+          <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
       <form id="form-edit-phrase">
         <input type="hidden" id="edit-id">
         <input type="hidden" id="edit-source" value="system">
         <div class="form-group">
-          <label for="edit-text">Frase / Mensagem</label>
+          <label for="edit-text">Texto da Mensagem</label>
           <textarea id="edit-text" rows="3" required></textarea>
         </div>
         <div class="form-row">
           <div class="form-group flex-grow">
-            <label for="edit-author">Autor / Remetente (opcional)</label>
+            <label for="edit-author">Autor / Secretaria / Bairro (opcional)</label>
             <input type="text" id="edit-author">
           </div>
           <div class="form-group kicker-group">
@@ -1043,23 +1269,25 @@
   <div id="playlist-modal" class="modal-backdrop is-hidden">
     <div class="modal-box">
       <div class="modal-header">
-        <h3 id="playlist-modal-title">Nova Playlist de Evento</h3>
-        <button type="button" id="btn-close-playlist-modal" class="btn-icon">✕</button>
+        <h3 id="playlist-modal-title">Nova Pauta de Evento</h3>
+        <button type="button" id="btn-close-playlist-modal" class="btn-icon" title="Fechar">
+          <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
       <form id="form-playlist-modal">
         <input type="hidden" id="playlist-modal-mode" value="create">
         <div class="form-group">
-          <label for="playlist-modal-name">Nome da Playlist / Evento <span class="req">*</span></label>
+          <label for="playlist-modal-name">Nome da Pauta / Solenidade / Evento <span class="req">*</span></label>
           <input
             type="text"
             id="playlist-modal-name"
-            placeholder="Ex: 🏛️ Audiência Pública, 🚴 Passeio Ciclístico, 🎀 Outubro Rosa..."
+            placeholder="Ex: Audiência Pública, Solenidade Oficial, Passeio Ciclístico..."
             required
           />
         </div>
         <div class="modal-footer">
           <button type="button" id="btn-cancel-playlist-modal" class="btn btn-ghost">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Salvar Playlist</button>
+          <button type="submit" class="btn btn-primary">Salvar Pauta</button>
         </div>
       </form>
     </div>
@@ -1069,26 +1297,31 @@
   <div id="mobile-qr-modal" class="modal-backdrop is-hidden">
     <div class="modal-box modal-qr-box">
       <div class="modal-header">
-        <h3>📱 Controle Remoto pelo Celular / Tablet</h3>
-        <button type="button" id="btn-close-qr-modal" class="btn-icon">✕</button>
+        <div class="title-with-badge">
+          <svg class="icon-svg" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+          <h3>Acesso Remoto via Celular ou Tablet</h3>
+        </div>
+        <button type="button" id="btn-close-qr-modal" class="btn-icon" title="Fechar">
+          <svg class="icon-svg icon-xs" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
       <p class="field-help">
-        Conecte o celular na <strong>mesma rede Wi-Fi</strong> deste computador e aponte a câmera para um dos QR Codes abaixo:
+        Conecte o smartphone ou tablet na <strong>mesma rede Wi-Fi</strong> deste computador e aponte a câmera para um dos QR Codes:
       </p>
 
       <div class="qr-cards-grid">
         <div class="qr-card-option highlight">
-          <span class="qr-badge">RECOMENDADO PARA EQUIPE</span>
-          <h4>🙋 Modo Recepção (Fila do Público)</h4>
-          <p>Tela limpa e otimizada para cadastrar mensagens da live pelo celular sem risco de esbarrar nas configurações.</p>
+          <span class="qr-badge">EQUIPE DE TRIAGEM / RECEPÇÃO</span>
+          <h4>Modo Recepção (Fila do Cidadão)</h4>
+          <p>Visão simplificada para cadastrar mensagens da população durante o evento sem risco de alterar as configurações de cena.</p>
           <div id="qr-svg-reception" class="qr-svg-container"></div>
           <code id="qr-url-reception" class="qr-url-code">http://localhost:3000/?mode=recepcao</code>
         </div>
 
         <div class="qr-card-option">
           <span class="qr-badge subtle">OPERADOR PRINCIPAL</span>
-          <h4>🎛️ Painel de Estúdio Completo</h4>
-          <p>Acesso integral à Fila do Público, Carrossel, Playlists, Temas e Configurações de Transmissão.</p>
+          <h4>Painel de Transmissão Completo</h4>
+          <p>Acesso integral à Fila do Cidadão, Pautas de Avisos, Tarjas Lower Third, Preview e Configurações de Palco.</p>
           <div id="qr-svg-full" class="qr-svg-container"></div>
           <code id="qr-url-full" class="qr-url-code">http://localhost:3000</code>
         </div>
