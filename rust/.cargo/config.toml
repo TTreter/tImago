@@ -1,0 +1,7 @@
+# Toolchain `x86_64-pc-windows-gnu` do rustup, sem MinGW/MSVC instalados:
+# linka direto com o `rust-lld` que acompanha o Rust. O `ld.bfd` embutido não
+# entende as import libraries geradas pelo `llvm-dlltool` (ver build.ps1) e
+# produz um executável que trava ao iniciar.
+[target.x86_64-pc-windows-gnu]
+linker = "rust-lld"
+rustflags = ["-C", "linker-flavor=ld.lld"]

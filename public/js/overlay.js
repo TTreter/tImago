@@ -170,7 +170,8 @@
     }
 
     // Posição
-    const rawPos = settings.overlayStyle?.position || settings.position;
+    // Os botões de posição do painel gravam settings.position; overlayStyle.position é só legado
+    const rawPos = settings.position || settings.overlayStyle?.position;
     const pos = VALID_POSITIONS.includes(rawPos) ? rawPos : 'bottom-left';
     if (pos !== _lastAppliedPos) {
       VALID_POSITIONS.forEach((p) => stageEl.classList.remove(`pos-${p}`));

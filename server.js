@@ -113,7 +113,7 @@ const defaultState = {
       lockoutMinutes: 5
     },
     overlayStyle: {
-      theme: 'modern',
+      theme: '',
       position: 'bottom-left',
       safeArea: 'standard',
       showClock: true

@@ -50,6 +50,34 @@ Ideal para **Assessorias de Comunicação (ASCOM) de Prefeituras Municipais**, t
 
 ---
 
+## 🦀 Edição Rust (leve)
+
+A pasta [`rust/`](rust/) contém a reescrita nativa do tImago: um único executável (~3 MB) que substitui o Electron + Node.js. O painel, o overlay e o protocolo Socket.IO são os mesmos (`public/` é embutido no executável) e o `state.json` em `%APPDATA%	Imago\data` é compatível nos dois sentidos.
+
+| | Electron (v1.5.1) | Rust |
+|---|---|---|
+| Instalador | 75 MB | 1,2 MB |
+| Instalado em disco | ~262 MB | ~3,3 MB |
+| Runtime da interface | Chromium embutido | WebView2 do Windows |
+
+- **Servidor**: `axum` + `socketioxide` (compatível com o cliente oficial do Socket.IO), mDNS `timago.local`, PIN, atualizador via GitHub Releases.
+- **Desktop**: `tao` + `wry` (WebView2), SplashScreen, bandeja do sistema, iniciar com o Windows, instância única.
+- **Requisito**: WebView2 Runtime (já incluso no Windows 10/11 atualizados).
+
+```powershell
+cd rust
+.uild.ps1              # release + dist-rust	Imago-Portable-x.y.z.zip
+.uild.ps1 -Installer   # idem + dist-rust	Imago-Setup-x.y.z.exe (NSIS)
+.uild.ps1 -Dev         # build de desenvolvimento
+```
+
+- `tImago.exe` — aplicativo desktop.
+- `tImago.exe --headless` — somente o servidor (equivale ao `npm start`). Variáveis: `PORT`, `TIMAGO_DATA_DIR`.
+
+O `build.ps1` funciona com o toolchain `x86_64-pc-windows-gnu` do rustup sem MinGW/MSVC instalados (usa `llvm-tools` + `rust-lld`); nesse toolchain o `WebView2Loader.dll` é distribuído ao lado do executável.
+
+---
+
 ## 🚀 Como Usar
 
 ### Opção 1: Aplicativo Executável Windows (`.exe`)

@@ -12,3 +12,7 @@ planejamento/
 npm-debug.log*
 .DS_Store
 Thumbs.db
+
+# Edição Rust
+rust/target/
+dist-rust/

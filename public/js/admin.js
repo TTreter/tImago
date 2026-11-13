@@ -272,6 +272,13 @@
     'custom': 'Tema Personalizado'
   };
 
+  // A Galeria de Temas e os Temas Broadcast disputam o mesmo visual do card:
+  // vale o último escolhido. Escolher um tema da galeria limpa o tema broadcast
+  // (overlayStyle.theme), que senão teria precedência no overlay.
+  function emitGalleryTheme(theme) {
+    socket.emit('settings:update', { theme, overlayStyle: { theme: '' } });
+  }
+
   if (quickThemeSelect) {
     Object.entries(THEME_NAMES).forEach(([key, label]) => {
       const opt = document.createElement('option');
@@ -280,7 +287,7 @@
       quickThemeSelect.appendChild(opt);
     });
     quickThemeSelect.addEventListener('change', () => {
-      socket.emit('settings:update', { theme: quickThemeSelect.value });
+      emitGalleryTheme(quickThemeSelect.value);
     });
   }
 
@@ -415,7 +422,7 @@
     }
 
     themeBtns.forEach((btn) => {
-      const isAct = btn.dataset.theme === settings.theme;
+      const isAct = !settings.overlayStyle?.theme && btn.dataset.theme === settings.theme;
       btn.classList.toggle('active', isAct);
       if (isAct && activeThemeNamePill) {
         const strongEl = btn.querySelector('.theme-info strong');
@@ -1200,7 +1207,7 @@
   // Controles de Tema, Posição e Configurações
   themeBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      socket.emit('settings:update', { theme: btn.dataset.theme });
+      emitGalleryTheme(btn.dataset.theme);
     });
   });
 
@@ -2507,7 +2514,7 @@
   const safeAreaButtons = document.querySelectorAll('.btn-safe-area');
 
   function renderBroadcastThemeControls(overlayStyle) {
-    const theme = overlayStyle?.theme || 'modern';
+    const theme = overlayStyle?.theme || '';
     const safe = overlayStyle?.safeArea || 'standard';
 
     bcastThemeCards.forEach((card) => {

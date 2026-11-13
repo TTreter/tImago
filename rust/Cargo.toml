@@ -1,0 +1,45 @@
+[package]
+name = "timago"
+version = "2.0.0"
+edition = "2021"
+description = "tImago — Sistema de Controle de Overlay em Tempo Real para OBS Studio"
+authors = ["Tiago Treter (TTreter)"]
+license = "MIT"
+
+[[bin]]
+name = "tImago"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "time", "sync", "fs", "io-util", "signal"] }
+axum = { version = "0.8", default-features = false, features = ["http1", "tokio", "json"] }
+socketioxide = "0.18"
+serde_json = { version = "1", features = ["preserve_order"] }
+parking_lot = "0.12"
+rust-embed = "8"
+mime_guess = "2"
+sha2 = "0.10"
+rand = "0.9"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+socket2 = "0.6"
+network-interface = "2"
+mdns-sd = "0.21"
+reqwest = { version = "0.13", default-features = false, features = ["native-tls", "stream", "json"] }
+futures-util = "0.3"
+
+# Casca desktop (janela nativa WebView2, bandeja, diálogos)
+tao = "0.37"
+wry = "0.57"
+tray-icon = "0.26"
+png = "0.18"
+rfd = { version = "0.18", default-features = false }
+open = "5"
+tauri-winrt-notification = "0.8"
+winreg = "0.56"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
